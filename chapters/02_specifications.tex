@@ -62,16 +62,6 @@ Abnormal, $V_\mathrm{abn}$              & \SI{1000}{\volt} & withstand with the 
 \end{tabularx}
 \end{table}
 
-\begin{figure}[htbp]
-\centering
-\input{figures/tikz/tensioni}
-\caption{The bus voltage levels of \cref{tab:vhierarchy} against the
-\SI{1200}{\volt} rating of the device: the \SI{130}{\volt} between the
-overvoltage trip and the \SI{90}{\percent} limit at the die is all the
-switching overshoot may use (criterion C2).}
-\label{fig:vhierarchy}
-\end{figure}
-
 Two derating rules are applied to the \SI{1200}{\volt} devices. In steady
 state the blocking voltage stays below \SI{80}{\percent} of the rating at
 $V_\mathrm{max,cont}$: $900/1200 = \SI{75}{\percent}$. During switching the
@@ -124,7 +114,6 @@ Device voltage class   & \SI{1200}{\volt} & \SI{650}{\volt} & \SI{650}{\volt} / 
 Output voltage levels  & 3 (line: 5) & 5 & 5 \\
 Output harmonic content & highest & lower & lower \\
 Gate drive channels    & \textbf{6} & 12 & 12 \\
-Isolated supplies      & \textbf{6} & 12 & 12 \\
 Commutation loop       & \textbf{one per leg} & multiple, asymmetric & multiple \\
 Neutral-point balancing & \textbf{not required} & required & required \\
 \bottomrule
@@ -141,23 +130,16 @@ the body diodes, since no external diode is fitted.}
 \label{fig:vsi}
 \end{figure}
 
-The two-level bridge is chosen (\cref{fig:vsi}), because with silicon carbide
-devices the main reasons for going multilevel largely disappear.
-
-Multilevel topologies exist to reduce the voltage step seen by the output
-filter and to allow lower-voltage, faster devices to be used at high bus
-voltages. With a \SI{1200}{\volt} SiC MOSFET the second reason is void: the
-device is already fast enough to switch \SI{800}{\volt} at \SI{20}{\kilo\hertz}
-with acceptable losses, as \cref{ch:losses} shows. The first reason remains
-real, but it is paid for with twice the devices, twice the gate drives, twice
-the isolated supplies, and a neutral-point balancing problem that has to be
-solved in the control software.
-
-For a converter of this rating the two-level bridge has one more advantage:
-\emph{one commutation loop per leg}, geometrically simple and short.
-\Cref{ch:layout} shows that loop inductance is the binding constraint of the
-entire layout, and several asymmetric commutation loops would make it harder
-to satisfy.
+The two-level bridge is chosen (\cref{fig:vsi}). Multilevel topologies exist
+to reduce the voltage step seen by the output filter and to allow
+lower-voltage, faster devices at high bus voltages. With a \SI{1200}{\volt}
+SiC MOSFET the second reason is void: the device is fast enough to switch
+\SI{800}{\volt} at \SI{20}{\kilo\hertz} with acceptable losses
+(\cref{ch:losses}). The first remains real, but it costs twice the devices
+and gate drives and a neutral-point balancing problem in the control
+software. The two-level bridge also has \emph{one commutation loop per
+leg}, geometrically simple and short; \cref{ch:layout} shows that loop
+inductance is the binding constraint of the layout.
 
 \subsection{Why silicon carbide}
 
@@ -198,20 +180,17 @@ better matched to a traction duty cycle, where the converter spends most of
 its life well below rated current, where an IGBT still pays its
 saturation-voltage offset in full.
 
-The price is paid at the gate. A SiC MOSFET has a low threshold voltage with
-a negative temperature coefficient, a small gate-charge, and switching edges
-measured in nanoseconds; all of this makes the gate loop and the commutation
-loop design critical rather than routine. The gate resistances and the dead
-time of \cref{ch:losses} and the layout of \cref{ch:layout} are, to a large
-extent, the consequence of this choice.
+The price is paid at the gate: a low threshold voltage with a negative
+temperature coefficient and edges measured in nanoseconds make the gate loop
+and the commutation loop critical. The gate resistances and the dead time of
+\cref{ch:losses} and the layout of \cref{ch:layout} follow from it.
 
 \section{Device selection}
 \label{sec:deviceselection}
 
-The device was chosen by a comparison set up so that it could be defended:
-the pass/fail criteria were fixed
-\emph{before} any result was computed, and every candidate went through the
-same model, the same load and the same thermal loop.
+The pass/fail criteria were fixed \emph{before} any result was computed, and
+every candidate went through the same model, the same load and the same
+thermal loop.
 
 \subsection{Criteria, fixed before the results}
 
@@ -249,8 +228,7 @@ C5 & Declared short-circuit withstand $t_\mathrm{SC} \geq \SI{1.5}{\micro\second
 
 \subsection{Candidates and results}
 
-\Cref{fig:selection} summarises the outcome before the detail of
-\cref{tab:selection}. Candidates were taken in the \SI{1200}{\volt} TO-247-4L class from two
+Candidates were taken in the \SI{1200}{\volt} TO-247-4L class from two
 manufacturers (Wolfspeed~\cite{wolfspeed_e3m0040,wolfspeed_e3m0021,wolfspeed_e3m0016},
 Infineon~\cite{infineon_aimzh040,infineon_aimzh020}), plus a paralleled pair,
 a top-side-cooled package~\cite{wolfspeed_e3m0032u2} and two
@@ -260,16 +238,6 @@ checked value by value against the vendor's own converted file; the Infineon
 ones were built from the datasheet graphs, since the vendor distributes them
 only through a registered tool. C2 was simulated with the vendor SPICE
 models, which exist for Wolfspeed and not, publicly, for Infineon.
-
-\begin{figure}[htbp]
-\centering
-\input{figures/tikz/selezione}
-\caption{Selection at a glance: every candidate against the criteria that decided
-it. The two that survive each leave one criterion undemonstrated, and not
-the same one; C3, the creepage on the board, is met by all and does not
-discriminate.}
-\label{fig:selection}
-\end{figure}
 
 \begin{table}[htbp]
 \centering
@@ -388,20 +356,15 @@ criterion that can be computed is computed with the manufacturer's own
 models (thermal description and SPICE model alike), and the gate drive,
 the footprint and the protection concept carry over unchanged.
 
-One specific bench test would reverse the choice: a
-double pulse on the AIMZH120R020M1T in the real power loop, at
-\SI{950}{\volt}, \SI{60}{\ampere} and a case temperature of
-\SI{175}{\celsius}, sweeping the gate resistance across the window of
-\cref{tab:selection}. The drain voltage is measured at the pins, so the
-pass mark is \SI{1080}{\volt} less the package drop, about
-\SI{25}{\volt} at \SI{20}{\nano\henry} (\cref{tab:overshoot}). If it passes
-at a gate resistance inside the window, the thermal result holds, and the
-Infineon device is then the better choice on every remaining criterion. The missing
-$t_\mathrm{SC}$ is recorded as a residual risk in \cref{app:assumptions}.
-The Infineon device remains the documented alternative: lower losses and a
-declared $t_\mathrm{SC}$, at the price of a gate supply at \SI{+20}{\volt},
-loss tables built by hand and an overshoot figure that exists only after a
-bench test.
+One measurement would reverse the choice: a double pulse on the
+AIMZH120R020M1T in the real power loop that keeps the die below
+\SI{1080}{\volt} at a gate resistance inside the window of
+\cref{tab:selection}. The Infineon device remains the documented
+alternative: lower losses and a declared $t_\mathrm{SC}$, at the price of a
+gate supply at \SI{+20}{\volt}, loss tables built by hand and an overshoot
+figure that exists only after a bench test. The missing $t_\mathrm{SC}$ of
+the chosen device is recorded as a residual risk in
+\cref{app:assumptions}.
 
 \begin{table}[htbp]
 \centering

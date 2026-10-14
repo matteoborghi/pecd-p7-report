@@ -392,7 +392,7 @@ is the best one for this design.
 cells across the section, \SI{2}{\milli\metre} along it), one heat source per
 device spread over its contact area on the rail face, and the fluid as a row
 of nodes along the rail heated by what it receives. Liquid: 50/50
-water--glycol at \SI{65}{\celsius} (A.22), Gnielinski correlation in the
+water--glycol at \SI{65}{\celsius} (\cref{tab:sysassume}), Gnielinski correlation in the
 channels~\cite{gnielinski}. Air: inlet at \SI{50}{\celsius}, the maximum
 ambient of the specification; plate fins with the Teertstra--Yovanovich--Culham
 correlation~\cite{teertstra} and the Muzychka--Yovanovich pressure
@@ -545,14 +545,6 @@ Top-side-cooled Q-DPAK, gap pad$^c$ & 0.61 & 139.4 & 179.9 & 110.3 \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{termica_raffreddamento_alternative.pdf}
-\caption{All cooling routes on one scale: hottest junction at locked rotor
-with nominal tolerances (C1) and in the simultaneous worst case.}
-\label{fig:coolalt}
-\end{figure}
-
 Route by route:
 %
 \begin{itemize}
@@ -560,7 +552,8 @@ Route by route:
         alumina and changing only the interface material and the clamping
         gains \SI{17.7}{\celsius}; aluminium nitride adds \SI{5}{\celsius}
         more. The board does not change, the cost is a few euros, and the
-        value becomes a mounting specification checked by bench test B5.
+        value becomes a mounting specification, confirmed by measuring the
+        mounted pad.
   \item A copper spreader at drain potential between tab and pad
         spreads the flux over \SI{7}{\centi\metre\squared} and gains another
         \SI{5}{\celsius}. It is not worth it here: a second clamped joint,
@@ -582,17 +575,12 @@ Route by route:
         gap pad: thermally worse here, by \SI{19}{\celsius}. Their strengths are
         automated assembly and loop inductance, and adopting them would
         mean a new board.
-  \item A plane on the bottom of the board does not help a
-        through-hole device: only the drain lead is joined to the tab, and
-        at \SI{18}{\celsius\per\watt} it carries at most
-        \SI{4}{\percent} of the heat even if the board were held at the
-        coolant temperature. For a bottom-cooled SMD package the path through
-        the board (eighty filled \SI{0.3}{\milli\metre} vias under a
-        \SI{8\times 10}{\milli\metre} pad, then an insulator, since the pad is the
-        drain) is \SI{1.9}{\celsius\per\watt}, ten times the AlN pad. An
-        insulated-metal substrate would fix the path but cannot carry a
-        six-layer gate-drive board. The bottom plane is a tool for the
-        board's own hot spots (\cref{sec:complife}), not for the switches.
+  \item A plane on the bottom of the board does not help a through-hole
+        device: only the drain lead is joined to the tab, and at
+        \SI{18}{\celsius\per\watt} it carries at most \SI{4}{\percent} of the
+        heat. A bottom-cooled SMD package needs eighty filled vias and an
+        insulator under its drain pad, \SI{1.9}{\celsius\per\watt}, ten times
+        the AlN pad.
   \item Classic heat sinks work only with the better pad and a fan,
         and then they work: one fan, \SI{108.3}{\celsius} at locked rotor and
         \SI{129.1}{\celsius} in the worst case. They lose on other
@@ -603,21 +591,8 @@ Route by route:
         towards the natural-convection figure within seconds, so it would
         need tachometer supervision and immediate derating; and the sink is
         about ten times the volume of the rail. The vehicle already has a
-        liquid loop (A.22).
+        liquid loop (\cref{tab:sysassume}).
 \end{itemize}
-
-\paragraph{Beyond discretes.} The solutions found in production and research
-for automotive SiC inverters go further than this design can within one
-board: pin-fin baseplates in direct contact with the coolant, as in the
-first mass-produced SiC traction inverter, whose two-die packages are
-assembled on a pin-fin cooler~\cite{yole_tesla}; double-sided cooled modules
-with sintered-silver interposers, demonstrated at
-\SI{100}{\kilo\watt\per\litre}~\cite{ornl_dsc}; dies embedded in the PCB
-and cooled through both faces~\cite{cpes_embedded}; jet impingement and
-two-phase immersion in dielectric fluid, still in research~\cite{immersion_pcb}.
-They share one idea: remove the insulating pad and the interfaces from the
-heat path. For a discrete design on one board, the internally isolated
-package is the closest step towards it.
 
 \begin{finding}{Adopted cooling: six-port rail and aluminium nitride pad}
 The adopted solution is the six-port liquid rail at \SI{10}{\litre\per\minute},
@@ -628,7 +603,7 @@ as design value. The hottest junction at locked rotor falls from
 \SI{153.4}{} to \SI{117.8}{\celsius}: \SI{32.2}{\celsius} from the
 \SI{150}{\celsius} limit, without touching the frozen board. The pad value
 not to be exceeded at assembly becomes \SI{0.50}{\celsius\per\watt}, at which
-C1 is still met on the real rail, and bench test B5 measures it. The
+C1 is still met on the real rail. The
 device-level results of this chapter, computed on the ideal plate with the
 prudent pad, remain a valid comparison between candidates; the absolute
 temperatures of the design are those of \cref{tab:coolalt}.
@@ -636,83 +611,26 @@ temperatures of the design are those of \cref{tab:coolalt}.
 
 \section{Thermal transient}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{plecs_11_transitorio_termico.pdf}
-\caption{Cold-plate temperature transient from a cold start, simulated over
-the first seconds and extrapolated from the identified exponential.}
-\label{fig:transitorio}
-\end{figure}
-
-The thermal time constant cannot be simulated directly: it is of the order of
-seconds, while the solver step is constrained to about \SI{1}{\micro\second}
-by the \SI{20}{\kilo\hertz} switching. A short window is therefore simulated
-and an exponential identified from it, then extrapolated.
-
-Identifying $\tau$ from the data rather than assuming it from
-$\Rthha C_\mathrm{hs}$ is deliberate, and it earned its keep: an early run
-reported $\tau = \SI{5.07}{\second}$ against an expected \SI{10.0}{\second},
-which revealed that the heat capacity had been changed in the post-processing
-but not in the model itself. With that corrected, the identification gives
-$\tau = \SI{10.20}{\second}$ against \SI{10.00}{\second} expected, and the
-temperature rise agrees with $P_\mathrm{tot}\Rthha$ to within
-\SI{1.6}{\percent}.
-
-The cold-plate heat capacity of \SI{1000}{\joule\per\kelvin} is estimated
-from geometry: a \SI{200}{}$\times$\SI{150}{}$\times$\SI{12}{\milli\metre}
-aluminium plate with \SI{15}{\percent} of its volume taken by channels gives
+The thermal time constant of the cold plate is of the order of seconds,
+while the solver step is about \SI{1}{\micro\second} at \SI{20}{\kilo\hertz},
+so a short window is simulated and an exponential identified from it. The
+heat capacity of \SI{1000}{\joule\per\kelvin} is estimated from geometry: a
+\SI{200}{}$\times$\SI{150}{}$\times$\SI{12}{\milli\metre} aluminium plate with
+\SI{15}{\percent} of its volume taken by channels gives
 \SI{744}{\joule\per\kelvin} of metal, \SI{204}{\joule\per\kelvin} of retained
-coolant and roughly \SI{90}{\joule\per\kelvin} of fittings. It affects only
-the transient: every steady-state temperature in this chapter is independent
-of it, which was verified by re-running the complete sweep with the value
-doubled and confirming that all eleven operating points reproduced
-bit-for-bit.
-
-\section{Temperature monitoring}
-
-The TO-247-4L has no integrated temperature sensor, so any NTC measures the
-cold plate and the junction must be inferred:
-$\Tj = T_\mathrm{NTC} + P_\mathrm{dev}(\Rthcs + \Rthjc)$, a rise of
-\SI{15.6}{\celsius} at rated power with the prudent pad and about
-\SI{9}{\celsius} with the aluminium-nitride stack adopted in
-\cref{sec:coolalt}, plus the spreading in the rail under the tab.
-
-With a cold-plate time constant of \SI{10}{\second} and a junction time
-constant of milliseconds, the NTC cannot protect against a short circuit, an
-overcurrent, or a loss of gate drive. Those belong to the protection of the
-gate drive and to the current measurement, outside this module. What
-the NTC protects against is loss of cooling, which is a real and otherwise
-undetected failure.
-
-\begin{finding}{At locked rotor the NTC sees nothing}
-With the motor stalled, the ideal cold plate is at \SI{66.4}{\celsius},
-barely above its rated-point value, while the hottest junction is at
-\SI{111}{\celsius}; on the real rail the face under the hottest tab warms
-by a few degrees more, but the rail between the legs, where a sensor can
-sit, stays close to the coolant (\cref{fig:coolmaps}). The NTC reads a normal temperature through the whole
-event. Locked rotor is therefore protected by design, not by the sensor: C1
-is met in steady state, so there is nothing to detect. If the
-controller is ever to derate at standstill, it has to estimate the junction
-temperature from the current it commands, with the chain of
-\cref{tab:lockedrotor}, not measure it.
-\end{finding}
-
-Two sensors are used: one on the cold plate between the devices of the
-centre leg, the hottest point, and one at the coolant inlet. Their
-\emph{difference} diagnoses the cooling loop at constant power before the
-absolute temperature becomes dangerous. Derating runs linearly from
-\SI{85}{} to \SI{100}{\celsius} on the first sensor, with a hardware trip at
-\SI{105}{\celsius}.
+coolant and roughly \SI{90}{\joule\per\kelvin} of fittings. The
+identification gives $\tau = \SI{10.20}{\second}$ against
+\SI{10.00}{\second} expected, and the temperature rise agrees with
+$P_\mathrm{tot}\Rthha$ within \SI{1.6}{\percent}. The heat capacity affects
+only the transient: all eleven steady-state operating points reproduce
+bit-for-bit with the value doubled.
 
 \section{The other components: temperature and life}
 \label{sec:complife}
 
-This section checks the other components of the frozen board that carry
-power, high voltage or ripple current, against their manufacturers' limits; those that
-the automotive revision and the reinforced auxiliary supplies will replace
-(the isolated converters, the \SI{12}{\volt} regulators and electrolytic, the
-connectors, the transient suppressor and the fuse) are left to that
-revision. Two assumptions frame it: the air inside the enclosure is
+This section checks the other components of the power stage (the DC-link
+films, the commutation ceramics and the shunts) against their manufacturers'
+limits. Two assumptions frame it: the air inside the enclosure is
 \SI{70}{\celsius} in normal operation and \SI{85}{\celsius} in a hot case,
 since the liquid loop at \SI{65}{\celsius} sets the interior rather than the
 \SI{50}{\celsius} outside; and the mission is \SI{8000}{\hour} of operation
@@ -720,8 +638,8 @@ with the bus energised, the usual order for fifteen years of a passenger car.
 
 \begin{table}[htbp]
 \centering
-\caption{Stress, temperature and margin of the components that carry power,
-high voltage or ripple current. Air inside the enclosure \SI{70}{\celsius},
+\caption{Stress, temperature and margin of the power-stage components that
+carry high voltage or ripple current. Air inside the enclosure \SI{70}{\celsius},
 hot case \SI{85}{\celsius}; power copper up to \SI{30}{\kelvin} above it
 (\cref{tab:widths}).}
 \label{tab:complife}

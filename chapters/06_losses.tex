@@ -109,20 +109,6 @@ the gate resistances impose (\cref{sec:deadtime}) therefore cost
 \SI{1.2}{\percent} of fundamental voltage it removes, which the modulation
 amplitude of \SI{427}{\volt} restores.
 
-\paragraph{One loss, three figures.} The report quotes this loss as
-\SI{3.4}{}, \SI{3.3}{} and \SI{3.2}{\watt}, and they are the same quantity
-at three operating points, not three estimates in disagreement:
-\SI{3.4}{\watt} is measured here, at \SI{30.37}{\Arms} with the thermal
-boundary at the coolant, which leaves the junction cooler;
-\SI{3.3}{\watt} is \cref{eq:deadtime-loss} at \SI{80}{\celsius} and the
-same current (\cref{ch:modulation}); \SI{3.2}{\watt} is the share inside
-\cref{tab:losses}, at the rated \SI{30.0}{\Arms} and the closed-loop
-junction temperature of \SI{81.8}{\celsius}. The spread is the temperature
-dependence described below plus that of the current, to which the loss is
-roughly proportional. The
-\SI{3.2}{\watt} of the finding that follows is a different number: the
-erroneous first estimate on the earlier device.
-
 \begin{finding}{The first dead-time estimate was wrong by a factor of 2.3}
 An earlier calculation in this work, on the device of the first iterations,
 gave \SI{3.2}{\watt} against \SI{1.4}{\watt} from the corrected formula
@@ -184,15 +170,35 @@ drain current, and gate--source voltage at the die.}
 \label{fig:dpt}
 \end{figure}
 
-\subsection{Gate resistance: fixed by the overshoot criterion}
+\subsection{Gate drive levels}
+\label{sec:negbias}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{spice_14_energie_vs_rg.pdf}
-\caption{Switching energies and peak die voltage against gate resistance, at
-\SI{950}{\volt}, \SI{60}{\ampere}, \SI{20}{\nano\henry}.}
-\label{fig:erg}
-\end{figure}
+The gate is driven between $+\SI{15}{\volt}$ and $-\SI{5}{\volt}$, a swing of
+\SI{20}{\volt}. The negative level keeps the off device off while its
+opposite is turned on: the Miller current injected through $C_\mathrm{gd}$
+raises the off gate by
+%
+\begin{equation}
+  \Delta V_\mathrm{GS} = C_\mathrm{gd,eff}\,\frac{\mathrm{d}v}{\mathrm{d}t}\,R
+  \left[1 - \exp\!\left(-\frac{t}{R\,C_\mathrm{iss}}\right)\right].
+  \label{eq:miller}
+\end{equation}
+%
+With $C_\mathrm{gd,eff} = Q_\mathrm{gd}/V_\mathrm{DS} = \SI{81}{\pico\farad}$,
+$C_\mathrm{iss} = \SI{6922}{\pico\farad}$, the turn-on slope that the
+double-pulse simulation gives for the opposite device,
+\SI{31.4}{\volt\per\nano\second}, and the \SI{15.4}{\ohm} of the off path,
+the gate of the off device reaches $+\SI{3.35}{\volt}$ at a bias of
+$-\SI{5}{\volt}$, above the \SI{1.8}{\volt} minimum threshold. The active
+Miller clamp of the driver brings it to $+\SI{0.58}{\volt}$, a margin of
+\SI{1.22}{\volt}; at the datasheet's typical $-\SI{4}{\volt}$ the margin
+would be \SI{0.22}{\volt}. The closed form is a bound, and the simulation,
+which resolves the internal gate network, keeps the die \SIrange{4}{5}{\volt}
+lower. The $-\SI{5}{\volt}$ leaves \SI{3}{\volt} to the absolute maximum of
+$-\SI{8}{\volt}$~\cite{wolfspeed_e3m0016} and is what a standard isolated
+gate-drive supply delivers without an extra regulator.
+
+\subsection{Gate resistance: fixed by the overshoot criterion}
 
 \begin{table}[htbp]
 \centering
@@ -233,20 +239,7 @@ to \SI{15}{\ohm} would buy twelve more volts for \SI{4}{\watt} of loss and
 \SI{2}{\celsius} at locked rotor; the thermal margin at a \SI{70}{\celsius}
 coolant was judged the scarcer of the two.
 
-The earlier design used \SI{2.5}{\ohm} on the argument that overshoot
-margin is cheaper to buy from the layout than from the gate. That is true of
-margin \emph{beyond} a criterion. It is not true of the criterion itself,
-and at \SI{2.5}{\ohm} this device reaches \SI{1195}{\volt}.
-
 \subsection{Overshoot and loop inductance}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{spice_13_overshoot_vs_lstray.pdf}
-\caption{Peak drain--source voltage at the die and at the pins against
-external loop inductance, at the design gate resistances.}
-\label{fig:overshoot}
-\end{figure}
 
 \begin{table}[htbp]
 \centering
@@ -300,7 +293,7 @@ $L_\mathrm{ext}$ & Turn-off & Recovery, opposite device \\
 C2 fails at \SI{22.6}{\nano\henry} at turn-off and at
 \SI{23.6}{\nano\henry} on recovery. The margin on the layout limit is
 therefore \SI{2.6}{\nano\henry}, \SI{13}{\percent}; with the \SI{2}{\volt}
-scatter between solver variants (\cref{sec:solverdep}) and a local slope of
+scatter between the converging variants of the model and a local slope of
 \SIrange{1.6}{2.7}{\volt\per\nano\henry}, the threshold is known to about
 $\pm\SI{1}{\nano\henry}$. Beyond \SI{23}{\nano\henry} the recovery peak rises at
 \SI{10}{\volt\per\nano\henry}, four times faster than the turn-off peak,
@@ -368,16 +361,6 @@ loss budget of \cref{tab:losses} uses the datasheet-derived tables, and the
 SPICE model is used for waveforms, overshoot, parasitics and the gate
 resistance. This is stated explicitly so that nobody later ``improves'' the
 thermal budget by substituting the simulated energies. Resolving it is on the
-bench-test list of \cref{app:assumptions}.
-
-\subsection{How much the numbers depend on the solver}
-\label{sec:solverdep}
-
-The model needs relaxed solver tolerances ($g_\mathrm{min}$ and the
-absolute current tolerance at \num{e-9}) to start at all, and the script
-retries a failed run with small, physically irrelevant changes: the forward
-drop of the ideal diodes that separate the two gate resistors, the relative
-tolerance, the maximum step. At the design point the variants that converge
-agree within \SI{2}{\volt} on the peak and \SI{3}{\percent} on the energies.
-One variant used in the earlier bench, a larger DC-link ESR, made the bus
-start discharged and was removed.
+bench-test list of \cref{app:assumptions}. The variants of the model that
+converge agree within \SI{2}{\volt} on the peak and \SI{3}{\percent} on the
+energies at the design point.

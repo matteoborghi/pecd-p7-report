@@ -18,10 +18,12 @@ the DC-link and the cooling, with the schematic and the board layout of that
 module. \Cref{fig:system} shows what the module contains and where it stops:
 the battery, the gate drive and the controller are outside it, and what
 crosses its boundary is written down as an assumption (\cref{tab:sysassume}).
-The target is a design that can be \emph{defended}: every
-component value in this report is either taken from a datasheet, computed from
-a formula shown in the text, or obtained from a simulation whose model is
-documented and validated.
+The report follows the four things the brief asks of it: the design
+equations (\cref{ch:analytical,ch:modulation}), the component selection
+(\cref{ch:spec}), the design choices, and the discussion of the numerical
+simulations (\cref{ch:model,ch:losses,ch:thermal}). Every component value is
+either taken from a datasheet, computed from a formula shown in the text, or
+obtained from a simulation whose model is documented and validated.
 
 \begin{figure}[htbp]
 \centering
@@ -32,32 +34,23 @@ grey: outside it, with the interface stated as assumptions
 \label{fig:system}
 \end{figure}
 
-\section{Method}
+\section{Method and structure}
 
-The design proceeds in four stages, each of which validates the previous one
-(\cref{fig:flow}). Four times a later stage found something that changed an
-earlier decision, and each of those returns is reported where it happened.
-
-\begin{enumerate}
-  \item Analytical sizing (\cref{ch:analytical}) fixes the
-        operating point, the DC-link capacitance and the device rating from
-        closed-form relations.
-  \item Circuit simulation (\cref{ch:model,ch:losses}) builds a
-        PLECS model of the converter and uses it to obtain the losses. Its
-        outputs are reconciled with the analytical results, and the vendor loss tables it relies on are
-        verified against the device datasheet. A SPICE study of a single
-        switching cell, with the vendor device model, fixes the gate
-        resistances on the overvoltage at the die.
-  \item Thermal analysis (\cref{ch:thermal}) closes the loop between
-        losses and temperature, a loop this device needs because its
-        on-resistance rises by \SI{80}{\percent} between \SI{25}{\celsius} and
-        \SI{175}{\celsius}, and verifies the stalled-motor case that selected
-        the device.
-  \item Schematic and layout (\cref{ch:schematic,ch:layout}) turn the
-        design into a KiCad module: the schematic is checked against an
-        independent model, pin by pin, and the board against the creepage
-        and clearance of the power pins at \SI{900}{\volt}.
-\end{enumerate}
+The design proceeds in four stages, each validating the previous one
+(\cref{fig:flow}). Analytical sizing fixes the operating point, the DC-link
+capacitance, the device rating and the modulation from closed-form relations
+(\cref{ch:analytical,ch:modulation}). Circuit simulation builds a PLECS model
+of the converter and uses it to obtain the losses; its outputs are reconciled
+with the analytical results, the vendor loss tables it relies on are verified
+against the datasheet, and a SPICE study of a single switching cell fixes the
+gate resistances on the overvoltage at the die (\cref{ch:model,ch:losses}).
+Thermal analysis closes the loop between losses and temperature, which this
+device needs because its on-resistance rises by \SI{80}{\percent} between
+\SI{25}{\celsius} and \SI{175}{\celsius}, and verifies the stalled-motor case
+that selected the device (\cref{ch:thermal}). Schematic and layout turn the
+design into a KiCad module (\cref{ch:schematic,ch:layout}).
+\Cref{ch:conclusions} draws the conclusions and \cref{app:assumptions}
+collects the assumptions that still need confirmation.
 
 \begin{figure}[htbp]
 \centering
@@ -70,40 +63,11 @@ cooling rail that replaced the ideal cold plate.}
 \label{fig:flow}
 \end{figure}
 
-\section{Findings that corrected the work}
-
-A design report can be written as a sequence of decisions that all turned out
-to be right. That version is shorter, and it is also less useful, because the
-reader learns nothing about where the traps are.
-
-Several of the results in this report contradict an assumption that was
-made earlier in the work. They are reported where they arise, in boxes
-formatted like this one:
-
-\begin{finding}{Example of a finding box}
-Findings of this kind mark a point where a reasonable assumption turned out
-to be wrong, and record both the wrong value and the evidence that corrected
-it.
-\end{finding}
-
-\noindent The ones that changed the design are: the choice of device
-(\cref{sec:deviceselection}), the double-pulse bench that measured a
-charging bus (\cref{sec:kelvin}), the interpretation of the vendor loss
-library (\cref{sec:losstables}), the dead-time loss calculation
-(\cref{sec:deadtime-loss}), the identification of the dominant thermal
-unknown (\cref{sec:rthcs}) and the cooling rail, whose real resistance an
-ideal cold plate had hidden (\cref{sec:cooling}). Smaller ones concern the package pitch assumed
-for the printed-circuit footprint (\cref{ch:schematic}) and the parts of the
-board that set the creepage at \SI{900}{\volt} (\cref{ch:layout}).
-
-\section{Structure of the report}
-
-\Cref{ch:spec} states the specification and justifies the topology and the
-device. \Cref{ch:analytical} performs the analytical sizing and
-\cref{ch:modulation} the choice of modulation. \Cref{ch:model} describes the
-simulation model and its validation, \cref{ch:losses} the loss budget and
-\cref{ch:thermal} the thermal design.
-\Cref{ch:schematic,ch:layout} document the schematic and the board of the
-module, and \cref{ch:conclusions} draws the conclusions.
-\Cref{app:assumptions} collects the assumptions that still require
-confirmation.
+Four times a later stage contradicted an assumption made earlier, and each
+return is reported where it happened, in a shaded box. The ones that changed
+the design are the choice of device (\cref{sec:deviceselection}), the
+double-pulse bench that measured a charging bus (\cref{sec:kelvin}), the
+interpretation of the vendor loss library (\cref{sec:losstables}), the
+dead-time loss calculation (\cref{sec:deadtime-loss}), the identification of
+the dominant thermal unknown (\cref{sec:rthcs}) and the cooling rail, whose
+real resistance an ideal cold plate had hidden (\cref{sec:cooling}).
