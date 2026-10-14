@@ -32,18 +32,12 @@ Sheet & Domain & Inst. & Parts & Content \\
 root & --- & 1 & 0 & blocks, the signals between them, the requirements on the system \\
 \texttt{1\_power\_stage} & HV & 1 & 9 & film DC-link capacitors, bus and phase terminals \\
 \quad\texttt{leg} & HV & 3 & 7 & two \device{}, four commutation ceramics, Kelvin shunt \\
-\texttt{2\_gate\_drive} & barrier & 1 & 4 & six channels, gate test points \\
-\quad\texttt{drv\_channel} & barrier & 7 & 16 & \driver{}, isolated supply, gate resistors, desaturation network \\
-\texttt{3\_phase\_sense} & LV & 1 & 14 & overload comparators, \SI{2.5}{\volt} reference \\
-\quad\texttt{sense\_channel} & barrier & 3 & 18 & \isoamp{}, isolated supply, LDO, input and output filters \\
-\texttt{4\_aux\_supply} & LV & 1 & 9 & fuse, crowbar TVS, \SI{12}{\volt} and \SI{3.3}{\volt} converters \\
-\texttt{5\_control\_if} & LV & 1 & 13 & control connector, ESD protection, thermistor inputs \\
-\texttt{6\_dclink\_mgmt} & HV, barrier & 1 & 39 & \isoampv{} bus measurement, divider, bleeder, active discharge, Y-capacitors, mounting holes \\
-\midrule
- & & & \textbf{275} & the seventh \texttt{drv\_channel} instance is the discharge driver, inside \texttt{6\_dclink\_mgmt} \\
 \bottomrule
 \end{tabularx}
 \end{table}
+
+The sheets of gate drive, sensing, auxiliary supply, control and DC-link
+management belong to the rest of the board and are outside this module.
 
 \section{Net naming and net classes}
 
@@ -76,23 +70,10 @@ Class & Nets & Clearance & Track \\
 \midrule
 \texttt{HV\_BUS}   & DC-link positive and negative & \SI{2.0}{\milli\metre} & \SI{10.4}{\milli\metre} \\
 \texttt{HV\_POWER} & switching nodes and phase outputs & \SI{2.0}{\milli\metre} & \SI{8.4}{\milli\metre} \\
-\texttt{HV\_AUX}   & drain of the discharge switch & \SI{2.0}{\milli\metre} & \SI{0.5}{\milli\metre} \\
-\texttt{HV\_DIV}   & intermediate nodes of the divider and the bleeder & \SI{1.6}{\milli\metre} & \SI{0.3}{\milli\metre} \\
 \texttt{GATE\_H1} \ldots\ \texttt{GATE\_DIS} & seven floating gate domains, one class each & \SI{0.3}{\milli\metre} & \SI{0.5}{\milli\metre} \\
-\texttt{SENSE\_1} \ldots\ \texttt{SENSE\_V} & four floating sensing domains, one class each & \SI{0.3}{\milli\metre} & \SI{0.3}{\milli\metre} \\
-\texttt{CTRL}      & control signals, analogue outputs & \SI{0.15}{\milli\metre} & \SI{0.3}{\milli\metre} \\
-\texttt{PWR\_LV}   & \SI{12}{\volt}, \SI{3.3}{\volt}, ground & \SI{0.15}{\milli\metre} & \SI{0.6}{\milli\metre} \\
-\texttt{CHASSIS}   & chassis connection & \SI{0.2}{\milli\metre} & \SI{1.0}{\milli\metre} \\
 \bottomrule
 \end{tabularx}
 \end{table}
-
-Classes are assigned by name pattern, not by hand: the schematic has 195
-nets, 52 of which are the single-pin nets KiCad creates for unused pins, and
-every one of the others falls into exactly one class. A net that fell into
-none would be treated as low voltage and checked at the reinforced distance
-from everything hazardous, so a missing assignment shows up as a violation
-rather than as a silent weakness.
 
 \section{Reference designators}
 
@@ -120,63 +101,11 @@ preceding chapters. None changes the topology; all are on the board.
 \midrule
 D8 & in C0G at \SI{1200}{\volt} the largest ceramic is \SI{47}{\nano\farad}, in a 3640~\cite{kemet_kclink}; the \SI{220}{\nano\farad} of the earlier estimate does not exist in that class
    & four KC-LINK \SI{47}{\nano\farad} per leg, \SI{188}{\nano\farad}, at \SI{75}{\percent} of the rating at \SI{900}{\volt} \\
-D9 & an SMB or DPAK desaturation diode leaves \SI{1.8}{} to \SI{2.0}{\milli\metre} between its pads, against \SI{2.80}{\milli\metre} required
-   & SiC \SI{1200}{\volt} diode in SMC~\cite{semiq_gp3d}, \SI{4.6}{\milli\metre} between pads; footprints for the two DESAT clamps, not fitted (test B8) \\
-D10 & an unregulated isolated module rises to 1.25 times its output at light load, and the amplifier supply is \SI{6.5}{\volt} absolute
-   & the gate-drive module (\dcdc{}) followed by a \SI{5}{\volt} LDO: one isolating component to qualify, not two \\
-D11 & a series reverse-polarity diode leaves \SI{8.5}{\volt} at cranking, below the converter's input range; no load uses a \SI{5}{\volt} rail
-   & TEN 8-1212~\cite{traco_ten8} (\SI{9}{}--\SI{18}{\volt} in, \SI{12}{\volt} regulated, \SI{8}{\watt}), crowbar TVS behind the fuse, \SI{3.3}{\volt} switching regulator \\
-D12 & Y1 discs reach \SI{4.7}{\nano\farad} at \SI{1500}{\volt} DC~\cite{vishay_ay1}, not \SI{22}{\nano\farad}
-   & \num{2}$\times$\SI{4.7}{\nano\farad} Y1, at \SI{60}{\percent} of the rating \\
-D13 & in a reused sheet every instance has the same circuit, so the discharge channel cannot omit its desaturation network
-   & the seventh channel's drain input is tied to its own reference: the DESAT pin sees at most \SI{6.1}{\volt} against an \SI{8.5}{\volt} minimum threshold \\
-D14 & the thermistor first named has $B = \SI{3977}{\kelvin}$, not \SI{3435}{\kelvin}, and is a board part
-   & \SI{10}{\kilo\ohm}, $B_{25/85} = \SI{3435}{\kelvin}$, M3 lug on the cold plate \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-Two consequences reach back into earlier chapters. The four amplifier
-supplies of D10 add four LDOs dissipating about \SI{72}{\milli\watt} each and
-four modules running at a few percent of their load, which takes the current
-from the \SI{12}{\volt} rail from the \SI{155}{\milli\ampere} of
-\cref{tab:auxbudget} to about \SI{185}{\milli\ampere}; this is an estimate
-from the LDO drop, not a recomputed budget, and the \SI{8}{\watt} module of
-D11 delivers \SI{666}{\milli\ampere}. And the gate resistors are E96 parts:
-\SI{4.99}{\ohm} on and \SI{12.4}{\ohm} off, \num{0.2} and
-\SI{0.8}{\percent} below the values of \cref{sec:kelvin}. The lower
-turn-off resistor makes the turn-off marginally faster; at
-\SI{0.8}{\percent} that is well inside the tolerance of the model it was
-chosen with, and the overshoot it adds has not been simulated separately.
-
-\section{Verification}
-
-ERC reports one warning: the ground pin of the bus amplifier is not on the
-low-voltage ground. The connection is intended: the high side of
-\texttt{U601} is referred to the negative DC rail, which is what makes the
-measurement possible.
-
-\begin{finding}{ERC passes a schematic with swapped pins}
-ERC checks that pins are connected compatibly: an output to inputs, a power
-input to a power output. It cannot check that they are connected to the
-\emph{right} net. The schematic passed ERC while the two command inputs of a
-driver were swapped, the two outputs of an isolated supply reversed, a
-comparator supplied backwards and the two thermistors crossed. Each was a
-circuit that would have failed on the bench, and the first one silently,
-because swapping IN+ and IN$-$ inverts the hardware interlock of
-\cref{tab:interlock} rather than breaking it.
-
-The schematic is therefore checked against an independent model: every
-component was described once, in a script, with its role and its
-pin-to-net connections, and the netlist exported from KiCad is compared with
-it pin by pin. All 275 parts match, and the comparison, not the
-ERC, is what was run after every edit.
-\end{finding}
-
-The same model checks the parts themselves: every symbol and footprint exists
-in a library, every pin of every symbol has a pad, and every footprint used
-for an isolating component is the manufacturer's high-voltage land pattern
-rather than the generic one (\cref{sec:isoslot}).
+\section{Footprint of the power device}
 
 \begin{finding}{The package pitch is not the one initially assumed}
 The TO-247-4L pad spacing is \emph{not} the uniform \SI{5.45}{\milli\metre}
@@ -221,13 +150,5 @@ the sensing channel of phase~1; the others differ only in their references.
     \label{fig:sch-#3}
   \end{sidewaysfigure}}
 
-\foglio{1}{Root sheet: the blocks and the signals between them.}{root}
 \foglio{2}{Power stage: DC-link film capacitors, terminals and the three legs.}{power}
 \foglio{3}{Half-bridge leg (leg 1 of 3): devices, commutation ceramics, Kelvin shunt.}{leg}
-\foglio{6}{Gate drive: the six channels of the bridge and the gate test points.}{gatedrive}
-\foglio{7}{Gate-drive channel (high side of leg 1, one of seven instances).}{drv}
-\foglio{13}{Phase-current sensing: overload comparators and reference.}{phasesense}
-\foglio{14}{Sensing channel (phase 1 of 3).}{sense}
-\foglio{17}{Auxiliary supply.}{aux}
-\foglio{18}{Control interface: connector, ESD protection, thermistors.}{controlif}
-\foglio{19}{DC-link management: bus measurement, active discharge, Y-capacitors.}{dclink}
