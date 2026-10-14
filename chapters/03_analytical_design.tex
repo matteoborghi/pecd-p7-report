@@ -83,8 +83,8 @@ that brings the current back to \SI{30}{\Arms} with that dead time.
 The peak phase current in the ideal sinusoidal case is
 $\hat{I} = \sqrt{2}\cdot 30 = \SI{42.4}{\ampere}$. The simulated waveform, which
 carries the switching ripple on top of the fundamental, peaks at
-\SI{43.0}{\Apk}; this is the value the devices see and the one used
-for gate-drive and protection sizing in \cref{ch:aux}.
+\SI{43.0}{\Apk}; this is the value the devices see and the one that sizes the overload
+protection of the gate drive.
 
 The RMS current of each device follows from synchronous rectification: the
 channel conducts in both directions whenever the gate is on, so the upper
@@ -145,8 +145,8 @@ the \SI{4}{\volt} limit. Two further conditions come with it. A source that
 is both less inductive than \SI{1.5}{\micro\henry} and less damped than
 \SI{50}{\milli\ohm} at \SI{20}{\kilo\hertz} would tune the
 source--capacitor resonance onto the switching harmonics, and no reasonable
-capacitor closes that band: it is requirement R11 on the battery and harness
-(\cref{tab:sysreq}). And the film's permitted voltage falls with its
+capacitor closes that band: it is an assumption on the battery and harness
+(\cref{tab:sysassume}). And the film's permitted voltage falls with its
 hotspot temperature (\SI{1100}{\volt} at \SI{85}{\celsius},
 \SI{800}{\volt} at \SI{105}{\celsius}), so the \SI{1100}{\volt} class, not
 the \SI{900}{\volt} one, is what allows \SI{900}{\volt} continuous up to a

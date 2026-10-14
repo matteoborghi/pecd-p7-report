@@ -1,50 +1,28 @@
-% L'inverter e i suoi confini: catena di potenza, barriera, cosa sta fuori dalla scheda.
+% Il power stage e i suoi confini: cosa sta dentro il modulo e cosa gli arriva da fuori.
 \begin{tikzpicture}[
-  font=\footnotesize, >=Stealth, scale=0.95, every node/.style={transform shape},
+  font=\footnotesize, >=Stealth,
   blk/.style={draw, rounded corners=2pt, align=center, minimum height=10mm, inner sep=3pt, fill=white},
   hv/.style={blk, draw=farancio, fill=farancio!7},
-  lv/.style={blk, draw=fblu, fill=fblu!7},
   ext/.style={blk, dashed, draw=fgrigio},
-  pw/.style={->, very thick, farancio},
-  sg/.style={->, fblu}]
-  % catena di potenza (riga in alto)
-  \node[ext, text width=15mm] (bat) at (0,0) {HV battery\\\SI{800}{\volt}};
-  \node[ext, text width=17mm] (flt) at (2.55,0) {input EMI\\filter};
-  \node[hv, text width=22mm] (dcl) at (5.35,0) {DC-link\\film \& ceramics};
-  \node[hv, text width=28mm] (brg) at (8.85,0) {three-phase bridge\\$6\times$ SiC MOSFET};
-  \node[draw, circle, minimum size=11mm] (mot) at (14.3,0) {M};
-  \draw[pw] (bat) -- (flt);
-  \draw[pw] (flt) -- (dcl);
+  pw/.style={->, very thick, farancio}]
+  % catena di potenza
+  \node[ext, text width=17mm] (bat) at (0,0) {HV battery\\\SI{800}{\volt}};
+  \node[hv, text width=26mm] (dcl) at (4.0,0) {DC-link\\film and ceramics};
+  \node[hv, text width=38mm] (brg) at (8.6,0) {three-phase bridge\\$6\times$ SiC MOSFET, shunts};
+  \node[draw, circle, minimum size=11mm] (mot) at (13.0,0) {M};
+  \draw[pw] (bat) -- node[above, font=\scriptsize]{DC} (dcl);
   \draw[pw] (dcl) -- (brg);
-  \draw[pw] (brg) -- node[above, pos=0.62]{3 phases} (mot);
-  % raffreddamento, fuori dalla scheda
-  \node[ext, text width=28mm] (rail) at (8.85,1.75) {cooling rail, liquid \SI{65}{\celsius}};
+  \draw[pw] (brg) -- node[above, font=\scriptsize]{3 phases} (mot);
+  % raffreddamento: dentro il modulo, con il suo liquido fuori
+  \node[hv, text width=38mm] (rail) at (8.6,1.9) {cooling rail, pad\\{\scriptsize liquid at \SI{65}{\celsius}}};
   \draw[->, thick, fgrigio] (brg) -- node[right, font=\scriptsize]{heat} (rail);
-  % lato alta tensione della scheda
-  \node[hv, text width=31mm] (gd) at (8.85,-1.75) {gate drive $\times7$\\desaturation and interlock};
-  \node[hv, text width=24mm] (bus) at (5.35,-1.75) {bus voltage,\\active discharge};
-  \node[hv, text width=20mm] (sns) at (12.0,-1.75) {phase current\\shunts $\times3$};
-  \draw[->, thick] (gd) -- (brg);
-  \draw[thick] (bus) -- (dcl);
-  \draw[thick] (sns.north) -- (sns.north |- brg.east);
-  % barriera di isolamento
-  \draw[very thick, dashed, fgrigio] (3.9,-2.75) -- (13.4,-2.75);
-  \node[fgrigio, anchor=south west, font=\scriptsize] at (3.9,-2.75) {reinforced isolation barrier};
-  % lato bassa tensione
-  \node[lv, text width=86mm] (lvb) at (8.65,-3.95) {control interface: connector, ESD protection, comparators,
-        isolated-amplifier outputs, auxiliary supply \SI{12}{}/\SI{3.3}{\volt}};
-  \node[ext, text width=17mm] (ctl) at (1.15,-3.95) {controller\\(vehicle)};
-  \node[ext, text width=17mm] (v12) at (1.15,-5.55) {\SI{12}{\volt} vehicle rail};
-  \draw[sg] (8.45,-2.25) -- node[left, font=\scriptsize, pos=0.78]{faults} (8.45,-3.45);
-  \draw[sg] (9.25,-3.45) -- node[right, font=\scriptsize, pos=0.22]{PWM} (9.25,-2.25);
-  \draw[sg] (sns.south) -- (sns.south |- lvb.north);
-  \draw[sg] (bus.south) -- (bus.south |- lvb.north);
-  \draw[<->, fblu] (ctl) -- node[above, font=\scriptsize]{PWM, enable} node[below, font=\scriptsize, align=center]{faults,\\measurements} (lvb);
-  \draw[sg] (v12.east) -| (6.0,-4.45);
-  % confine della scheda
+  % cio' che arriva da fuori
+  \node[ext, text width=46mm] (ctl) at (8.6,-2.1) {gate drive, protection, controller\\{\scriptsize outside the module}};
+  \draw[->, thick] (ctl.north) -- node[right, font=\scriptsize, pos=0.28]{gate and Kelvin-source signals} (brg.south);
+  % confine del modulo
   \begin{scope}[on background layer]
-    \node[draw=black, dash dot, rounded corners=4pt, inner sep=2.5mm,
-          fit=(dcl)(brg)(gd)(bus)(sns)(lvb)] (pcb) {};
+    \node[draw=black, dash dot, rounded corners=4pt, inner sep=3mm,
+          fit=(dcl)(brg)(rail)] (mod) {};
   \end{scope}
-  \node[anchor=north east, font=\scriptsize\bfseries] at (pcb.north east) {this board};
+  \node[anchor=north west, font=\scriptsize\bfseries] at (mod.north west) {power stage module};
 \end{tikzpicture}

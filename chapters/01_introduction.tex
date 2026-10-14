@@ -13,11 +13,11 @@ silicon IGBTs become slow and lossy. Silicon carbide MOSFETs are the natural
 answer, and they bring their own set of problems: fast edges, small gate-drive
 margins, and a body diode whose reverse recovery is not negligible.
 
-The object of this work is the complete design of such a converter, from the
-specification down to a laid-out printed circuit board. \Cref{fig:system}
-shows what that board contains and, as importantly, where it stops: the
-battery, the input filter, the cooling and the controller are outside it,
-and what crosses its boundary is written down as a requirement.
+The object of this work is the power stage of such a converter: the bridge,
+the DC-link and the cooling, with the schematic and the board layout of that
+module. \Cref{fig:system} shows what the module contains and where it stops:
+the battery, the gate drive and the controller are outside it, and what
+crosses its boundary is written down as an assumption (\cref{tab:sysassume}).
 The target is a design that can be \emph{defended}: every
 component value in this report is either taken from a datasheet, computed from
 a formula shown in the text, or obtained from a simulation whose model is
@@ -26,16 +26,15 @@ documented and validated.
 \begin{figure}[htbp]
 \centering
 \input{figures/tikz/sistema}
-\caption{The inverter and its boundaries. Orange: high-voltage side of the board;
-blue: low-voltage side, separated by a reinforced isolation barrier; dashed
-grey: parts outside the board, whose interface is specified as requirements
-(\cref{tab:sysreq}).}
+\caption{The power stage and its boundaries. Orange: inside the module; dashed
+grey: outside it, with the interface stated as assumptions
+(\cref{tab:sysassume}).}
 \label{fig:system}
 \end{figure}
 
 \section{Method}
 
-The design proceeds in five stages, each of which validates the previous one
+The design proceeds in four stages, each of which validates the previous one
 (\cref{fig:flow}). Four times a later stage found something that changed an
 earlier decision, and each of those returns is reported where it happened.
 
@@ -54,13 +53,10 @@ earlier decision, and each of those returns is reported where it happened.
         on-resistance rises by \SI{80}{\percent} between \SI{25}{\celsius} and
         \SI{175}{\celsius}, and verifies the stalled-motor case that selected
         the device.
-  \item Auxiliary circuit design (\cref{ch:aux}) covers the gate
-        drive, protection, sensing and DC-link management.
-  \item Schematic and layout (\cref{ch:schematic,ch:layout}) turn
-        the design into a KiCad project. The schematic is checked against an
-        independent model, pin by pin; the board against design rules that
-        encode the insulation coordination, which are themselves tested on a
-        board built to violate them.
+  \item Schematic and layout (\cref{ch:schematic,ch:layout}) turn the
+        design into a KiCad module: the schematic is checked against an
+        independent model, pin by pin, and the board against the creepage
+        and clearance of the power pins at \SI{900}{\volt}.
 \end{enumerate}
 
 \begin{figure}[htbp]
@@ -106,9 +102,8 @@ board that set the creepage at \SI{900}{\volt} (\cref{ch:layout}).
 device. \Cref{ch:analytical} performs the analytical sizing and
 \cref{ch:modulation} the choice of modulation. \Cref{ch:model} describes the
 simulation model and its validation, \cref{ch:losses} the loss budget and
-\cref{ch:thermal} the thermal design. \Cref{ch:aux} covers the auxiliary
-circuits. \Cref{ch:schematic,ch:layout} document the schematic and the board,
-and \cref{ch:conclusions} draws the conclusions. \Cref{app:assumptions}
-collects the assumptions that still require confirmation, together with the
-bench tests that close them; \cref{app:bom} gives the bill of
-materials and the cost.
+\cref{ch:thermal} the thermal design.
+\Cref{ch:schematic,ch:layout} document the schematic and the board of the
+module, and \cref{ch:conclusions} draws the conclusions.
+\Cref{app:assumptions} collects the assumptions that still require
+confirmation.

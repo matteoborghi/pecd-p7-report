@@ -32,17 +32,13 @@ implemented and the checks the frozen board passes.
   \label{fig:pcb-3d}
 \end{figure}
 
-\paragraph{Floorplan.} Everything is on one board
-(\cref{fig:pcb-top,fig:pcb-3d}), for three reasons that have numbers behind
-them. A connector between a driver board and a power board would add a
+\paragraph{Floorplan.} The power stage is the lower part of one board that
+also carries its gate drives (\cref{fig:pcb-top,fig:pcb-3d}). Each driver
+faces its own device across a few millimetres, so the gate loop never leaves
+its channel: a connector between a driver board and a power board would add a
 pair of parallel pins to every gate loop, about \SI{8}{\nano\henry} for
-\SI{10}{\milli\metre} of stacking height; the common-mode current that the
-barriers carry, \SI{0.80}{\ampere} peak (\cref{tab:cmcap}), returns on the
-board's own ground plane instead of through a cable; and the reinforced
-barrier is a single straight line, \SI{80}{\milli\metre} from the top edge,
-that every isolator straddles and the design rules check in one piece.
-The cost of one board (area that is six-layer even where two layers would
-do, and a board lost to any power fault) is accepted for a prototype.
+\SI{10}{\milli\metre} of stacking height. The module in this report is that
+lower part; the rest of the board is outside its scope.
 
 The floorplan follows the domains from top to bottom. The low-voltage side,
 above the barrier, carries the control connector, the auxiliary supply, the
@@ -503,8 +499,7 @@ Whether the standard permits interpolating creepage is to be confirmed on
 its text. If it did not, the \SI{1000}{\volt} row would apply: in pollution
 degree 1, which is the design basis, the drain--source gap would pass by
 \SI{1}{\percent} (\SI{3.24}{} against \SI{3.2}{\milli\metre}) and every
-other barrier would keep its margin; the pollution-degree-2 checks of
-\cref{tab:pd2robust} would each lose \SI{0.5}{} to \SI{1}{\milli\metre}.
+other barrier would keep its margin.
 
 \subsection{What the package leaves}
 
@@ -561,9 +556,11 @@ Rated impulse & Clearance & Creepage (PD1) & Margin on \SI{3.24}{\milli\metre} \
 
 At the selected level the air gap (\SI{1.50}{\milli\metre} required against
 \SI{3.24}{\milli\metre} available) does not constrain the design, and the
-surface path governs, which is what the coating addresses. Clearance stays below creepage only as long as the impulse assumption of
-\cref{sec:ovc} holds. Above \SI{4}{\kilo\volt} clearance
-becomes the quantity that sets creepage, and the design does not survive
+surface path governs, which is what the coating addresses. The
+\SI{2.5}{\kilo\volt} is derived from the transient the converter generates
+itself, \SI{1148}{\volt} at the die in the worst simulated case, and not from
+an overvoltage category. Above \SI{4}{\kilo\volt} clearance becomes the
+quantity that sets creepage, and the design does not survive
 \SI{6}{\kilo\volt}.
 
 \subsection{Two air paths the design rule check cannot see}

@@ -1,21 +1,23 @@
 % Il metodo: le fasi in avanti e i ritorni che hanno cambiato il progetto.
 \begin{tikzpicture}[
   font=\footnotesize, >=Stealth,
-  fase/.style={draw=fblu, fill=fblu!7, rounded corners=2pt, align=center, text width=18mm,
+  fase/.style={draw=fblu, fill=fblu!7, rounded corners=2pt, align=center, text width=22mm,
                minimum height=14mm, inner sep=2pt},
   ritorno/.style={->, farancio, thick, rounded corners=3pt},
-  lab/.style={font=\scriptsize, farancio, fill=white, inner sep=1.5pt}]
+  lab/.style={font=\scriptsize, farancio, inner sep=2pt}]
   \node[fase] (s) at (0,0)     {specification\\and criteria\\[1pt]\scriptsize Ch.~\ref{ch:spec}};
-  \node[fase] (a) at (2.2,0)   {analytical\\sizing\\[1pt]\scriptsize Ch.~\ref{ch:analytical}--\ref{ch:modulation}};
-  \node[fase] (m) at (4.4,0)   {circuit models\\{\scriptsize PLECS, SPICE}\\[1pt]\scriptsize Ch.~\ref{ch:model}--\ref{ch:losses}};
-  \node[fase] (t) at (6.6,0)   {thermal\\and cooling\\[1pt]\scriptsize Ch.~\ref{ch:thermal}};
-  \node[fase] (x) at (8.8,0)   {auxiliary\\circuits\\[1pt]\scriptsize Ch.~\ref{ch:aux}};
-  \node[fase] (b) at (11.0,0)  {schematic\\and board\\[1pt]\scriptsize Ch.~\ref{ch:schematic}--\ref{ch:layout}};
-  \node[fase, draw=fgrigio, fill=fgrigio!10] (v) at (13.2,0) {bench plan\\[1pt]\scriptsize App.~\ref{app:assumptions}};
-  \foreach \i/\j in {s/a, a/m, m/t, t/x, x/b, b/v} \draw[->, thick, fblu] (\i) -- (\j);
+  \node[fase] (a) at (2.7,0)   {analytical\\sizing\\[1pt]\scriptsize Ch.~\ref{ch:analytical}--\ref{ch:modulation}};
+  \node[fase] (m) at (5.4,0)   {circuit models\\{\scriptsize PLECS, SPICE}\\[1pt]\scriptsize Ch.~\ref{ch:model}--\ref{ch:losses}};
+  \node[fase] (t) at (8.1,0)   {thermal\\and cooling\\[1pt]\scriptsize Ch.~\ref{ch:thermal}};
+  \node[fase] (b) at (10.8,0)  {schematic\\and board\\[1pt]\scriptsize Ch.~\ref{ch:schematic}--\ref{ch:layout}};
+  \foreach \i/\j in {s/a, a/m, m/t, t/b} \draw[->, thick, fblu] (\i) -- (\j);
   % ritorni: ciascuno e' una scoperta che ha cambiato una decisione a monte
-  \draw[ritorno] (6.6,-0.7) -- (6.6,-1.15) -- node[lab]{locked rotor changes the device} (0,-1.15) -- (0,-0.7);
-  \draw[ritorno] (11.0,-0.7) -- (11.0,-1.75) -- node[lab]{drawn rail replaces the ideal plate} (6.9,-1.75) -- (6.9,-0.7);
-  \draw[ritorno] (4.1,0.7) -- (4.1,1.15) -- node[lab]{C2 sets $R_g$ and dead time} (0,1.15) -- (0,0.7);
-  \draw[ritorno] (11.0,0.7) -- (11.0,1.75) -- node[lab]{extracted loop re-simulated against C2} (4.7,1.75) -- (4.7,0.7);
+  \draw[ritorno] (8.1,-0.7) -- (8.1,-1.2) -- (0,-1.2) -- (0,-0.7);
+  \node[lab, below] at (4.05,-1.2) {locked rotor changes the device};
+  \draw[ritorno] (10.8,-0.7) -- (10.8,-2.1) -- (8.5,-2.1) -- (8.5,-0.7);
+  \node[lab, below] at (9.65,-2.1) {drawn rail replaces the ideal plate};
+  \draw[ritorno] (5.1,0.7) -- (5.1,1.2) -- (0.3,1.2) -- (0.3,0.7);
+  \node[lab, above] at (2.7,1.2) {C2 sets $R_g$ and the dead time};
+  \draw[ritorno] (10.8,0.7) -- (10.8,2.1) -- (5.7,2.1) -- (5.7,0.7);
+  \node[lab, above] at (8.25,2.1) {extracted loop re-run against C2};
 \end{tikzpicture}

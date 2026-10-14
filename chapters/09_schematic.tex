@@ -1,24 +1,20 @@
 \chapter{Schematic design}
 \label{ch:schematic}
 
-The schematic is drawn in KiCad 10.0.6 and was frozen on 11 October 2026,
-together with the board, as revision 1.2; the revisions after the first
-changed copper, title blocks and the text on the root sheet, which since
-revision 1.2 lists the system requirements R1--R14 (\cref{tab:sysreq}), but
-no circuit. It holds 275 parts on ten sheet
-files, which become eighteen sheet instances once the repeated blocks are
-expanded. This chapter explains how it is organised, what was decided while
-drawing it, and how it was checked; the sheets themselves close the chapter.
+The power stage is two sheets of a KiCad 10.0.6 project that was frozen on
+11 October 2026, together with the board, as revision 1.2: a sheet with the
+DC-link and the terminals, and a half-bridge leg instantiated three times.
+The module has 30 parts and talks to the rest of the project through 23
+labelled signals (\cref{tab:interface}). This chapter explains how it is
+organised and what was decided while drawing it; the two sheets close the
+chapter.
 
 \section{Sheet hierarchy}
 
-The schematic is organised by \emph{isolation domain} rather than by function
-or by phase. Each sheet either contains a single reference potential, in
-which case any stray ground symbol is a visible error, or is explicitly a
-barrier sheet, in which case exactly one barrier is verified and then reused.
-Repeated blocks (the three legs, the seven driver channels, the three sensing
-channels) are drawn once and instantiated: 187 of the 275 parts, about
-\SI{70}{\percent}, sit on a reused sheet and were drawn a single time.
+The schematic is organised by \emph{voltage domain} rather than by function
+or by phase. The three legs are one sheet drawn once and instantiated three
+times: 21 of the 30 parts of the module sit on that sheet and were drawn a
+single time.
 
 \begin{table}[htbp]
 \centering
@@ -39,29 +35,45 @@ root & --- & 1 & 0 & blocks, the signals between them, the requirements on the s
 The sheets of gate drive, sensing, auxiliary supply, control and DC-link
 management belong to the rest of the board and are outside this module.
 
+\begin{table}[htbp]
+\centering
+\caption{Interface of the power-stage module: the 23 signals that leave its
+sheet.}
+\label{tab:interface}
+\small
+\begin{tabularx}{\textwidth}{lYrl}
+\toprule
+Group & Signals & Count & Goes to \\
+\midrule
+DC-link & \texttt{HV\_DCP}, \texttt{HV\_DCN} & 2 & gate drive, DC-link management \\
+Switching nodes & \texttt{HV\_SW1}, \texttt{HV\_SW2}, \texttt{HV\_SW3} & 3 & gate drive \\
+Gate and Kelvin source & \texttt{GHk\_GATE}, \texttt{GHk\_COM}, \texttt{GLk\_GATE}, \texttt{GLk\_COM}, $k = 1,2,3$ & 12 & gate drive \\
+Shunt voltage & \texttt{SNSk\_SP}, \texttt{SNSk\_SN}, $k = 1,2,3$ & 6 & phase-current sensing \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 \section{Net naming and net classes}
 
-Net names carry their isolation domain as a prefix, so that whether a net is
-hazardous can be read from its name and enforced by a net class. The seven
-floating gate references are deliberately distinct names rather than a shared
-one: they move by hundreds of volts with respect to one another during
-commutation, and merging them would be an error that ERC cannot detect.
+Net names carry their voltage domain as a prefix, so that whether a net is
+hazardous can be read from its name and enforced by a net class. The
+floating gate references of the six devices are deliberately distinct names
+rather than a shared one: they move by hundreds of volts with respect to one
+another during commutation, and merging them would be an error that ERC
+cannot detect.
 
-The net classes follow the same rule: one class per isolation
-domain. A first version had a single class for all seven gate domains and
-asked for \SI{4.5}{\milli\metre} between any two of its nets. That is wrong
-inside a domain: the gate and the Kelvin source of one device are the same
-domain and sit \SI{0.70}{\milli\metre} apart on the package, and the
-supply pins of one driver \SI{0.67}{\milli\metre}. The design rule check
-would have raised hundreds of false violations, and a rule that always fails
-is a rule somebody switches off. With one class per domain the clearance
-\emph{inside} a class is the manufacturing value, and the distances
-\emph{between} classes are set by the rules of \cref{sec:rules}.
+The net classes follow the same rule: one class per domain. A first version
+had a single class for all gate domains and asked for
+\SI{4.5}{\milli\metre} between any two of its nets. That is wrong inside a
+domain: the gate and the Kelvin source of one device are the same domain and
+sit \SI{0.70}{\milli\metre} apart on the package. With one class per domain
+the clearance \emph{inside} a class is the manufacturing value, and the
+distances \emph{between} classes are set by the rules of the board.
 
 \begin{table}[htbp]
 \centering
-\caption{Net classes. Clearance and track width are the values inside the
-class; between classes the design rules of \cref{tab:rules} apply.}
+\caption{Net classes of the power stage. Clearance and track width are the
+values inside the class; between classes the rules of the board apply.}
 \label{tab:netclasses}
 \small
 \begin{tabularx}{\textwidth}{lYrr}
@@ -70,7 +82,7 @@ Class & Nets & Clearance & Track \\
 \midrule
 \texttt{HV\_BUS}   & DC-link positive and negative & \SI{2.0}{\milli\metre} & \SI{10.4}{\milli\metre} \\
 \texttt{HV\_POWER} & switching nodes and phase outputs & \SI{2.0}{\milli\metre} & \SI{8.4}{\milli\metre} \\
-\texttt{GATE\_H1} \ldots\ \texttt{GATE\_DIS} & seven floating gate domains, one class each & \SI{0.3}{\milli\metre} & \SI{0.5}{\milli\metre} \\
+\texttt{GATE\_H1} \ldots\ \texttt{GATE\_DIS} & floating gate domains, one class each & \SI{0.3}{\milli\metre} & \SI{0.5}{\milli\metre} \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -86,9 +98,10 @@ the schematic, and the same part has the same last digit in every instance.
 
 \section{Component choices fixed at capture}
 
-Giving every part a unique order code meant opening the datasheet of each,
-and seven times the datasheet contradicted an assumption made in the
-preceding chapters. None changes the topology; all are on the board.
+Giving every part a unique order code meant opening its datasheet, and for
+the commutation ceramics the datasheet contradicted an assumption made in the
+preceding chapters (\cref{tab:captdecisions}). It does not change the
+topology.
 
 \begin{table}[htbp]
 \centering

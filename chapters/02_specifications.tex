@@ -81,8 +81,30 @@ the die, not at the pins: the package inductance between the two adds
 \SIrange{40}{75}{\volt} at turn-off, so a criterion verified at the pins
 would pass while the die is already beyond it (\cref{sec:kelvin}).
 
-$V_\mathrm{max,cont}$ is a requirement on the battery, not a property of
-this board, and it is recorded as R12 in \cref{tab:sysreq}.
+$V_\mathrm{max,cont}$ is an assumption on the battery, not a property of
+this module, and it is recorded in \cref{tab:sysassume}.
+
+\subsection{Assumptions on the surrounding system}
+
+The module is sized under four assumptions about what surrounds it. Each is
+stated here once and used in the chapter that needs it.
+
+\begin{table}[htbp]
+\centering
+\caption{Assumptions on the system around the power stage.}
+\label{tab:sysassume}
+\small
+\begin{tabularx}{\textwidth}{YYY}
+\toprule
+Assumption & Value & Used in \\
+\midrule
+Maximum continuous bus voltage, including charging and regenerative braking & \SI{900}{\volt} & \cref{sec:vhierarchy}, \cref{sec:dclink}, \cref{sec:insulation} \\
+Source impedance at \SI{20}{\kilo\hertz} & $L \geq \SI{1.5}{\micro\henry}$ or $R \geq \SI{50}{\milli\ohm}$ & \cref{sec:dclink}, \cref{ch:model} \\
+Coolant at the rail inlet & 50/50 water--glycol, $\leq\SI{65}{\celsius}$, $\geq\SI{10}{\litre\per\minute}$, \SI{4.7}{\kilo\pascal} drop & \cref{sec:cooling} \\
+Modulation at standstill & discontinuous (DPWM), recommended and not relied upon & \cref{ch:modulation}, \cref{sec:lrdpwm} \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \section{Topology}
 
@@ -179,7 +201,8 @@ saturation-voltage offset in full.
 The price is paid at the gate. A SiC MOSFET has a low threshold voltage with
 a negative temperature coefficient, a small gate-charge, and switching edges
 measured in nanoseconds; all of this makes the gate loop and the commutation
-loop design critical rather than routine. \Cref{ch:aux} is, to a large
+loop design critical rather than routine. The gate resistances and the dead
+time of \cref{ch:losses} and the layout of \cref{ch:layout} are, to a large
 extent, the consequence of this choice.
 
 \section{Device selection}
@@ -218,7 +241,7 @@ C3 & Drain--source creepage on the board at \SI{900}{\volt}
    & PD1, \SI{2.8}{\milli\metre}~\cite{standardclarity} \\
 C4 & AEC-Q101 (discretes) or AQG~324 (modules) & automotive application \\
 C5 & Declared short-circuit withstand $t_\mathrm{SC} \geq \SI{1.5}{\micro\second}$
-   & twice the typical desaturation chain of \cref{ch:aux}
+   & twice the typical desaturation chain of the gate driver
      (\SI{0.75}{\micro\second}); \num{1.7} times the worst-case one \\
 \bottomrule
 \end{tabularx}

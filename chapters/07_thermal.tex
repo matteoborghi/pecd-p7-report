@@ -284,8 +284,8 @@ it is \SI{23}{\watt}, not \SI{40}{\watt}. DPWM-MIN clamps the other two
 phases instead; phase~1 keeps switching at a duty of \SI{5}{\percent}, and
 the two devices of its leg end at \SI{95.2}{} and \SI{92.9}{\celsius}. It
 is nearly as good, and either would serve. How this margin is used, as a
-recommendation to the controller and not as a basis for sizing, is argued in
-\cref{sec:sysreq}.
+recommendation to the controller and not as a basis for sizing, is stated in
+\cref{tab:sysassume}.
 
 \begin{finding}{Discontinuous modulation would not have saved the \SI{40}{\milli\ohm} device}
 If modulation could have kept the first device inside C1, the device change
@@ -346,7 +346,7 @@ Maximum $\Rdson$ & \SI{118.2}{\celsius} & $+\SI{7.1}{\celsius}$ \\
 Sum of the four & & $+\SI{26.0}{\celsius}$ \\
 \textbf{All four together, loop closed} & \textbf{\SI{140.5}{\celsius}} & $\mathbf{+\SI{29.4}{\celsius}}$ \\
 Same, pad at the mounting limit \SI{0.62}{\celsius\per\watt} & \SI{142.4}{\celsius} & $+\SI{31.3}{\celsius}$ \\
-Same, with DPWM-MAX (R13) & \SI{126.4}{\celsius} & $+\SI{15.3}{\celsius}$ \\
+Same, with DPWM-MAX & \SI{126.4}{\celsius} & $+\SI{15.3}{\celsius}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -564,10 +564,8 @@ Route by route:
   \item A copper spreader at drain potential between tab and pad
         spreads the flux over \SI{7}{\centi\metre\squared} and gains another
         \SI{5}{\celsius}. It is not worth it here: a second clamped joint,
-        \SI{2.2}{} times the pad capacitance of the low-side devices to
-        chassis (\cref{tab:cmcap}), and spreaders of opposite potentials
-        \SI{5}{\milli\metre} apart where the creepage asks for
-        \SI{4.5}{}.
+        and spreaders of opposite potentials \SI{5}{\milli\metre} apart where the
+        creepage asks for \SI{4.5}{}.
   \item Internally isolated TO-247-4 packages put the ceramic
         inside, under the die (Littelfuse ISO247, Navitas UHV-TO-247-4-ISO
         with AlN, Luminus ISOMOS~\cite{littelfuse_iso247,navitas_uhviso}):
@@ -681,9 +679,8 @@ $\Tj = T_\mathrm{NTC} + P_\mathrm{dev}(\Rthcs + \Rthjc)$, a rise of
 
 With a cold-plate time constant of \SI{10}{\second} and a junction time
 constant of milliseconds, the NTC cannot protect against a short circuit, an
-overcurrent, or a loss of gate drive. Those belong to the desaturation detection
-(\SI{0.69}{}--\SI{0.83}{\micro\second}, \cref{tab:protection})
-and the shunt chain (\SI{3}{}--\SI{4}{\micro\second}) of \cref{ch:aux}. What
+overcurrent, or a loss of gate drive. Those belong to the protection of the
+gate drive and to the current measurement, outside this module. What
 the NTC protects against is loss of cooling, which is a real and otherwise
 undetected failure.
 
@@ -737,10 +734,6 @@ Film C101, \SI{140}{\micro\farad} & \SI{13.7}{} of \SI{43.5}{\ampere}, \SI{0.37}
 Film C102, \SI{60}{\micro\farad} & \SI{5.9}{} of \SI{40}{\ampere}, \SI{0.09}{\watt} & hotspot $+\SI{0.6}{\kelvin}$ & as C101, slightly better \\
 KC-LINK, $12\times\SI{47}{\nano\farad}$ & \SIrange{1.0}{2.0}{\ampere} each, \SI{2}{\mega\hertz} & a few tenths of a kelvin & \SI{12}{\ampere} allowed; C0G does not age \\
 Shunts, \SI{0.5}{\milli\ohm} & \SI{0.45}{}/\SI{0.90}{\watt} rated/stalled & terminals \SIrange{100}{115}{\celsius} & \SIrange{5.0}{6.3}{\watt} allowed there \\
-Gate resistors & \SI{27}{} and \SI{36}{\milli\watt} & negligible & \SI{0.75}{} and \SI{0.66}{\watt} rated \\
-Gate drivers & \SI{0.11}{\watt} & $+\SI{3.7}{\kelvin}$ on the board & far from \SI{150}{\celsius} \\
-Bleeders R602--R605 & \SI{0.90}{\watt} each at \SI{900}{\volt} & hotspot \SIrange{138}{153}{\celsius} & \SI{220}{\celsius} limit; see below \\
-Discharge resistor & \SI{81}{\joule} pulse & on the rail & \SI{100}{\joule} specified (\cref{sec:dclinkmgmt}) \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -767,17 +760,6 @@ voltage, from the manufacturer's life curves.}
 \label{fig:filmlife}
 \end{figure}
 
-\begin{finding}{The hottest parts on the board are four passive bleeders}
-The passive bleeder of \cref{sec:dclinkmgmt}, four \SI{56}{\kilo\ohm} resistors
-in series across the bus, dissipates \SI{0.90}{\watt} each at
-\SI{900}{\volt}, continuously, in a \SI{2}{\watt} part whose thermal
-resistance is \SI{75}{\kelvin\per\watt}: a hotspot of \SI{138}{\celsius}
-with the enclosure at \SI{70}{\celsius} and \SI{153}{\celsius} at
-\SI{85}{\celsius}. The resistor tolerates it (\SI{220}{\celsius}); a
-laminate with $T_g = \SI{150}{\celsius}$ in contact with its body does not.
-Revision 1.2 therefore specifies the bodies \SI{4}{\milli\metre} above the
-board (fabrication note 9). Nothing else on the board comes close.
-\end{finding}
 
 \paragraph{The ceramics ring with the films.} At every switching edge the
 step in bridge current is first supplied by the ceramics, then handed to
@@ -788,13 +770,7 @@ $C = \SI{564}{\nano\farad}$. With the energy of each ring
 $\Delta I^2/(4\alpha)$, $\alpha = R/2L$, summed over six edges per switching
 period, the ceramics carry \SIrange{12}{24}{\ampere} in total for a loop
 resistance of \SIrange{4}{1}{\milli\ohm}: \SIrange{1}{2}{\ampere} each,
-well inside their rating. The same number has a second reading. A ring with
-a quality factor of \numrange{35}{140} at \SI{2}{\mega\hertz} sits in the
-conducted-emission band of CISPR~25~\cite{cispr25}, just above the medium-wave
-broadcast band, and it is a differential-mode current on the bus. It is the
-one emission mechanism this design can predict before a board exists, and
-the first thing to look for on the bench; a damping network across the bus
-is the usual remedy (\cref{app:assumptions}, A.19).
+well inside their rating.
 
 \paragraph{The shunts} dissipate a fifth of what their terminals allow even
 in the hot case. What their temperature does affect is accuracy: with

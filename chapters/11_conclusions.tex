@@ -39,30 +39,19 @@ C3, creepage & \SI{900}{\volt} working, PD2 &
   rail and the pad; functional only across the isolated converters (A.25) &
   \cref{sec:insulation} \\
 C4, automotive & AEC-Q101 / AQG~324 &
-  power devices, drivers and isolators qualified; the auxiliary supplies and
-  connectors are not & \cref{sec:nextrev} \\
+  power device qualified & \cref{sec:deviceselection} \\
 C5, short circuit & $t_\mathrm{SC} \geq \SI{1.5}{\micro\second}$ declared &
   \textbf{open}: not declared by the manufacturer; bench test B1 & A.5 \\
 DC-link ripple & $\leq\SI{0.5}{\percent}$ &
   \SI{0.17}{\percent} at the rated point, \SI{2.86}{\volt} in the worst case &
   \cref{sec:dclink} \\
-Discharge & $<\SI{60}{\volt}$ in \SI{5}{\second} &
-  \SI{0.54}{\second} with the auxiliary supply; \textbf{not met} without it
-  (A.L1) & \cref{sec:dclinkmgmt} \\
-Conducted emission & CISPR~25 & class~3 met by estimate, by
-  \SI{3}{\decibel} at least, with an input filter outside the board; the board as
-  frozen alone would not & \cref{sec:emcest} \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-The specification is met wherever the design can show it, with two
-declared exceptions and one open point. The exceptions are system-level
-choices written as limits rather than hidden: the isolated converters
-provide functional insulation only at \SI{900}{\volt}, and the active
-discharge depends on the auxiliary supply. The open point is the
-short-circuit withstand time, which the manufacturer does not declare and
-which no simulation can replace.
+The specification is met wherever the design can show it, with one open
+point: the short-circuit withstand time, which the manufacturer does not
+declare and which no simulation can replace.
 
 The stalled motor, a requirement this design added, sizes the design. It
 decided the device, it decided the
@@ -88,9 +77,6 @@ consequence:
         turn-off loss by \SI{38}{\percent}.
   \item Switching energies (B4) and locked rotor (B6), which
         close the loss model and C1 on hardware.
-  \item Conducted emission, which closes the estimate of
-        \cref{sec:emcest}: its margin with the filter is \SI{3}{\decibel},
-        less than the accuracy of an estimate.
 \end{itemize}
 
 \section{What the work taught}
@@ -122,12 +108,7 @@ found taught more than the error itself.
 
 \section{Possible developments}
 
-The production changes are listed in \cref{sec:nextrev}: reinforced
-auxiliary supplies and a discharge that survives the loss of the
-\SI{12}{\volt} rail, automotive replacements for the remaining parts, the
-input filter of \cref{tab:emcfilter} outside the board, and a four-layer
-board. Three
-developments go beyond a revision.
+Three developments go beyond a revision.
 
 \paragraph{Discontinuous modulation at standstill.} Clamping the phase that
 carries the peak current to the positive rail lowers the hottest junction at
@@ -162,7 +143,7 @@ once: the integrated busbar removes most of the package inductance, and the
 creepage becomes a certified property of the module rather than a consequence
 of a lead pitch. The argument for a module is therefore stronger than the
 inductance figure alone suggests, and it is the single change that would let
-this design scale in frequency. See \cref{sec:packagelimits}.
+this design scale in frequency.
 
 The selection study of \cref{sec:deviceselection} looked for such a module
 at this rating and did not find one that fits: the small six-packs on the
