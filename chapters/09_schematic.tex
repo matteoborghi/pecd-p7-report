@@ -96,24 +96,43 @@ leg~2 is \texttt{Q121}, the driver of the high side of leg~1 is
 \texttt{U601}. A reference read on the board therefore says where to look in
 the schematic, and the same part has the same last digit in every instance.
 
-\section{Component choices fixed at capture}
+\section{Components of the power stage}
 
-Giving every part a unique order code meant opening its datasheet, and for
-the commutation ceramics the datasheet contradicted an assumption made in the
-preceding chapters (\cref{tab:captdecisions}). It does not change the
-topology.
+\Cref{tab:components} lists every part of the module with the reason it was
+chosen. Giving each part a unique order code meant opening its datasheet, and
+for the commutation ceramics the datasheet contradicted an assumption of the
+preceding chapters: in C0G at \SI{1200}{\volt} the largest ceramic is
+\SI{47}{\nano\farad} in a 3640~\cite{kemet_kclink}, and the \SI{220}{\nano\farad}
+of the earlier estimate does not exist in that class.
 
 \begin{table}[htbp]
 \centering
-\caption{Decisions taken while drawing the schematic.}
+\caption{Components of the power stage, with the basis of each choice.}
+\label{tab:components}
 \label{tab:captdecisions}
 \small
-\begin{tabularx}{\textwidth}{lYY}
+\begin{tabularx}{\textwidth}{L{0.16\textwidth}L{0.2\textwidth}L{0.15\textwidth}Y}
 \toprule
- & What the datasheet showed & Part on the board \\
+Function (quantity) & Part & Key values & Chosen because \\
 \midrule
-D8 & in C0G at \SI{1200}{\volt} the largest ceramic is \SI{47}{\nano\farad}, in a 3640~\cite{kemet_kclink}; the \SI{220}{\nano\farad} of the earlier estimate does not exist in that class
-   & four KC-LINK \SI{47}{\nano\farad} per leg, \SI{188}{\nano\farad}, at \SI{75}{\percent} of the rating at \SI{900}{\volt} \\
+Switching devices (6) & E3M0016120K, Wolfspeed~\cite{wolfspeed_e3m0016}
+  & \SI{1200}{\volt}, \SI{16}{\milli\ohm}, TO-247-4L
+  & passes C1--C4 with the vendor SPICE model (\cref{sec:deviceselection}) \\
+DC-link film (2) & MKP1848 \SI{140}{} and \SI{60}{\micro\farad}, Vishay~\cite{vishay_mkp1848}
+  & \SI{200}{\micro\farad}, \SI{1100}{\volt} DC
+  & ripple \SI{2.86}{\volt} in the worst case against \SI{4}{\volt}; the \SI{1100}{\volt} class carries \SI{900}{\volt} up to a \SI{98}{\celsius} hotspot (\cref{sec:dclink}) \\
+Commutation ceramics (12, four per leg) & CKC33C473\-KEGACAUTO, KEMET~\cite{kemet_kclink}
+  & \SI{47}{\nano\farad} C0G, \SI{1200}{\volt}, 3640
+  & \SI{188}{\nano\farad} per leg at \SI{75}{\percent} of the rating at \SI{900}{\volt}; \SI{6.25}{\milli\metre} between pads against \SI{2.80}{\milli\metre} of creepage; no bias loss \\
+Phase shunts (3) & CSS2H-3920R-L500FE, Bourns
+  & \SI{0.5}{\milli\ohm}, Kelvin
+  & \SI{0.45}{\watt} at rated current, \SI{0.90}{\watt} stalled, terminals at most \SI{115}{\celsius} (\cref{sec:complife}) \\
+Insulating pad (one per leg) & aluminium nitride \SI{0.63}{\milli\metre} with phase-change interface
+  & $\Rthcs \leq \SI{0.18}{\celsius\per\watt}$
+  & the interfaces, not the ceramic, set the value (\cref{sec:coolalt}) \\
+Cooling rail (1) & six-port aluminium extrusion, \SI{10}{\litre\per\minute}
+  & $R_\mathrm{eq} = \SI{0.069}{\celsius\per\watt}$
+  & the rail as first drawn, with two channels, reaches \SI{128.7}{\celsius} at locked rotor, beyond C1 (\cref{sec:cooling}) \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -151,9 +170,9 @@ footprint, and would not have been found by reading the pitch.
 
 \section{Schematic sheets}
 
-The sheets follow, one per page, in the order of \cref{tab:sheets}. Of each
-reused sheet one instance is shown: leg~1, the high-side driver of leg~1 and
-the sensing channel of phase~1; the others differ only in their references.
+The two sheets of the module follow, one per page, in the order of
+\cref{tab:sheets}. Of the leg sheet one instance is shown, leg~1; the others
+differ only in their references.
 
 \newcommand{\foglio}[3]{%
   \begin{sidewaysfigure}

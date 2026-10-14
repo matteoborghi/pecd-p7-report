@@ -29,7 +29,13 @@ coolant temperature of \SI{65}{\celsius} is \emph{not} given by the
 specification: it is the value normally available from a vehicle's
 power-electronics loop, a separate and hotter circuit than the one serving
 the cabin, and it is adopted here as an assumption. Every thermal result is
-therefore also given at \SI{70}{\celsius}.
+therefore also given at \SI{70}{\celsius}. The brief fixes the maximum
+ambient at \SI{50}{\celsius}. A liquid loop rejects its heat to that ambient
+through a radiator, so its coolant cannot be colder than the ambient, and
+\SI{65}{\celsius} leaves \SI{15}{\kelvin} of approach: for the
+\SI{128}{\watt} of the rated point that is a radiator conductance of about
+\SI{9}{\watt\per\kelvin}, a small one. Forced air takes the \SI{50}{\celsius}
+ambient directly at the fin inlet (\cref{sec:cooling}).
 
 \subsection{Requirements this design adds}
 

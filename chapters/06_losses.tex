@@ -72,6 +72,49 @@ Conduction losses are not exactly constant across the sweep: they rise by
 thermal feedback: more switching loss raises the junction temperature, which raises $\Rdson$, which raises the conduction
 loss.
 
+\section{Dependence on the load power factor}
+\label{sec:pfsweep}
+
+The brief asks for the rated current at any load power factor. The sweep of
+$\cos\varphi$ from \num{0.02} to \num{1} that validates the DC-link current
+(\cref{sec:validation}) was run with the losses and the thermal loop as well,
+at the rated modulation amplitude and on the ideal cold plate.
+\Cref{tab:sweep-pf} gives the result.
+
+\begin{table}[htbp]
+\centering
+\caption{Losses and junction temperature against load power factor, at
+\SI{800}{\volt}, \SI{20}{\kilo\hertz}, modulation amplitude \SI{427}{\volt}.
+The last two columns scale each point to exactly \SI{30}{\Arms}, with
+conduction proportional to $I^2$ and switching to $I$ [estimate].}
+\label{tab:sweep-pf}
+\small
+\begin{tabular}{rrrrrrrr}
+\toprule
+ & $I_\mathrm{rms}$ & $P_\mathrm{cond}$ & $P_\mathrm{sw}$ & $P_\mathrm{tot}$ & $\Tj$ & $P_\mathrm{tot}$ at \SI{30}{\Arms} & $\Tj$ at \SI{30}{\Arms} \\
+$\cos\varphi$ & [\si{\ampere}] & [\si{\watt}] & [\si{\watt}] & [\si{\watt}] & [\si{\celsius}] & [\si{\watt}] & [\si{\celsius}] \\
+\midrule
+1.00 & 30.94 & 61.8 & 75.7 & 137.6 & 83.1 & 131.5 & 82.3 \\
+0.87 & 30.04 & 57.7 & 70.6 & 128.3 & 81.9 & 128.1 & 81.8 \\
+0.50 & 30.18 & 57.9 & 71.0 & 128.9 & 81.9 & 127.8 & 81.8 \\
+0.20 & 30.30 & 58.0 & 71.3 & 129.3 & 82.0 & 127.5 & 81.8 \\
+0.10 & 30.34 & 58.2 & 71.6 & 129.7 & 82.1 & 127.7 & 81.8 \\
+0.02 & 30.36 & 58.2 & 71.6 & 129.8 & 82.1 & 127.6 & 81.8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At a fixed modulation amplitude the load current drifts between \SI{30.0}{}
+and \SI{30.9}{\ampere} with the load, so the raw columns mix two effects.
+Brought to \SI{30}{\Arms} the losses are \SIrange{127.5}{128.1}{\watt} for
+every power factor below \num{0.9}, which is the rated-point value of
+\cref{tab:losses}, and the junction stays at \SI{81.8}{\celsius}. The
+worst case for the losses is unity power factor, at about \SI{131.5}{\watt}
+(\SI{+2.7}{\percent}) and \SI{82.3}{\celsius}: half a kelvin above the rated
+point. The rated current is therefore met at any power factor with no change
+to the thermal result, and the worst case of the power stage remains the
+stalled motor of \cref{sec:lockedrotor}.
+
 \section{The dead-time loss}
 \label{sec:deadtime-loss}
 
