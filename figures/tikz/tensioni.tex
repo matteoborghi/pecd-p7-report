@@ -1,0 +1,24 @@
+% Scala delle tensioni del bus: cosa dimensiona ciascun livello e quanto margine resta al dispositivo.
+\begin{tikzpicture}[font=\footnotesize, >=Stealth, x=0.023cm, y=1cm]
+  \draw[->] (700,0) -- (1240,0) node[right]{$V_\mathrm{DS}$};
+  \foreach \v in {700,800,...,1200} \draw (\v,0.08) -- (\v,-0.08) node[below, font=\scriptsize]{\v};
+  % zone di funzionamento
+  \fill[fverde!20]   (700,0.2) rectangle (900,0.6);
+  \fill[farancio!20] (900,0.2) rectangle (1000,0.6);
+  \fill[farancio!45] (1000,0.2) rectangle (1080,0.6);
+  \fill[black!12]    (1080,0.2) rectangle (1200,0.6);
+  \node[font=\scriptsize] at (800,0.4) {continuous operation};
+  \node[font=\scriptsize] at (950,0.4) {trip, fault};
+  \node[font=\scriptsize] at (1040,0.4) {overshoot};
+  \node[font=\scriptsize] at (1140,0.4) {unused};
+  % livelli: altezza e lato dell'etichetta scelti perche' nessuna linea attraversi un testo
+  \foreach \v/\t/\h/\a in {800/nominal $\Vdc$/1.0/south, 900/maximum continuous/1.5/south east,
+                           950/overvoltage trip/2.5/south west, 1000/{abnormal, bridge off}/2.0/south west,
+                           1080/die limit/1.0/south west, 1200/device rating/1.5/south east} {
+    \draw[thick] (\v,0.2) -- (\v,\h);
+    \node[anchor=\a, font=\scriptsize, inner sep=1.5pt] at (\v,\h) {\t, \SI{\v}{\volt}};
+  }
+  % margini
+  \draw[decorate, decoration={brace, mirror, amplitude=4pt}] (950,-0.5) -- node[below=4pt, font=\scriptsize]{\SI{130}{\volt} for the overshoot (C2)} (1080,-0.5);
+  \draw[decorate, decoration={brace, mirror, amplitude=4pt}] (700,-0.5) -- node[below=4pt, font=\scriptsize]{at \SI{900}{\volt} the device blocks \SI{75}{\percent} of its rating} (900,-0.5);
+\end{tikzpicture}

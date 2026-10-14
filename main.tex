@@ -1,0 +1,80 @@
+% ===========================================================================
+%  Three-Phase Two-Level SiC Traction Inverter
+%  Project 7 - Automotive Power Electronics Circuit Design
+%  Universita' di Bologna
+%
+%  Compilazione:  latexmk -pdf main.tex        (oppure make)
+%  Le figure vanno sincronizzate prima con:    python aggiorna_figure.py
+% ===========================================================================
+\documentclass[11pt,a4paper,twoside,openright]{report}
+
+\input{preamble}
+
+\begin{document}
+
+% --------------------------------------------------------------- frontespizio
+\begin{titlepage}
+\centering
+\vspace*{2cm}
+
+{\Large\scshape University of Bologna}\\[0.3cm]
+{\large School of Engineering}\\[2.5cm]
+
+{\large Automotive Power Electronics Circuit Design}\\[0.4cm]
+{\large\bfseries Project 7}\\[1.5cm]
+
+\rule{\textwidth}{0.5pt}\\[0.6cm]
+{\huge\bfseries Design of a Three-Phase Two-Level\\[0.2cm]
+SiC Traction Inverter\\[0.4cm]}
+{\large \SI{800}{\volt} DC-link, \SI{30}{\Arms} per phase, \SI{20}{\kilo\hertz}}\\[0.5cm]
+\rule{\textwidth}{0.5pt}\\[2.5cm]
+
+{\large Matteo Borghi}\\[2cm]
+
+{\large Academic Year 2025/2026}
+
+\vfill
+\end{titlepage}
+
+\cleardoublepage
+\pagenumbering{roman}
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+\input{chapters/00_abstract}
+
+\cleardoublepage
+\tableofcontents
+\cleardoublepage
+\listoffigures
+\cleardoublepage
+\listoftables
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+% ------------------------------------------------------------------ capitoli
+\input{chapters/01_introduction}
+\input{chapters/02_specifications}
+\input{chapters/03_analytical_design}
+\input{chapters/04_modulation}
+\input{chapters/05_simulation_model}
+\input{chapters/06_losses}
+\input{chapters/07_thermal}
+\input{chapters/08_auxiliary}
+\input{chapters/09_schematic}
+\input{chapters/10_layout}
+\input{chapters/11_conclusions}
+
+% ------------------------------------------------------------- bibliografia
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Bibliography}
+\printbibliography[title={Bibliography}]
+
+% ---------------------------------------------------------------- appendici
+\appendix
+\input{chapters/A_open_assumptions}
+\input{chapters/B_bill_of_materials}
+
+\end{document}

@@ -1,0 +1,15 @@
+% Catena termica dell'eq. (thermal-chain): ogni dispositivo ha i suoi R_jc e R_cs, il
+% dissipatore e' comune. Le perdite sono generatori di corrente, le temperature potenziali.
+\begin{circuitikz}[font=\footnotesize]
+  \draw (0,0) node[ground]{} to[I, l={$P_k$}] (0,2)
+        to[short, -*] (0.6,2) node[below=2pt]{$T_{j,k}$}
+        to[R, l={$\Rthjc$}, -*] (3.0,2) node[below=2pt]{$T_{c,k}$}
+        to[R, l={$\Rthcs$, pad}, -*] (5.4,2) node[below right=1pt]{$T_\mathrm{hs}$}
+        to[R, l={$\Rthha$}] (9.6,2)
+        to[V, l={$T_\mathrm{liq}$}, invert] (9.6,0) node[ground]{};
+  % gli altri cinque dispositivi arrivano sullo stesso nodo
+  \draw[dashed] (5.4,2) -- (5.4,3.0) -- (3.4,3.0);
+  \node[anchor=east, font=\scriptsize] at (3.4,3.0) {five more branches $P$--$\Rthjc$--$\Rthcs$};
+  \node[font=\scriptsize, align=center, text width=62mm] at (5.0,0.55)
+       {$\Rthha$: one value for the ideal plate; spreading, conduction and convection in the real rail (\cref{sec:cooling})};
+\end{circuitikz}

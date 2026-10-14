@@ -1,0 +1,30 @@
+% Ponte trifase a due livelli: bus, DC-link, tre gambe con diodo di corpo, carico RL a stella.
+% Riferimenti dei MOSFET come sulla scheda (Q1k1 lato alto, Q1k2 lato basso).
+\begin{circuitikz}[font=\footnotesize, scale=0.9, transform shape]
+  \def\yp{4.4}\def\ym{2.2}
+  % bus
+  \draw (0.3,\yp) node[left]{DC$+$} -- (11.2,\yp);
+  \draw (0.3,0) node[left]{DC$-$} -- (11.2,0);
+  % DC-link: film e ceramici
+  \draw (1.3,\yp) to[C] (1.3,0);
+  \draw (2.7,\yp) to[C] (2.7,0);
+  \node[font=\scriptsize, align=right, anchor=east] at (1.15,3.3) {film\\\SI{200}{\micro\farad}};
+  \node[font=\scriptsize, align=right, anchor=east] at (2.6,1.1) {C0G\\\SI{564}{\nano\farad}};
+  % tre gambe
+  \foreach \x/\k/\f in {4.6/1/a, 7.2/2/b, 9.8/3/c} {
+    \draw (\x,\yp) -- (\x,3.95) node[nmos, bodydiode, anchor=D] (H\k) {};
+    \draw (H\k.S) -- (\x,\ym);
+    \draw (\x,0.45) node[nmos, bodydiode, anchor=S] (L\k) {};
+    \draw (L\k.S) -- (\x,0);
+    \draw (L\k.D) -- (\x,\ym);
+    \node[anchor=east, font=\scriptsize] at ($(H\k.G)+(-0.1,0.25)$) {Q1\k1};
+    \node[anchor=east, font=\scriptsize] at ($(L\k.G)+(-0.1,0.25)$) {Q1\k2};
+    % uscita di fase: scende attraversando il bus negativo senza collegarsi
+    \draw (\x,\ym) to[short, *-] (\x+0.7,\ym) -- (\x+0.7,0.12);
+    \draw[white, line width=3pt] (\x+0.7,0.1) -- (\x+0.7,-0.1);
+    \draw (\x+0.7,0.12) -- (\x+0.7,-0.6) node[right]{$\f$};
+    \draw (\x+0.7,-0.6) to[R, l_=$R$] (\x+0.7,-2.2) to[cute inductor, l_=$L$] (\x+0.7,-3.6);
+  }
+  \draw (5.3,-3.6) -- (10.5,-3.6);
+  \node[font=\scriptsize, align=left, anchor=west] at (10.8,-2.6) {motor, or the\\$RL$ bench load\\of \cref{ch:analytical}};
+\end{circuitikz}

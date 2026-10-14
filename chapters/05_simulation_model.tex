@@ -1,0 +1,217 @@
+\chapter{Simulation model and validation}
+\label{ch:model}
+
+\section{Model structure}
+
+The converter is modelled in PLECS~\cite{plecs}: three half-bridge power
+modules on a common heat sink, the \SI{200}{\micro\farad} DC-link with its
+ESR, a \SI{5}{\micro\henry} source inductance standing for battery and
+harness, an equivalent $RL$ load per phase, and the modulator of
+\cref{ch:modulation}. The devices carry the vendor thermal
+description~\cite{wolfspeed_plecs}, which supplies conduction and switching
+losses as lookup tables indexed by current, voltage and junction temperature,
+and scales the switching energies with the gate resistance through a formula
+of its own; the model passes it the design values, \SI{5}{\ohm} at turn-on
+and \SI{12.5}{\ohm} at turn-off. The model file is version V08.
+
+For the \device{} the vendor ships the description only in the legacy
+two-file format (MOSFET plus body diode), while the model uses the newer
+single-component format. The conversion was written as a script and
+validated on a device available in both formats: converting the legacy
+C3M0040120K reproduces the vendor's own single-file version in all
+\num{579} table values, with zero difference.
+
+The entire study is driven from Python over the PLECS XML-RPC interface, so
+that every figure and every number in this report is reproducible by running
+one command. This matters more than it sounds: several of the results below
+were obtained by re-running the same sweep with one parameter changed, and
+doing that by hand in a GUI is both slow and unreliable.
+
+\section{Coherent sampling for the spectra}
+
+PLECS uses a variable-step solver, so its output is not sampled uniformly in
+time. A discrete Fourier transform of that output would be meaningless.
+Every waveform used for spectral analysis is therefore requested on a
+\emph{uniform grid} supplied to the solver, which interpolates on its own
+steps. This is more accurate than post-hoc interpolation and transfers far
+less data.
+
+The grid spans an integer number of fundamental periods, so the fundamental
+falls exactly on a bin and no window is required.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{plecs_07_spettri_fft.pdf}
+\caption{Spectra of the phase voltage $v_{1N}$ and of the phase current
+$i_1$. The switching sidebands around \SI{20}{\kilo\hertz} and its multiples
+are clearly resolved; the load inductance attenuates them almost completely
+in the current.}
+\label{fig:fft}
+\end{figure}
+
+The total harmonic distortion is computed from the RMS value rather than by
+truncating the sum at a fixed harmonic order:
+%
+\begin{equation}
+  \mathrm{THD} = \frac{\sqrt{V_\mathrm{rms}^2 - V_1^2}}{V_1} .
+  \label{eq:thd}
+\end{equation}
+%
+This matters for a PWM voltage. Truncating at the usual 50 harmonics reaches
+only \SI{10}{\kilo\hertz} and misses the entire switching spectrum, giving a
+THD of about \SI{1}{\percent} where the true figure is \SI{62.6}{\percent}.
+The current THD, by contrast, is \SI{0.85}{\percent}: the difference between
+the two is the load inductance doing its job.
+
+\section{Verification of the vendor loss tables}
+\label{sec:losstables}
+
+The loss figures of \cref{ch:losses} are only as good as the tables they come
+from. Those tables were therefore checked against the datasheet, and the
+check changed the result.
+
+The vendor library ships the same device in two folders: a legacy pair
+(\texttt{MOSFET} plus a separate \texttt{Diode} file) and a newer single
+file whose class is \texttt{MOSFET with Diode}. The second name invites the
+reading ``MOSFET plus an external SiC Schottky diode''. Under that reading
+the tables would be referred to the \SI{1287}{\micro\joule} case of
+\cref{tab:device}, and since this design has no external diodes, the
+simulated switching losses would be underestimated by a factor of 2.0.
+
+The reading is wrong. Comparing the table entry at the datasheet test point
+(\SI{800}{\volt}, \SI{80.28}{\ampere}, \SI{175}{\celsius},
+\SI{2.5}{\ohm}) against the two datasheet columns settles it:
+
+\begin{table}[htbp]
+\centering
+\caption{Vendor table entries against the two datasheet
+cases~\cite{wolfspeed_e3m0016,wolfspeed_plecs}.}
+\label{tab:losstable-check}
+\begin{tabular}{lrrrl}
+\toprule
+Quantity & XML table & SiC diode FWD & \textbf{Body diode FWD} & Verdict \\
+\midrule
+$\Eon$  & \SI{2545.8}{\micro\joule} & \SI{1287}{\micro\joule} & \textbf{\SI{2552}{\micro\joule}} & body diode \\
+$\Eoff$ & \SI{784.7}{\micro\joule}  & \SI{805}{\micro\joule} & \textbf{\SI{788}{\micro\joule}}  & body diode \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The agreement is \SI{0.24}{\percent} and \SI{0.41}{\percent} against the
+body-diode column; the turn-on energy of the SiC-diode case is half the table
+value and does not fit. The same check on the device of the first iterations
+gave \SI{0.05}{\percent} and \SI{0.46}{\percent}, and there it was
+confirmed independently: the gate-off conduction table of the single-file
+description is identical, value by value, to the standalone body-diode file
+of the legacy pair.
+
+\begin{finding}{The folder name means the opposite of what it suggests}
+\texttt{MOSFET with Diode} denotes a MOSFET modelled \emph{together with its
+own body diode} in one component, not a MOSFET paired with an external
+diode. It is the modern replacement for the legacy two-file pair, using
+PLECS's gate-dependent conduction feature to distinguish channel conduction
+from body-diode conduction.
+
+Read the other way, one concludes that the simulation underestimates
+switching losses by a factor of 2 and ``corrects'' the budget by tens of
+watts that do not exist. The check costs thirty seconds: open the table and
+look for \SI{2552}{\micro\joule}.
+\end{finding}
+
+\section{Validation against analytical results}
+
+Three independent checks are used to establish that the model behaves as
+intended.
+
+\paragraph{DC-link capacitor current.} The simulated worst-case RMS current
+is compared against \cref{eq:kolar} across the power-factor sweep.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{plecs_10_corrente_condensatore_vs_cosphi.pdf}
+\caption{DC-link capacitor RMS current against power factor at the rated
+modulation index $m = 1.06$, simulated and analytical. At this index the
+largest value is at the lowest power factor; over the whole operating
+envelope the worst case is at unity power factor and $m = 0.61$
+(\cref{sec:dclink}).}
+\label{fig:iC}
+\end{figure}
+
+At the lowest power factor of the sweep ($\cos\varphi = 0.02$) the
+simulation gives $I_{C,\mathrm{rms}} = \SI{16.48}{\ampere}$, a ratio of
+\num{0.543} to the output current, against \num{0.542} from
+\cref{eq:kolar}: agreement to \SI{0.1}{\percent}. This sweep holds $m$ at its
+rated value, so it validates the formula but does not locate the worst case.
+At the true worst case of \cref{sec:dclink}, $\cos\varphi = 1$ and
+$m = 0.61$, the formula gives \SI{19.49}{\ampere} and the model with a
+\SI{5}{\micro\henry} source inductance about \SI{19.9}{\ampere}; the
+$0.65$ rule of thumb coincides with that point rather than exceeding it.
+
+\paragraph{Switching-loss linearity.} A sweep of $\fsw$ from \SI{10}{} to
+\SI{30}{\kilo\hertz} must give a switching loss linear in frequency through
+the origin. The regression gives \SI{596.5}{\micro\joule} per device per
+cycle with $R^2 = \num{1.0000}$ and an intercept of \SI{-1.01}{\watt}
+against an expected zero.
+
+\paragraph{Conduction loss from first principles.} The conduction loss was
+recomputed independently, by integrating the vendor voltage-drop tables over
+a sinusoidal current directly in Python, at the rated-point current
+(\SI{30.006}{\Arms}) and at the junction temperature of the closed thermal
+loop (\SI{81.84}{\celsius}). The channels give \SI{54.56}{\watt} and the
+dead-time surplus of \cref{eq:deadtime-loss} \SI{3.21}{\watt}: in total
+\SI{57.77}{\watt} against \SI{57.64}{\watt} from PLECS, an agreement of
+\SI{0.23}{\percent}. The same check on the device of the first iterations,
+at zero dead time and at the model's own junction temperature, agreed to
+\SI{0.002}{\percent}; the residual here is of the size one expects from
+using a single mean temperature for the whole period. This is the check
+that licenses the use of the same tables, in \cref{ch:thermal,ch:losses},
+for the estimates made outside PLECS.
+
+\paragraph{Native steady-state analysis.} The thermal results of this
+report are obtained in the time domain, iterating on the case temperature
+until the loss--temperature loop closes. PLECS also offers a native
+steady-state analysis that finds the periodic solution directly, and it is
+an independent check, provided it is told the right period. The model
+originally set it to $1/\fsw$. The system is periodic in $1/f_\mathrm{ref}$,
+not in the switching period, and with the wrong span the analysis returned
+\SI{2}{\watt} of total loss without any warning. With the span set to
+$1/f_\mathrm{ref}$, and run on the final model (the \device{} at
+\SI{5}{}/\SI{12.5}{\ohm} and \SI{260}{\nano\second}), it gives
+\SI{128.52}{\watt} and $\Tj = \SI{81.89}{\celsius}$ against
+\SI{128.09}{\watt} and \SI{81.84}{\celsius} from the time-domain method:
+\SI{0.33}{\percent} on the loss and \SI{0.05}{\celsius} on the junction.
+Across the whole sweep of $\Rthcs$ of \cref{ch:thermal}, from
+\SI{0.2}{} to \SI{1.2}{\celsius\per\watt}, the two methods agree within
+\SI{0.35}{\percent} and \SI{0.12}{\celsius}. The check was first made on
+the device of the first iterations, where it agreed within
+\SI{0.45}{\celsius}, and it has been repeated on the design this report
+describes.
+
+The same tool also measures why the locked rotor needs a boundary of its
+own. It represents the pad as one resistance shared by the six devices,
+which is exact at the rated point, where their losses are equal. At locked
+rotor it returns \SI{90.6}{\celsius} for the hottest junction, against the
+\SI{111.1}{\celsius} of the per-device method of \cref{sec:lockedrotor}:
+a shared case node underestimates the device that sizes the design by
+\SI{20.5}{\celsius}. A tool that returns a plausible
+number for a wrong setting is the reason every result in this chapter is
+checked by a second, independent method.
+
+\section{DC-link ripple}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{plecs_04_ripple_dc_link.pdf}
+\caption{DC-link voltage ripple at the rated point, with the
+\SI{5}{\micro\henry} source inductance: \SI{1.36}{\volt} peak-to-peak on
+\SI{800}{\volt}, i.e. \SI{0.17}{\percent}, against a \SI{0.5}{\percent}
+requirement.}
+\label{fig:ripple}
+\end{figure}
+
+The ripple at the rated point is \SI{1.36}{\volt}, three times the
+\SI{0.43}{\volt} of the first model, with a capacitor twice as large: the
+source is no longer an ideal voltage generator absorbing part of the ripple
+current. Over the operating envelope
+the worst case is \SI{2.86}{\volt}, inside the \SI{4}{\volt} limit
+(\cref{sec:dclink}).

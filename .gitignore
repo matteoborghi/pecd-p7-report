@@ -1,0 +1,23 @@
+# prodotti di compilazione LaTeX
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.toc
+_build.log
+_test/
+
+# PDF compilato: si rigenera, e le versioni consegnate vanno allegate ai tag
+main.pdf
+
+# script e copie di lavoro delle revisioni passate, superati da Git
+_patch_*.py
+_p5_*.py
+_backup_pre_E3M0016/

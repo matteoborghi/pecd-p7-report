@@ -1,0 +1,206 @@
+% ---------------------------------------------------------------------------
+%  Preambolo comune. Tenuto separato da main.tex cosi' che l'indice dei
+%  capitoli resti leggibile in un colpo d'occhio.
+% ---------------------------------------------------------------------------
+
+% --- lingua e codifica -----------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% --- impaginazione ---------------------------------------------------------
+\usepackage[a4paper,inner=3cm,outer=2.5cm,top=2.8cm,bottom=2.8cm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{emptypage}
+\setlength{\parskip}{0.4em}
+
+\setlength{\headheight}{14pt}   % richiesto da fancyhdr
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE]{\nouppercase{\leftmark}}
+\fancyhead[LO]{\nouppercase{\rightmark}}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}%
+  \renewcommand{\headrulewidth}{0pt}}
+
+% --- matematica ------------------------------------------------------------
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% --- unita' di misura ------------------------------------------------------
+% Un solo punto di configurazione per tutte le unita' del report: cosi' non
+% si finisce con "30 A_RMS", "30 Arms" e "30 A rms" in tre capitoli diversi.
+%
+% NOTA SULLA SCELTA. Lo strumento naturale sarebbe siunitx, ed e' quello per
+% cui la sintassi qui sotto e' scritta. Su questa macchina non e' usabile:
+% MiKTeX ha siunitx 3.5.12 (2026-09-08) su un kernel LaTeX2e 2023-11-01 con
+% L3 2024-01-04, e il pacchetto usa variabili che quel kernel non definisce.
+% Fallisce anche su un documento minimo di quattro righe, quindi non e' un
+% problema di questo report.
+%
+% Per non lasciare il documento ostaggio di un toolchain rotto, le macro
+% sono reimplementate qui in LaTeX puro. I punti di chiamata restano
+% identici a siunitx: quando MiKTeX sara' aggiornato bastera' cancellare
+% questo blocco e togliere il commento alle due righe in fondo.
+\usepackage{textcomp}
+
+\makeatletter
+% I simboli sono definiti GLOBALMENTE, non solo dentro \si. Serve perche'
+% \caption scrive i propri argomenti negli elenchi di figure e tabelle cosi'
+% come sono: la' dentro \volt viene riletto a livello superiore, e se fosse
+% definito solo localmente sarebbe una sequenza non definita.
+% prefissi
+\def\yocto{y}\def\pico{p}\def\nano{n}\def\micro{\textmu}\def\milli{m}
+\def\centi{c}\def\deci{d}\def\kilo{k}\def\mega{M}\def\giga{G}
+% unita' di base e derivate usate nel report
+\def\metre{m}\def\meter{m}\def\second{s}\def\gram{g}\def\kelvin{K}\def\minute{min}
+\def\ampere{A}\def\volt{V}\def\watt{W}\def\joule{J}\def\hertz{Hz}
+% L'ohm NON usa \textohm: il glifo TS1 ha una mappatura ToUnicode rotta e
+% l'estrazione di testo dal PDF restituisce "W" al posto di "ohm", rendendo
+% inutilizzabili ricerca e copia-incolla ("40 mohm" diventava "40 mW").
+% L'Omega matematico e' dritto per default in TeX ed e' mappato bene.
+\def\ohm{\ensuremath{\Omega}}\def\farad{F}\def\henry{H}\def\coulomb{C}
+\def\siemens{S}\def\celsius{\textcelsius}\def\percent{\%}
+\def\VA{VA}\def\var{var}
+\def\degree{\textdegree}\def\rpm{rpm}
+% raffreddamento (11/10/2026): portate, pressioni, volumi. Litro maiuscolo:
+% la l minuscola accanto a un numero si legge 1 ("10 l/min" sembrava "101/min")
+\def\litre{L}\def\liter{L}\def\pascal{Pa}\def\hour{h}\def\decibel{dB}\def\cubic#1{#1\ensuremath{^{3}}}
+% grandezze efficaci e di picco: scritte sempre allo stesso modo
+\def\Arms{A\textsubscript{rms}}\def\Vrms{V\textsubscript{rms}}
+\def\Apk{A\textsubscript{pk}}\def\Vpk{V\textsubscript{pk}}
+% separatore
+\def\per{/}
+\def\squared{\ensuremath{^{2}}}\def\cubed{\ensuremath{^{3}}}
+\let\pecd@units\relax
+
+% Tutte protette: compaiono dentro \caption, che scrive negli elenchi di
+% figure e tabelle. Senza \protected verrebbero espanse durante quella
+% scrittura, dove i simboli di \pecd@units non sono definiti.
+% Numero: \ensuremath cosi' che \pm, \times e simili funzionino.
+\protected\def\num#1{\ensuremath{#1}}
+% Unita' sola.
+\protected\def\si#1{{\pecd@units\textup{#1}}}
+% Parte unita' di \SI: se vuota non mette lo spazio fine, cosi' si possono
+% scrivere intervalli come \SI{10}{}--\SI{30}{\kilo\hertz}.
+\protected\def\pecd@unit#1{%
+  \edef\pecd@tmp{\detokenize{#1}}%
+  \ifx\pecd@tmp\@empty\else\,\si{#1}\fi}
+\protected\def\SI#1#2{\num{#1}\pecd@unit{#2}}
+\protected\def\qty#1#2{\SI{#1}{#2}}
+\protected\def\numrange#1#2{\num{#1}\,--\,\num{#2}}
+\protected\def\SIrange#1#2#3{\num{#1}\,--\,\SI{#2}{#3}}
+% Accettate e ignorate, per compatibilita' con la sintassi siunitx.
+\newcommand{\sisetup}[1]{}
+\newcommand{\DeclareSIUnit}[2]{}
+\makeatother
+
+% Quando MiKTeX sara' aggiornato, sostituire tutto il blocco qui sopra con:
+%   \usepackage{siunitx}
+%   \sisetup{detect-all, per-mode=symbol}
+%   \DeclareSIUnit{\Arms}{A_{\mathrm{rms}}}  ... e le altre tre
+
+% --- figure e tabelle ------------------------------------------------------
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{rotating}   % sidewaysfigure: fogli dello schema in orizzontale (cap. 9)
+
+% colonna centrata a larghezza automatica per le tabelle numeriche
+% Colonne di testo allineate a sinistra: una cella su piu' righe centrata si
+% legge male (revisione dell'11/10/2026).
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% --- colori e riquadri -----------------------------------------------------
+\usepackage{xcolor}
+\definecolor{notebg}{RGB}{245,245,245}
+\definecolor{noteline}{RGB}{120,120,120}
+\usepackage[most]{tcolorbox}
+
+% Riquadro per le discrepanze trovate durante il lavoro. Sono il valore
+% aggiunto del progetto rispetto a un'esecuzione a ricetta, quindi hanno un
+% formato riconoscibile invece di sparire nel corpo del testo.
+\newtcolorbox{finding}[1]{%
+  colback=notebg, colframe=noteline, boxrule=0.4pt, arc=1pt,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  title={\textbf{#1}}, fonttitle=\small, coltitle=black,
+  colbacktitle=notebg, breakable}
+
+% --- codice ----------------------------------------------------------------
+% Schemi disegnati (figures/tikz/): TikZ e' gia' caricato da tcolorbox.
+% Palette uguale a quella delle figure Python (config.COLORI): leggibile in
+% scala di grigi e dai daltonici.
+\usepackage[european,straightvoltages]{circuitikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usetikzlibrary{arrows.meta,positioning,calc,fit,backgrounds,decorations.pathreplacing,shapes.geometric,shapes.misc}
+\definecolor{fblu}{HTML}{0072B2}
+\definecolor{farancio}{HTML}{D55E00}
+\definecolor{fverde}{HTML}{009E73}
+\definecolor{fgrigio}{HTML}{777777}
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{noteline},
+  columns=fullflexible,
+  keepspaces=true
+}
+
+% --- bibliografia ----------------------------------------------------------
+\usepackage{csquotes}   % richiesto da biblatex quando c'e' babel
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+\addbibresource{references.bib}
+
+% --- riferimenti incrociati ------------------------------------------------
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+  pdftitle  = {Three-Phase Two-Level SiC Traction Inverter},
+  pdfauthor = {Matteo Borghi},
+  pdfsubject= {Automotive Power Electronics Circuit Design, Project 7},
+  bookmarksnumbered = true
+}
+\usepackage[capitalise,noabbrev]{cleveref}
+\crefname{chapter}{Chapter}{Chapters}
+\crefname{section}{Section}{Sections}
+\crefname{figure}{Figure}{Figures}
+\crefname{table}{Table}{Tables}
+\crefname{equation}{Equation}{Equations}
+
+% --- macro di progetto -----------------------------------------------------
+% I nomi ricorrenti si scrivono una volta sola: se cambia il dispositivo,
+% cambia qui e non in trenta punti del testo.
+\newcommand{\device}{E3M0016120K}
+\newcommand{\driver}{UCC21750}
+\newcommand{\isoamp}{AMC1302}
+\newcommand{\isoampv}{AMC1311}
+\newcommand{\dcdc}{MGJ2D121505SC}
+\newcommand{\Rthjc}{R_{\theta,\mathrm{JC}}}
+\newcommand{\Rthcs}{R_{\theta,\mathrm{CS}}}
+\newcommand{\Rthha}{R_{\theta,\mathrm{HA}}}
+\newcommand{\Tj}{T_{\mathrm{j}}}
+\newcommand{\Tcase}{T_{\mathrm{case}}}
+\newcommand{\Ths}{T_{\mathrm{hs}}}
+\newcommand{\Rdson}{R_{\mathrm{DS(on)}}}
+\newcommand{\Eon}{E_{\mathrm{on}}}
+\newcommand{\Eoff}{E_{\mathrm{off}}}
+\newcommand{\fsw}{f_{\mathrm{sw}}}
+\newcommand{\Vdc}{V_{\mathrm{DC}}}
+
+% Segnaposto visibile per i capitoli non ancora scrivibili.
+\newcommand{\stubnote}[1]{%
+  \begin{center}
+  \fcolorbox{noteline}{notebg}{%
+    \parbox{0.9\textwidth}{\small\textbf{Placeholder.} #1}}
+  \end{center}}

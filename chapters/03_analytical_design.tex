@@ -1,0 +1,256 @@
+\chapter{Analytical design}
+\label{ch:analytical}
+
+This chapter fixes the operating point and the passive components from
+closed-form relations. Everything here is computed before any simulation, so
+that the simulation of \cref{ch:model} has something independent to be checked
+against.
+
+\section{Operating point}
+
+With space-vector modulation the maximum phase voltage amplitude that can be
+synthesised without overmodulation is
+%
+\begin{equation}
+  \hat{V}_{\mathrm{ph,max}} = \frac{\Vdc}{\sqrt{3}}
+  = \frac{\SI{800}{\volt}}{\sqrt{3}} = \SI{462}{\volt} .
+  \label{eq:svpwm-limit}
+\end{equation}
+%
+A phase voltage amplitude of $\hat{V}_\mathrm{ph} = \SI{427}{\volt}$ is
+chosen, giving a modulation index
+%
+\begin{equation}
+  m = \frac{\hat{V}_\mathrm{ph}}{\Vdc} = \frac{427}{800} = 0.534 ,
+  \qquad m_{\max} = \frac{1}{\sqrt{3}} = 0.577 ,
+\end{equation}
+%
+that is, \SI{92}{\percent} of the linear range. The remaining headroom is
+deliberate: it leaves room for the voltage lost to the dead time and to the
+device drops, and it keeps the converter out of overmodulation during
+transients, where the harmonic content degrades sharply.
+
+The resulting load is an equivalent $RL$ branch per phase drawing
+\SI{30}{\Arms}, with $R = \SI{9.43}{\ohm}$ and
+$L = \SI{2.5}{\milli\henry}$.
+
+\subsection{Power factor and which power is quoted}
+\label{sec:powerfactor}
+
+That branch is \emph{not} at unity power factor, and the distinction matters
+for every figure derived from it. At the \SI{200}{\hertz} fundamental
+%
+\begin{equation}
+  X_L = 2\pi f_\mathrm{ref} L = \SI{3.142}{\ohm},
+  \qquad
+  |Z| = \sqrt{R^2 + X_L^2} = \SI{9.940}{\ohm},
+  \qquad
+  \cos\varphi = \frac{R}{|Z|} = 0.949 ,
+  \label{eq:powerfactor}
+\end{equation}
+%
+that is, a displacement angle of \SI{18.4}{\degree}. The values of $R$ and
+$L$ are the ones that give \SI{30}{\Arms} at the chosen modulation depth;
+it is only the unity-power-factor label that would be wrong.
+
+Three different powers can be quoted for this operating point, and they
+differ by more than a rounding error:
+%
+\begin{align}
+  S_1 &= 3\,V_{1,\mathrm{rms}} I_{1,\mathrm{rms}}
+       = 3 \cdot \frac{427}{\sqrt{2}} \cdot 30
+       = \SI{27.17}{\kilo\VA}
+       &&\text{(apparent, fundamental)} \label{eq:apparent}\\
+  P   &= S_1 \cos\varphi = \SI{25.79}{\kilo\watt}
+       &&\text{(active, ideal)} \label{eq:active-ideal}\\
+  P   &= R\left(I_1^2 + I_2^2 + I_3^2\right) = \SI{25.48}{\kilo\watt}
+       &&\text{(active, simulated)} \label{eq:active-sim}
+\end{align}
+
+This report quotes the active power, \SI{25.48}{\kilo\watt}, because
+that is the quantity against which an efficiency is meaningful. The value
+comes from \cref{eq:active-sim} rather than from
+\cref{eq:active-ideal}: on a series $RL$ branch the inductance dissipates
+nothing, so all the active power appears in $R$, and the relation is exact
+without needing a voltage measurement. The \SI{1.2}{\percent} gap between
+the two is the voltage lost to the \SI{260}{\nano\second} dead time
+(\cref{sec:deadtime}), which reduces the fundamental from \SI{301.9}{} to
+\SI{298.3}{\Vrms}; the modulation amplitude of \SI{427}{\volt} is the one
+that brings the current back to \SI{30}{\Arms} with that dead time.
+
+\section{Current ratings}
+
+The peak phase current in the ideal sinusoidal case is
+$\hat{I} = \sqrt{2}\cdot 30 = \SI{42.4}{\ampere}$. The simulated waveform, which
+carries the switching ripple on top of the fundamental, peaks at
+\SI{43.0}{\Apk}; this is the value the devices see and the one used
+for gate-drive and protection sizing in \cref{ch:aux}.
+
+The RMS current of each device follows from synchronous rectification: the
+channel conducts in both directions whenever the gate is on, so the upper
+switch of a leg carries $i^2$ for a fraction $d(t) = \tfrac12[1 + m\sin\omega t]$
+of each period. Averaged over the fundamental, the term in $m$ multiplies an
+odd function and vanishes, leaving
+%
+\begin{equation}
+  I_\mathrm{rms,dev} = \sqrt{\overline{d(t)\,i^2(t)}}
+  = \frac{\hat{I}}{2} = \frac{I_\mathrm{ph}}{\sqrt{2}} = \SI{21.2}{\ampere},
+\end{equation}
+%
+independent of modulation index and power factor, dead time neglected. It is
+the current that sets the conduction loss, $P_\mathrm{cond} = \Rdson\,
+I_\mathrm{rms,dev}^2$ per device.
+
+Against the device rating this is comfortable: the \device{} is rated well
+above \SI{42}{\ampere} continuous at the relevant case temperature. The
+limiting quantity is the junction temperature, which \cref{ch:thermal}
+resolves.
+
+\section{DC-link capacitor}
+\label{sec:dclink}
+
+\subsection{Sizing for ripple}
+
+The capacitor must hold the bus within \SI{0.5}{\percent} of
+\SI{800}{\volt}, i.e. $\Delta V \leq \SI{4}{\volt}$. The worst-case charge
+displaced in one switching period is bounded by
+%
+\begin{equation}
+  \Delta Q \approx \frac{\hat{I}}{2}\cdot\frac{1}{2\fsw},
+  \qquad
+  C \geq \frac{\Delta Q}{\Delta V},
+\end{equation}
+%
+which for $\hat{I}=\SI{42.4}{\ampere}$, $\fsw=\SI{20}{\kilo\hertz}$ and
+$\Delta V = \SI{4}{\volt}$ gives $C \gtrsim \SI{133}{\micro\farad}$ as an
+order of magnitude.
+
+\begin{finding}{An ideal source hid the ripple that the hand calculation predicted}
+The first version adopted \SI{100}{\micro\farad}, reassured by a simulation
+that gave \SI{0.43}{\volt} of ripple, an order of magnitude inside the
+requirement. That model fed the DC-link from an ideal voltage source, which
+absorbed half of the ripple current in place of the capacitor. With a
+realistic source inductance of \SI{5}{\micro\henry} the ripple with
+\SI{100}{\micro\farad} reaches \SI{6.2}{\volt} in the worst case, 54 percent
+beyond the limit: the model's defect was hiding exactly the violation that
+the \SI{133}{\micro\farad} estimate above predicted. With the corrected
+source, hand calculation and simulation agree.
+\end{finding}
+
+$C_\mathrm{DC} = \SI{200}{\micro\farad}$ is adopted, as two film capacitors
+of \SI{140}{} and \SI{60}{\micro\farad} in the \SI{1100}{\volt}
+class~\cite{vishay_mkp1848}. The ripple is \SI{1.36}{\volt} at the rated
+point (\SI{0.17}{\percent}) and \SI{2.86}{\volt} in the worst case, inside
+the \SI{4}{\volt} limit. Two further conditions come with it. A source that
+is both less inductive than \SI{1.5}{\micro\henry} and less damped than
+\SI{50}{\milli\ohm} at \SI{20}{\kilo\hertz} would tune the
+source--capacitor resonance onto the switching harmonics, and no reasonable
+capacitor closes that band: it is requirement R11 on the battery and harness
+(\cref{tab:sysreq}). And the film's permitted voltage falls with its
+hotspot temperature (\SI{1100}{\volt} at \SI{85}{\celsius},
+\SI{800}{\volt} at \SI{105}{\celsius}), so the \SI{1100}{\volt} class, not
+the \SI{900}{\volt} one, is what allows \SI{900}{\volt} continuous up to a
+hotspot of \SI{98}{\celsius}.
+
+\subsection{Sizing for RMS current}
+
+\begin{figure}[htbp]
+\centering
+\input{figures/tikz/corrente_dc}
+\caption{Who carries what in the DC-link, over three switching periods (shape only).
+The bridge draws its current in blocks, one phase current or the sum of two
+depending on the active vector; the battery, behind its cable inductance,
+supplies only the average; the capacitor supplies the rest, with zero
+average and an RMS value that sets its heating.}
+\label{fig:dccurrent}
+\end{figure}
+
+The capacitor carries the difference between the inverter input current and
+the (smooth) DC source current (\cref{fig:dccurrent}). Its RMS value is the quantity that determines
+the capacitor's self-heating and therefore its life. A closed-form result for
+the two-level bridge is given by Kolar and Round~\cite{kolar_dclink}:
+%
+\begin{equation}
+  \frac{I_{C,\mathrm{rms}}}{I_\mathrm{out,rms}}
+  = \sqrt{ 2m\left[\frac{\sqrt{3}}{4\pi}
+    + \cos^2\!\varphi\left(\frac{\sqrt{3}}{\pi}-\frac{9}{16}m\right)\right]} .
+  \label{eq:kolar}
+\end{equation}
+
+\begin{finding}{Two different modulation indices live in this report}
+\Cref{eq:kolar} uses $m$ referred to \emph{half} the DC-link,
+$m = 2\hat{V}_\mathrm{ph}/\Vdc = 1.07$, which is the convention of the
+original derivation. \Cref{eq:svpwm-limit} uses $m$ referred to the full
+DC-link, $m = \hat{V}_\mathrm{ph}/\Vdc = 0.534$.
+
+The distinction matters: with $m = 1.07$ the bracket
+$\left(\sqrt{3}/\pi - 9m/16\right)$ is \emph{negative}, so at the rated point
+the ratio grows as $\cos\varphi$ falls; with $m = 0.534$ it is positive and
+the trend reverses. Substituting the wrong one places the rated point on the
+wrong branch of the curve.
+\end{finding}
+
+Two properties of \cref{eq:kolar} matter for the design. At the \emph{rated}
+modulation index, $m = 1.07$, the bracket multiplying $\cos^2\varphi$ is
+negative and the ratio grows as $\cos\varphi$ falls: \num{0.447} at the rated
+point, \num{0.542} at $\cos\varphi \to 0$. But the modulation index
+falls with speed, and the worst case must be sought over the whole
+operating envelope, $0 \leq m \leq 1.15$ and $0 \leq \cos\varphi \leq 1$.
+There the maximum is at unity power factor, where
+$\partial/\partial m$ of the bracket vanishes:
+%
+\begin{equation}
+  m^\ast = \frac{8}{9}\left(\frac{\sqrt{3}}{4\pi}+\frac{\sqrt{3}}{\pi}\right)
+         = 0.613,
+  \qquad
+  \frac{I_{C,\mathrm{rms}}}{I_\mathrm{out,rms}}\bigg|_{\max} = 0.650 ,
+\end{equation}
+%
+that is \SI{19.5}{\ampere} at \SI{30}{\Arms} (\cref{fig:kolar}). The capacitor's worst case is a
+low-speed point at full current and unity power factor, not the rated point
+(\SI{13.4}{\ampere}) nor the reactive one (\SI{16.9}{\ampere} at $m = 1.15$).
+
+\begin{figure}[htbp]
+\centering
+\input{figures/tikz/kolar}
+\caption{DC-link RMS current relative to the phase current, \cref{eq:kolar}, over
+the whole modulation range and four power factors. The rated point sits on
+the falling branch of its curve; the worst case of the envelope is a
+low-speed point at unity power factor.}
+\label{fig:kolar}
+\end{figure}
+
+A rule of thumb frequently used in practice sets
+$I_{C,\mathrm{rms}} \approx 0.65\,I_\mathrm{out,rms}$. It coincides with the
+maximum of \cref{eq:kolar} over the
+envelope, which is presumably where it comes from. \Cref{ch:model} checks the
+formula against the simulation at the rated modulation index.
+
+The two film capacitors are rated \SI{43.5}{} and \SI{40}{\ampere} RMS at
+\SI{85}{\celsius}~\cite{vishay_mkp1848}. At the worst case the larger one
+carries about \SI{13.6}{\ampere} of the \SI{19.5}{}, which heats its hotspot
+by \SI{1.5}{\celsius}: the binding constraint is the voltage class. Film is chosen over electrolytic for the ripple-current capability
+and the life at temperature; the cost is volume, \SI{864}{\gram} and two
+packages of \SI{130}{} and \SI{65}{\milli\metre} by \SI{65}{\milli\metre}.
+
+\section{Switching frequency}
+
+The choice of \SI{20}{\kilo\hertz} balances three effects that pull in
+different directions. At \SI{20}{\kilo\hertz} the acoustic noise from
+magnetostriction in the machine and from the capacitor is above the range
+most people hear; \SI{10}{\kilo\hertz} would halve the switching losses but
+put a tone in the middle of the audible band, which a passenger vehicle does
+not accept. A higher $\fsw$ reduces the current ripple and with it the
+harmonic losses in the machine. The switching losses grow linearly with
+$\fsw$: \cref{ch:losses} measures the slope at \SI{596}{\micro\joule} per
+device per cycle.
+
+\Cref{ch:losses} shows the full sweep from \SI{10}{} to \SI{30}{\kilo\hertz}.
+The total loss varies from \SI{90.5}{\watt} to \SI{166.1}{\watt} across
+that range, and the junction temperature at the rated point from
+\SI{76.9}{\celsius} to \SI{86.8}{\celsius}: at the rated point the design is
+not thermally limited anywhere in the range. The limit is at locked rotor
+(\cref{sec:lockedrotor}), where the \SI{20}{\kilo\hertz} is held by
+requirement and costs its full switching loss on one device. The frequency
+is therefore chosen on the acoustic and harmonic-content arguments and then
+verified at locked rotor.

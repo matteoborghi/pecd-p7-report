@@ -1,0 +1,27 @@
+% Corrente efficace nel DC-link riferita alla corrente di fase (eq. di Kolar), al variare
+% dell'indice di modulazione (riferito a mezzo bus) e del fattore di potenza.
+\begin{tikzpicture}
+  \begin{axis}[
+    width=0.82\textwidth, height=6.2cm,
+    xmin=0, xmax=1.15, ymin=0, ymax=0.76,
+    xlabel={modulation index $m$ (half-bus convention)},
+    ylabel={$I_{C,\mathrm{rms}}/I_\mathrm{out,rms}$},
+    grid=major, grid style={black!10},
+    legend style={font=\scriptsize, draw=none, fill=none, at={(0.98,0.03)}, anchor=south east},
+    tick label style={font=\scriptsize}, label style={font=\footnotesize},
+    domain=0.001:1.15, samples=120]
+    \addplot[fblu, thick] {sqrt(max(0, 2*x*(sqrt(3)/(4*pi) + 1*(sqrt(3)/pi - 9*x/16))))};
+    \addlegendentry{$\cos\varphi = 1$}
+    \addplot[farancio, thick] {sqrt(max(0, 2*x*(sqrt(3)/(4*pi) + 0.949^2*(sqrt(3)/pi - 9*x/16))))};
+    \addlegendentry{$\cos\varphi = 0.949$ (rated load)}
+    \addplot[fverde, thick, dashed] {sqrt(max(0, 2*x*(sqrt(3)/(4*pi) + 0.25*(sqrt(3)/pi - 9*x/16))))};
+    \addlegendentry{$\cos\varphi = 0.5$}
+    \addplot[fgrigio, thick, dotted] {sqrt(max(0, 2*x*(sqrt(3)/(4*pi))))};
+    \addlegendentry{$\cos\varphi = 0$}
+    % punto nominale e massimo sull'inviluppo
+    \addplot[only marks, mark=*, mark size=1.8pt, farancio] coordinates {(1.07,0.447)};
+    \node[font=\scriptsize, anchor=north east, farancio] at (axis cs:1.07,0.43) {rated point, 0.447};
+    \addplot[only marks, mark=*, mark size=1.8pt, fblu] coordinates {(0.613,0.650)};
+    \node[font=\scriptsize, anchor=south, fblu] at (axis cs:0.613,0.655) {worst case, 0.650 at $m^\ast = 0.613$};
+  \end{axis}
+\end{tikzpicture}

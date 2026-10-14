@@ -1,0 +1,172 @@
+\chapter{Conclusions}
+\label{ch:conclusions}
+
+A three-phase two-level SiC inverter for \SI{800}{\volt}, \SI{30}{\Arms} and
+\SI{20}{\kilo\hertz} has been designed from the specification to a frozen
+six-layer board, its cooling and its fabrication data. This chapter states
+what the design achieves against what was asked, what only a bench can
+settle, what the work taught, and where the design would go next.
+
+\section{Results against the specification}
+
+\begin{table}[htbp]
+\centering
+\caption{The design against the specification (\cref{tab:spec}) and the
+criteria fixed before the results (\cref{tab:criteria}).}
+\label{tab:results}
+\small
+\begin{tabularx}{\textwidth}{lYYl}
+\toprule
+ & Asked & Achieved & Where \\
+\midrule
+Power stage & \SI{800}{\volt}, \SI{30}{\Arms}, \SI{20}{\kilo\hertz} &
+  \SI{25.48}{\kilo\watt} out, \SI{128.1}{\watt} of loss, efficiency
+  \SI{99.50}{\percent} & \cref{ch:losses} \\
+Junction, rated point & $\leq\SI{150}{\celsius}$ &
+  \SI{77.1}{\celsius} on the real rail with the adopted pad
+  (\SI{81.8}{\celsius} on the ideal plate) & \cref{sec:cooling} \\
+C1, locked rotor & $\leq\SI{120}{\celsius}$ &
+  \textbf{\SI{97.9}{\celsius}}; all tolerances together \SI{117.8}{\celsius}
+  against \SI{150}{\celsius} & \cref{sec:coolalt} \\
+C2, die overvoltage & $\leq\SI{1080}{\volt}$ at \SI{950}{\volt}, \SI{60}{\ampere} &
+  \SI{1073.5}{\volt} at the \SI{20}{\nano\henry} budget; \SI{1040}{\volt}
+  with the loop extracted from the copper & \cref{tab:dptextract} \\
+Commutation loop & $\leq\SI{20}{\nano\henry}$ of board &
+  \SI{7.8}{\nano\henry} of copper, about \SI{8}{\nano\henry} with the
+  capacitors' inductance & \cref{sec:loopextract} \\
+C3, creepage & \SI{900}{\volt} working, PD2 &
+  reinforced from high voltage to low voltage and chassis on the board, the
+  rail and the pad; functional only across the isolated converters (A.25) &
+  \cref{sec:insulation} \\
+C4, automotive & AEC-Q101 / AQG~324 &
+  power devices, drivers and isolators qualified; the auxiliary supplies and
+  connectors are not & \cref{sec:nextrev} \\
+C5, short circuit & $t_\mathrm{SC} \geq \SI{1.5}{\micro\second}$ declared &
+  \textbf{open}: not declared by the manufacturer; bench test B1 & A.5 \\
+DC-link ripple & $\leq\SI{0.5}{\percent}$ &
+  \SI{0.17}{\percent} at the rated point, \SI{2.86}{\volt} in the worst case &
+  \cref{sec:dclink} \\
+Discharge & $<\SI{60}{\volt}$ in \SI{5}{\second} &
+  \SI{0.54}{\second} with the auxiliary supply; \textbf{not met} without it
+  (A.L1) & \cref{sec:dclinkmgmt} \\
+Conducted emission & CISPR~25 & class~3 met by estimate, by
+  \SI{3}{\decibel} at least, with an input filter outside the board; the board as
+  frozen alone would not & \cref{sec:emcest} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The specification is met wherever the design can show it, with two
+declared exceptions and one open point. The exceptions are system-level
+choices written as limits rather than hidden: the isolated converters
+provide functional insulation only at \SI{900}{\volt}, and the active
+discharge depends on the auxiliary supply. The open point is the
+short-circuit withstand time, which the manufacturer does not declare and
+which no simulation can replace.
+
+The stalled motor, a requirement this design added, sizes the design. It
+decided the device, it decided the
+pad, and it is met with \SI{22}{\celsius} of margin on the criterion once the
+heat path is designed rather than assumed.
+
+\section{What only the bench can settle}
+
+Every number above that rests on a model is attached to a test with a pass
+mark written before the measurement (\cref{tab:benchplan}). In order of
+consequence:
+%
+\begin{itemize}
+  \item Short circuit (B1): the protection is sized on a threshold
+        of \SI{0.83}{\micro\second}, not on a datasheet value.
+  \item The pad as mounted (B5): the single largest term between
+        die and coolant. The design value is \SI{0.18}{\celsius\per\watt},
+        the limit \SI{0.50}{\celsius\per\watt}; the gap is the margin the
+        bench must confirm.
+  \item Loop and overshoot (B2, B3): the extraction predicts
+        \SI{8}{\nano\henry}; if the measurement agrees, the turn-off gate
+        resistance can come down from \SI{12.5}{} to \SI{7.5}{\ohm} and the
+        turn-off loss by \SI{38}{\percent}.
+  \item Switching energies (B4) and locked rotor (B6), which
+        close the loss model and C1 on hardware.
+  \item Conducted emission, which closes the estimate of
+        \cref{sec:emcest}: its margin with the filter is \SI{3}{\decibel},
+        less than the accuracy of an estimate.
+\end{itemize}
+
+\section{What the work taught}
+
+Several results of this report were first wrong, and the way each error was
+found taught more than the error itself.
+%
+\begin{itemize}
+  \item Every idealised boundary hid an error. An ideal voltage source hid
+        half of the DC-link ripple (\cref{sec:dclink}); a bus still charging
+        hid \SI{70}{\volt} of overshoot; an ideal cold plate hid the
+        temperature spent spreading heat under each tab
+        (\cref{sec:cooling}). Each time the fix was to replace an idealised
+        boundary with the real one, and each time the hand estimate had
+        already pointed at the answer.
+  \item Each check found only what it was written to find. The design
+        rule check measures tracks and not pours, so a phase-pour neck
+        passed it; it does not know the mechanics, so test points too close
+        to a chassis rail passed it; and a local pad clearance silently
+        overrode a custom rule. Each was found by a check written for the
+        purpose, and the rules test board now carries every case.
+  \item The insulating pad, a few euros of ceramic and two interfaces,
+        moves the hottest junction by more than the choice of liquid or air,
+        more than the rail design and more than the package.
+  \item Writing the criteria before the results made the device choice
+        defensible. The first candidate, industrial and twenty degrees too hot, was
+        rejected by them rather than by preference.
+\end{itemize}
+
+\section{Possible developments}
+
+The production changes are listed in \cref{sec:nextrev}: reinforced
+auxiliary supplies and a discharge that survives the loss of the
+\SI{12}{\volt} rail, automotive replacements for the remaining parts, the
+input filter of \cref{tab:emcfilter} outside the board, and a four-layer
+board. Three
+developments go beyond a revision.
+
+\paragraph{Discontinuous modulation at standstill.} Clamping the phase that
+carries the peak current to the positive rail lowers the hottest junction at
+locked rotor by about \SI{12}{\celsius} on the real rail with the adopted pad and the converter
+loss by a third (\cref{sec:lrdpwm}). It stays a recommendation to the
+controller, R13, because hardware is not sized on a control strategy the
+board cannot guarantee.
+
+\paragraph{Internally isolated packages.} A TO-247-4 with the ceramic inside,
+under the die, removes the external pad and one interface with the same
+footprint (\cref{sec:coolalt}). When one is offered at this resistance with
+automotive qualification it is the natural next step for the power devices.
+
+\subsection{A power module, for two reasons}
+
+The discrete TO-247-4L sets two ceilings on this design. Each alone sounds
+like an acceptable cost; together they make the case for a module.
+
+The first is inductance: \SI{14.6}{\nano\henry} of package contribution that
+no layout can remove, \SI{73}{\percent} of the board-attributable budget
+(\cref{sec:kelvin}). It is this inductance that forces
+$R_{g,\mathrm{off}}$ to \SI{12.5}{\ohm}, and the gate resistance that makes
+switching more than half of the loss budget. The second is insulation: the
+\SI{5.08}{\milli\metre} lead pitch leaves \SI{3.24}{\milli\metre} of
+creepage between drain and source, which passes with \SI{16}{\percent} of
+margin at \SI{900}{\volt} only under conformal coating, and which
+IEC 60664-4~\cite{iec606644} would derate above \SI{30}{\kilo\hertz}, the
+exact upper end of the switching-frequency sweep of \cref{tab:sweep-fsw}.
+
+Both ceilings push in the same direction and a power module lifts both at
+once: the integrated busbar removes most of the package inductance, and the
+creepage becomes a certified property of the module rather than a consequence
+of a lead pitch. The argument for a module is therefore stronger than the
+inductance figure alone suggests, and it is the single change that would let
+this design scale in frequency. See \cref{sec:packagelimits}.
+
+The selection study of \cref{sec:deviceselection} looked for such a module
+at this rating and did not find one that fits: the small six-packs on the
+market are industrial and run hot, and the automotive single-switch modules
+are designed to be sintered onto a cooler. At \SI{30}{\Arms} the module is
+the right answer to a question this converter does not yet ask; at a few
+times the current, it would be the only one.

@@ -1,0 +1,233 @@
+\chapter{Schematic design}
+\label{ch:schematic}
+
+The schematic is drawn in KiCad 10.0.6 and was frozen on 11 October 2026,
+together with the board, as revision 1.2; the revisions after the first
+changed copper, title blocks and the text on the root sheet, which since
+revision 1.2 lists the system requirements R1--R14 (\cref{tab:sysreq}), but
+no circuit. It holds 275 parts on ten sheet
+files, which become eighteen sheet instances once the repeated blocks are
+expanded. This chapter explains how it is organised, what was decided while
+drawing it, and how it was checked; the sheets themselves close the chapter.
+
+\section{Sheet hierarchy}
+
+The schematic is organised by \emph{isolation domain} rather than by function
+or by phase. Each sheet either contains a single reference potential, in
+which case any stray ground symbol is a visible error, or is explicitly a
+barrier sheet, in which case exactly one barrier is verified and then reused.
+Repeated blocks (the three legs, the seven driver channels, the three sensing
+channels) are drawn once and instantiated: 187 of the 275 parts, about
+\SI{70}{\percent}, sit on a reused sheet and were drawn a single time.
+
+\begin{table}[htbp]
+\centering
+\caption{Sheet hierarchy. Parts are counted per instance.}
+\label{tab:sheets}
+\small
+\begin{tabularx}{\textwidth}{llrrY}
+\toprule
+Sheet & Domain & Inst. & Parts & Content \\
+\midrule
+root & --- & 1 & 0 & blocks, the signals between them, the requirements on the system \\
+\texttt{1\_power\_stage} & HV & 1 & 9 & film DC-link capacitors, bus and phase terminals \\
+\quad\texttt{leg} & HV & 3 & 7 & two \device{}, four commutation ceramics, Kelvin shunt \\
+\texttt{2\_gate\_drive} & barrier & 1 & 4 & six channels, gate test points \\
+\quad\texttt{drv\_channel} & barrier & 7 & 16 & \driver{}, isolated supply, gate resistors, desaturation network \\
+\texttt{3\_phase\_sense} & LV & 1 & 14 & overload comparators, \SI{2.5}{\volt} reference \\
+\quad\texttt{sense\_channel} & barrier & 3 & 18 & \isoamp{}, isolated supply, LDO, input and output filters \\
+\texttt{4\_aux\_supply} & LV & 1 & 9 & fuse, crowbar TVS, \SI{12}{\volt} and \SI{3.3}{\volt} converters \\
+\texttt{5\_control\_if} & LV & 1 & 13 & control connector, ESD protection, thermistor inputs \\
+\texttt{6\_dclink\_mgmt} & HV, barrier & 1 & 39 & \isoampv{} bus measurement, divider, bleeder, active discharge, Y-capacitors, mounting holes \\
+\midrule
+ & & & \textbf{275} & the seventh \texttt{drv\_channel} instance is the discharge driver, inside \texttt{6\_dclink\_mgmt} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Net naming and net classes}
+
+Net names carry their isolation domain as a prefix, so that whether a net is
+hazardous can be read from its name and enforced by a net class. The seven
+floating gate references are deliberately distinct names rather than a shared
+one: they move by hundreds of volts with respect to one another during
+commutation, and merging them would be an error that ERC cannot detect.
+
+The net classes follow the same rule: one class per isolation
+domain. A first version had a single class for all seven gate domains and
+asked for \SI{4.5}{\milli\metre} between any two of its nets. That is wrong
+inside a domain: the gate and the Kelvin source of one device are the same
+domain and sit \SI{0.70}{\milli\metre} apart on the package, and the
+supply pins of one driver \SI{0.67}{\milli\metre}. The design rule check
+would have raised hundreds of false violations, and a rule that always fails
+is a rule somebody switches off. With one class per domain the clearance
+\emph{inside} a class is the manufacturing value, and the distances
+\emph{between} classes are set by the rules of \cref{sec:rules}.
+
+\begin{table}[htbp]
+\centering
+\caption{Net classes. Clearance and track width are the values inside the
+class; between classes the design rules of \cref{tab:rules} apply.}
+\label{tab:netclasses}
+\small
+\begin{tabularx}{\textwidth}{lYrr}
+\toprule
+Class & Nets & Clearance & Track \\
+\midrule
+\texttt{HV\_BUS}   & DC-link positive and negative & \SI{2.0}{\milli\metre} & \SI{10.4}{\milli\metre} \\
+\texttt{HV\_POWER} & switching nodes and phase outputs & \SI{2.0}{\milli\metre} & \SI{8.4}{\milli\metre} \\
+\texttt{HV\_AUX}   & drain of the discharge switch & \SI{2.0}{\milli\metre} & \SI{0.5}{\milli\metre} \\
+\texttt{HV\_DIV}   & intermediate nodes of the divider and the bleeder & \SI{1.6}{\milli\metre} & \SI{0.3}{\milli\metre} \\
+\texttt{GATE\_H1} \ldots\ \texttt{GATE\_DIS} & seven floating gate domains, one class each & \SI{0.3}{\milli\metre} & \SI{0.5}{\milli\metre} \\
+\texttt{SENSE\_1} \ldots\ \texttt{SENSE\_V} & four floating sensing domains, one class each & \SI{0.3}{\milli\metre} & \SI{0.3}{\milli\metre} \\
+\texttt{CTRL}      & control signals, analogue outputs & \SI{0.15}{\milli\metre} & \SI{0.3}{\milli\metre} \\
+\texttt{PWR\_LV}   & \SI{12}{\volt}, \SI{3.3}{\volt}, ground & \SI{0.15}{\milli\metre} & \SI{0.6}{\milli\metre} \\
+\texttt{CHASSIS}   & chassis connection & \SI{0.2}{\milli\metre} & \SI{1.0}{\milli\metre} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Classes are assigned by name pattern, not by hand: the schematic has 195
+nets, 52 of which are the single-pin nets KiCad creates for unused pins, and
+every one of the others falls into exactly one class. A net that fell into
+none would be treated as low voltage and checked at the reinforced distance
+from everything hazardous, so a missing assignment shows up as a violation
+rather than as a silent weakness.
+
+\section{Reference designators}
+
+References encode position in the hierarchy: the hundreds give the sheet, the
+tens the instance, the units the part within it. The high-side device of
+leg~2 is \texttt{Q121}, the driver of the high side of leg~1 is
+\texttt{U211}, the amplifier of phase~1 is \texttt{U321}, the bus amplifier
+\texttt{U601}. A reference read on the board therefore says where to look in
+the schematic, and the same part has the same last digit in every instance.
+
+\section{Component choices fixed at capture}
+
+Giving every part a unique order code meant opening the datasheet of each,
+and seven times the datasheet contradicted an assumption made in the
+preceding chapters. None changes the topology; all are on the board.
+
+\begin{table}[htbp]
+\centering
+\caption{Decisions taken while drawing the schematic.}
+\label{tab:captdecisions}
+\small
+\begin{tabularx}{\textwidth}{lYY}
+\toprule
+ & What the datasheet showed & Part on the board \\
+\midrule
+D8 & in C0G at \SI{1200}{\volt} the largest ceramic is \SI{47}{\nano\farad}, in a 3640~\cite{kemet_kclink}; the \SI{220}{\nano\farad} of the earlier estimate does not exist in that class
+   & four KC-LINK \SI{47}{\nano\farad} per leg, \SI{188}{\nano\farad}, at \SI{75}{\percent} of the rating at \SI{900}{\volt} \\
+D9 & an SMB or DPAK desaturation diode leaves \SI{1.8}{} to \SI{2.0}{\milli\metre} between its pads, against \SI{2.80}{\milli\metre} required
+   & SiC \SI{1200}{\volt} diode in SMC~\cite{semiq_gp3d}, \SI{4.6}{\milli\metre} between pads; footprints for the two DESAT clamps, not fitted (test B8) \\
+D10 & an unregulated isolated module rises to 1.25 times its output at light load, and the amplifier supply is \SI{6.5}{\volt} absolute
+   & the gate-drive module (\dcdc{}) followed by a \SI{5}{\volt} LDO: one isolating component to qualify, not two \\
+D11 & a series reverse-polarity diode leaves \SI{8.5}{\volt} at cranking, below the converter's input range; no load uses a \SI{5}{\volt} rail
+   & TEN 8-1212~\cite{traco_ten8} (\SI{9}{}--\SI{18}{\volt} in, \SI{12}{\volt} regulated, \SI{8}{\watt}), crowbar TVS behind the fuse, \SI{3.3}{\volt} switching regulator \\
+D12 & Y1 discs reach \SI{4.7}{\nano\farad} at \SI{1500}{\volt} DC~\cite{vishay_ay1}, not \SI{22}{\nano\farad}
+   & \num{2}$\times$\SI{4.7}{\nano\farad} Y1, at \SI{60}{\percent} of the rating \\
+D13 & in a reused sheet every instance has the same circuit, so the discharge channel cannot omit its desaturation network
+   & the seventh channel's drain input is tied to its own reference: the DESAT pin sees at most \SI{6.1}{\volt} against an \SI{8.5}{\volt} minimum threshold \\
+D14 & the thermistor first named has $B = \SI{3977}{\kelvin}$, not \SI{3435}{\kelvin}, and is a board part
+   & \SI{10}{\kilo\ohm}, $B_{25/85} = \SI{3435}{\kelvin}$, M3 lug on the cold plate \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Two consequences reach back into earlier chapters. The four amplifier
+supplies of D10 add four LDOs dissipating about \SI{72}{\milli\watt} each and
+four modules running at a few percent of their load, which takes the current
+from the \SI{12}{\volt} rail from the \SI{155}{\milli\ampere} of
+\cref{tab:auxbudget} to about \SI{185}{\milli\ampere}; this is an estimate
+from the LDO drop, not a recomputed budget, and the \SI{8}{\watt} module of
+D11 delivers \SI{666}{\milli\ampere}. And the gate resistors are E96 parts:
+\SI{4.99}{\ohm} on and \SI{12.4}{\ohm} off, \num{0.2} and
+\SI{0.8}{\percent} below the values of \cref{sec:kelvin}. The lower
+turn-off resistor makes the turn-off marginally faster; at
+\SI{0.8}{\percent} that is well inside the tolerance of the model it was
+chosen with, and the overshoot it adds has not been simulated separately.
+
+\section{Verification}
+
+ERC reports one warning: the ground pin of the bus amplifier is not on the
+low-voltage ground. The connection is intended: the high side of
+\texttt{U601} is referred to the negative DC rail, which is what makes the
+measurement possible.
+
+\begin{finding}{ERC passes a schematic with swapped pins}
+ERC checks that pins are connected compatibly: an output to inputs, a power
+input to a power output. It cannot check that they are connected to the
+\emph{right} net. The schematic passed ERC while the two command inputs of a
+driver were swapped, the two outputs of an isolated supply reversed, a
+comparator supplied backwards and the two thermistors crossed. Each was a
+circuit that would have failed on the bench, and the first one silently,
+because swapping IN+ and IN$-$ inverts the hardware interlock of
+\cref{tab:interlock} rather than breaking it.
+
+The schematic is therefore checked against an independent model: every
+component was described once, in a script, with its role and its
+pin-to-net connections, and the netlist exported from KiCad is compared with
+it pin by pin. All 275 parts match, and the comparison, not the
+ERC, is what was run after every edit.
+\end{finding}
+
+The same model checks the parts themselves: every symbol and footprint exists
+in a library, every pin of every symbol has a pad, and every footprint used
+for an isolating component is the manufacturer's high-voltage land pattern
+rather than the generic one (\cref{sec:isoslot}).
+
+\begin{finding}{The package pitch is not the one initially assumed}
+The TO-247-4L pad spacing is \emph{not} the uniform \SI{5.45}{\milli\metre}
+of the three-lead TO-247. From the recommended pad layout of the device
+datasheet~\cite{wolfspeed_e3m0016} it is \SI{5.08}{\milli\metre} between pins 1
+and 2 and \SI{2.54}{\milli\metre} between the remaining pins, for a total
+span of \SI{10.16}{\milli\metre}.
+
+The consequence for insulation coordination is larger than a change of
+pitch, because the pitch is not the creepage. Pins 1 and 2 are the
+drain--source pair, and with pads \SI{1.84}{\milli\metre} wide on a
+\SI{5.08}{\milli\metre} pitch the copper-to-copper gap is
+\SI{3.24}{\milli\metre}: that, and not \SI{5.45}{\milli\metre}, is the
+worst-case creepage between high-voltage nodes on the board. The gate is
+\SI{10.16}{\milli\metre} from the drain and is not the critical pair.
+
+\SI{3.24}{\milli\metre} is \SI{2.8}{} times less than the
+\SI{9.00}{\milli\metre} that IEC 60664-1~\cite{iec60664} asks for at the
+\SI{900}{\volt} working voltage in pollution degree 2 on ordinary FR-4, and
+the package leaves no room to do better. Conformal coating brings the
+pollution degree to 1, where the requirement is \SI{2.80}{\milli\metre} and
+the same \SI{3.24}{\milli\metre} passes with \SI{16}{\percent} of margin. The full
+coordination, including the reinforced barrier and the two paths that this
+first pass missed, is in \cref{sec:insulation}.
+
+The lesson concerns method: a constraint that
+the package imposes on the \emph{process} was found by measuring the
+footprint, and would not have been found by reading the pitch.
+\end{finding}
+
+\section{Schematic sheets}
+
+The sheets follow, one per page, in the order of \cref{tab:sheets}. Of each
+reused sheet one instance is shown: leg~1, the high-side driver of leg~1 and
+the sensing channel of phase~1; the others differ only in their references.
+
+\newcommand{\foglio}[3]{%
+  \begin{sidewaysfigure}
+    \centering
+    \includegraphics[page=#1,width=\textwidth,height=0.86\textheight,keepaspectratio]{figures/kicad_schema.pdf}
+    \caption{#2}
+    \label{fig:sch-#3}
+  \end{sidewaysfigure}}
+
+\foglio{1}{Root sheet: the blocks and the signals between them.}{root}
+\foglio{2}{Power stage: DC-link film capacitors, terminals and the three legs.}{power}
+\foglio{3}{Half-bridge leg (leg 1 of 3): devices, commutation ceramics, Kelvin shunt.}{leg}
+\foglio{6}{Gate drive: the six channels of the bridge and the gate test points.}{gatedrive}
+\foglio{7}{Gate-drive channel (high side of leg 1, one of seven instances).}{drv}
+\foglio{13}{Phase-current sensing: overload comparators and reference.}{phasesense}
+\foglio{14}{Sensing channel (phase 1 of 3).}{sense}
+\foglio{17}{Auxiliary supply.}{aux}
+\foglio{18}{Control interface: connector, ESD protection, thermistors.}{controlif}
+\foglio{19}{DC-link management: bus measurement, active discharge, Y-capacitors.}{dclink}
