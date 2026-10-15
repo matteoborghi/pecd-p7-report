@@ -272,7 +272,7 @@ failure threshold \SI{22.6}{\nano\henry}. The limit is a design input: the gate 
 chosen so that the die stays below \SI{1080}{\volt} at \SI{950}{\volt} and
 \SI{60}{\ampere} \emph{with} \SI{20}{\nano\henry} (\cref{sec:kelvin}). The
 frozen board's loop is extracted below (\cref{sec:loopextract}) and still
-to be measured (test B2 of \cref{tab:benchplan}); both are to be checked
+to be measured on the finished board (\cref{app:assumptions}, A.7); both are to be checked
 against the threshold at which C2 is
 lost, \SI{22.6}{\nano\henry} at turn-off and
 \SI{23.6}{\nano\henry} on recovery (\cref{tab:lthreshold}), not only
@@ -350,7 +350,7 @@ spent: with the extracted loop, $R_{g,\mathrm{off}}$ could come down to
 energy would fall by \SI{38}{\percent}; at \SI{5}{\ohm} the die reaches
 \SI{1087}{\volt} and C2 is lost. The resistor is not changed. The
 margin comes from a model of the copper, not from a measurement, and
-spending it before test B2 has confirmed it would stake the most expensive
+spending it before a measurement has confirmed it would stake the most expensive
 part on the board on an unverified number. It is the first change to make
 once the loop has been measured.
 
@@ -467,7 +467,7 @@ and a board whose power path is all pours needs its sections measured.
 \end{finding}
 
 The IPC-2152 charts~\cite{ipc2152} supersede the closed form and were not
-available (\cref{app:assumptions}, A.15).
+available (\cref{app:assumptions}, A.8).
 
 \section{Insulation coordination}
 \label{sec:insulation}

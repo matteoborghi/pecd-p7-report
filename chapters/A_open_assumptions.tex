@@ -2,405 +2,59 @@
 \label{app:assumptions}
 
 This appendix collects the quantities that are assumed rather than measured
-or read from a datasheet. They are gathered in one place because these are
-the points at which the design would change if the assumption turned out to
-be wrong.
+or read from a datasheet, in order of how much each would change the result,
+with what happens if it is wrong and what would close it.
 
-They are ordered by how much they would change the result. Their numbers are
-identifiers rather than positions: the chapters and the bench plan refer to
-them, so they were kept when an item moved between sections.
-
-\section{Would change the design}
-
-\paragraph{A.1 Pollution degree 1, obtained by conformal coating.}
-Every insulation distance in this design, functional and reinforced
-alike, is qualified in pollution degree 1, which is claimed on the basis
-that the high-voltage area is conformally coated on both faces. The
-coating is an existence condition: in pollution degree 2
-the functional requirement at the \SI{900}{\volt} working voltage is
-\SI{9.00}{\milli\metre} on ordinary FR-4 where the \device{} package offers
-\SI{3.24}{\milli\metre} between its drain and source pads, and no layout can
-recover a factor of \num{2.8}. At \SI{900}{\volt} the coating also carries
-the reinforced barrier under the isolator bodies (A.24). If the coating is refused, the board is not buildable with
-this device, and the answer is a different package, not a different layout.
-
-The assumption is a \emph{process} condition rather than a dimension. A design rule check verifies
-dimensions and passes the board either way. This is why it is written at the
-head of the rules file, on the fabrication drawing, and here. See
-\cref{sec:insulation}.
-
-It is no longer only an assumption of process. The coating is specified with
-a UV tracer and every board is inspected under UV light over the whole
-high-voltage area (\cref{sec:isoslot}), so each board carries the evidence
-that the condition holds on it. What remains assumed is the coating's
-long-term integrity, not its presence.
-
-\paragraph{A.2 Rated impulse withstand voltage, and the non-applicability of
-overvoltage category.}
-Clearance follows from an assumed rated impulse voltage, and because creepage
-may not be smaller than clearance, that assumption can also set the creepage.
-\SI{2.5}{\kilo\volt} is declared, derived from the transient the converter
-generates internally (\SI{1148}{\volt} at the die in the worst simulated
-case) rather
-than from an overvoltage category, on the grounds that a battery-fed floating
-system is not supplied from a low-voltage distribution network and cannot
-receive a mains-borne impulse (\cref{sec:ovc}).
-
-This is the critical entry of this group. The design passes at \SI{4}{\kilo\volt} with
-\SI{8}{\percent} of margin and fails at \SI{6}{\kilo\volt}, which is what
-overvoltage category II on a \SI{1000}{\volt} band would give. The argument
-rests on three legs, and it falls if any one of them falls: the standard
-provides for deriving the impulse from the actual transient where the circuit
-is not mains-supplied; that transient is simulated rather than assumed; and
-the declared level is \num{2.2} times the worst simulated peak.
-
-\paragraph{A.3 Table values of IEC 60664-1, and their source.}
-The creepage and clearance requirements used throughout
-\cref{sec:insulation} come from a third-party calculator implementing a
-stored subset of the standard~\cite{standardclarity}, not from the text of
-IEC 60664-1~\cite{iec60664}, which was not available.
-
-The calculator checked nine values that had been quoted from memory (five
-creepage rows, two clearance rows, the reinforced doubling rule and the
-pollution-degree floor), and all nine agreed to the digit. A published,
-reproducible secondary source that confirms every value is a different kind
-of evidence from a recollection. It is still not the standard: it covers a
-stored subset and describes itself as a reference estimate, so the text is to
-be read before release. A.2 weighs more than this entry.
-
-\paragraph{A.4 Galvanic isolation in the charging path.}
-The argument that overvoltage category does not apply (A.2) depends on the
-high-voltage bus never being conductively tied to the mains. During charging
-the contactors are closed and the bus \emph{is} connected to the inlet, so
-what breaks the path is the galvanic isolation of the charging
-equipment (the on-board charger's transformer in AC charging, the station's
-in DC charging). Both sit outside this perimeter, and the assumption is
-recorded as requirement R10 (\cref{tab:sysreq}).
-
-It is not normatively guaranteed. IEC 61851-23~\cite{iec6185123}
-distinguishes isolated from non-isolated DC charging stations, imposing
-additional protective measures on the latter, so a vehicle that accepts any
-station cannot assume isolation. If the assumption fails, the insulation
-coordination moves into a different normative domain rather than
-losing margin, and the mitigation belongs at the charge inlet, not on this
-board. This is the second most load-bearing assumption in the
-design, after A.1.
-
-\paragraph{A.5 Short-circuit withstand time, carried as a threshold.}
-The \device{} datasheet does not declare $t_\mathrm{SC}$, the only
-selection criterion the chosen device leaves undemonstrated. It is carried
-as a threshold (\cref{sec:tsc}): counted as the manufacturer measures it,
-the protection chain closes in \SI{0.69}{\micro\second} typical and
-\SI{0.83}{\micro\second} worst case, so the design survives a short
-if $t_\mathrm{SC} \geq \SI{0.83}{\micro\second}$ and has a factor of two at
-\SI{1.66}{\micro\second}. A class value from the manufacturer, on a
-\SI{16}{\milli\ohm} die of the same generation at \SI{+15}{\volt}, gives
-\SI{2.4}{\micro\second} at \SI{950}{\volt} once scaled at constant
-energy~\cite{wolfspeed_scan}: a factor of 2.9, but on another part. The
-plan B is sized (\cref{sec:planb}): with a \SI{4.7}{\pico\farad} blanking
-capacitor and a \SI{4.7}{\volt} zener the protection covers
-\SI{0.71}{\micro\second}; below that, desaturation detection is the wrong
-principle for this device. The value is to be obtained from the
-manufacturer in writing or from test B1 of \cref{tab:benchplan}, before the
-protection is trusted.
-
-\paragraph{A.6 Switching energy: model against datasheet.}
-At the datasheet test point the SPICE model gives $\Eon = \SI{748}{\micro\joule}$
-against \SI{2552}{\micro\joule} measured, a factor of 3.4, and
-$\Eoff = \SI{509}{}$ against \SI{788}{\micro\joule}, a factor of 1.55
-(\cref{sec:kelvin}); the device of the first iterations showed the same
-factor on turn-on. The loss budget uses the datasheet, on the grounds that it
-is a measurement, but this is the first thing to verify on the
-bench: if the model is right, the thermal budget improves considerably. The
-overshoot results do not depend on it: they come from the same model's
-waveforms, not from its energies.
-
-\paragraph{A.7 Insulating pad thermal resistance.}
-$\Rthcs = \SI{0.50}{\celsius\per\watt}$ is a class value, not a product
-figure, and it also depends on the mounting torque. Across the plausible
-range it moves the nominal junction temperature by \SI{23}{\celsius}
-(\cref{tab:rthcs}) and never threatens the rated point. At locked rotor it
-does: C1 holds only up to \SI{0.62}{\celsius\per\watt}, about
-\SI{7}{\celsius} per tenth (\cref{sec:lockedrotor}). The pad value is
-therefore a mounting specification, torque included, and not a free choice;
-it is the largest single uncertainty in the numbers quoted and the first
-thing to measure on a mounted sample. On the real rail (\cref{sec:cooling})
-the limit tightens to \SI{0.50}{\celsius\per\watt}, and the design adopts
-aluminium nitride with a phase-change interface material at
-\SI{0.18}{\celsius\per\watt}; the interfaces decide the value more than the
-ceramic does (\cref{sec:coolalt}).
-
-\paragraph{A.8 Sampling rate and sampling instant.}
-The analogue interface of \cref{sec:analogif} is designed for
-$f_s = \fsw = \SI{20}{\kilo\hertz}$, one sample per switching period, taken
-synchronously with the carrier peak or valley. This is standard practice in
-machine control and it is what makes a current loop of a few kilohertz
-sensible, but the controller has not been selected and the rate has not been
-agreed with anyone.
-
-Two things follow from it. The anti-aliasing corner is placed at
-\SI{106}{\kilo\hertz} rather than near Nyquist \emph{because} synchronous
-sampling already nulls the ripple; if the sampling turned out to be
-asynchronous, the ripple would alias, the filter would have to move down by
-a decade, and the \SI{16}{\micro\second} of delay that follows would not fit
-the current loop, and the board would then need its own ADC, which reverses the
-boundary decision of \cref{sec:sysreq}. And the reading error moves from zero
-to $\pm\SI{4.10}{\percent}$ of rating (\cref{tab:sampling}).
-
-It is therefore written as requirement R6 rather than left as an
-assumption, because the board depends on something that happens outside
-it. It is listed here because a requirement that the
-system cannot meet is an assumption again.
-
-\paragraph{A.22 Coolant temperature.}
-The \SI{65}{\celsius} coolant is this design's assumption, not part of the
-specification (\cref{tab:spec}). At \SI{70}{\celsius} the locked-rotor
-junction temperature rises by about \SI{6}{\celsius}: on the ideal plate of
-\cref{sec:lockedrotor} it stays within C1 with a few degrees to spare, on the
-cooling rail adopted in \cref{sec:coolalt} it reaches \SI{117.8}{\celsius} only
-with every other tolerance stacked on top (\cref{tab:coolalt}). It is a requirement on the vehicle's cooling loop and should be
-written as one.
-
-\paragraph{A.23 Maximum continuous battery voltage.}
-Every working-voltage quantity (creepage, the static derating of the
-devices, the voltage class of the film capacitor, the divider) is sized at
-\SI{900}{\volt}. That is requirement R12 on the battery, including charging
-and regenerative braking; a pack that sits above it for long enough to count
-as ``continuous'' is outside this design.
-
-\paragraph{A.25 The isolated DC/DC converters (open decision).}
-The eleven converters that supply the drivers and the sensing cross the
-HV-to-control barrier, and their datasheet recognises them as reinforced
-insulation only up to \SI{150}{\volt} rms, basic up to \SI{300}{\volt} rms,
-functional up to \SI{2.4}{\kilo\volt}~\cite{murata_mgj2}. At
-\SI{900}{\volt} they are functional insulation. The reinforced
-barrier declared in this report is therefore not met at these components.
-Two ways out, both changing the design: supplies rated for reinforced
-insulation at a working voltage of at least \SI{900}{\volt} DC, or a
-safety barrier placed elsewhere in the system with the board's HV-to-control
-insulation declared functional. It is the one open point of this appendix
-that is a safety question rather than a margin question.
-
-The schematic and the board were frozen with these converters, so
-the frozen board implements the second option as far as the board can: the
-rules file treats the converter pins as functional insulation, at
-\SI{5.5}{\milli\metre}, and declares it by name (\cref{tab:rules}); every
-other crossing of the barrier (isolators, board copper, the slots) is
-reinforced. Choosing the first option means a different module and a
-different footprint, that is a board revision, not an edit.
-
-\section{Would change a component choice}
-
-\paragraph{A.9 Negative gate bias (resolved).}
-\SI{-5}{\volt} is used. The datasheet's \SI{-4}{\volt} is a typical
-operating value, not a limit; the absolute maximum is
-\SI{-8}{\volt}~\cite{wolfspeed_e3m0016}, leaving \SI{3}{\volt} of margin. The
-standard isolated module delivers \SI{-5}{\volt} without an extra
-regulator, and the extra volt goes straight into the margin against spurious
-turn-on (\cref{tab:miller}). See \cref{sec:negbias}.
-
-\paragraph{A.10 Isolation grade of the gate-drive supply.}
-The \dcdc{} withstands \SI{2400}{\volt} continuously but its \emph{certified}
-reinforced rating is only \SI{150}{\Vrms}~\cite{murata_mgj2}. Functional
-isolation has been assumed, on the basis that the HV system floats with
-respect to chassis and the low-voltage side is not touchable. If certified
-reinforced isolation is required across that barrier, the module must change.
-
-\paragraph{A.11 Vehicle \SI{12}{\volt} rail range.}
-Assumed \SI{9}{}--\SI{16}{\volt} continuous with larger transients, typical
-of ISO 16750-2~\cite{iso16750}, without access to the standard itself. The
-pre-regulator must be sized on the real range.
-
-\paragraph{A.12 Terminal dimensions and voltage class of the ceramic capacitors.}
-The decoupling capacitor carries up to \SI{900}{\volt} between its own two
-terminals, so its creepage is the body length less the two terminations. On
-the typical dimensions used here a 1210 leaves \SI{2.00}{\milli\metre}, below
-the \SI{2.80}{\milli\metre} required, while a 1812 leaves
-\SI{3.20}{\milli\metre}. The voltage class is \SI{1250}{\volt} or more, in
-C0G: a \SI{1000}{\volt} part would work at \SI{90}{\percent} of its rating
-at \SI{900}{\volt}, and an X7R one would lose most of its capacitance to the
-bias. Resolved at capture (D8, \cref{tab:captdecisions}): a
-\SI{220}{\nano\farad} part of that class does not exist; the largest C0G
-ceramic at \SI{1200}{\volt} is \SI{47}{\nano\farad} in a 3640, whose
-\SI{6.25}{\milli\metre} between pads passes with margin. Four are
-fitted per leg, \SI{188}{\nano\farad}, at \SI{75}{\percent} of the rating at
-\SI{900}{\volt}~\cite{kemet_kclink}.
-
-\paragraph{A.13 Material group of the ceramic pad.}
-The pad is sized in pollution degree 2 with the ceramic assigned material
-group I, which requires a datasheet stating CTI $\geq \SI{600}{\volt}$.
-Technical ceramics (aluminium nitride, adopted in \cref{sec:coolalt}, and
-alumina) do not track, so the assignment is expected to hold, but it has not
-been confirmed on a specific part. Material group II would take a pad
-standing on its own from \SI{33}{}$\times$\SI{37}{} to
-\SI{41}{}$\times$\SI{45}{\milli\metre} (\cref{tab:pad}); on the cooling rail,
-where the creepage below the tab comes from raising the rail, it would mean
-raising it further and checking the section of \cref{fig:mechsection} again.
-
-The pollution degree at the pad is not in this appendix. Degree 1 at the pad
-would rest on a sealed housing, a system-level property this design does not
-own. Sizing the pad for
-degree 2 removed the assumption at a cost of \SI{57}{\percent} more pad
-area, the only point in this design where an assumption was eliminated
-rather than declared.
-
-\section{Would change the layout or the verification}
-
-\paragraph{A.14 Loop inductance of the real layout.}
-The \SI{20}{\nano\henry} limit is not yet a verified result, and it is now
-load-bearing: $R_{g,\mathrm{off}} = \SI{12.5}{\ohm}$ keeps the die below
-\SI{1080}{\volt} \emph{at} \SI{20}{\nano\henry}, with six and a half volts to spare.
-In inductance that margin is \SI{2.6}{\nano\henry}: C2 fails at
-\SI{22.6}{\nano\henry} at turn-off and at \SI{23.6}{\nano\henry} on
-recovery (\cref{tab:lthreshold}), each known to about
-$\pm\SI{1}{\nano\henry}$. Extracted on the frozen board
-(\cref{sec:loopextract}), it is \SI{7.8}{\nano\henry} of copper in revision 1.1,
-about \SI{8.3}{\nano\henry} with the capacitor ESL, so the verification
-holds with \SI{14}{\nano\henry} to the threshold, and the double pulse with
-the extracted values puts the die at \SI{1040}{\volt}. What remains assumed is
-the extraction itself (a quasi-static model of the copper layers, with the
-packages taken from the vendor's model) until test B2 measures it,
-against the failure threshold rather than the limit, and
-remembering that the figure to compare is the PCB contribution and not the
-whole loop. Between \SI{20}{} and \SI{22.6}{\nano\henry} the design holds
-as it is; above \SI{23}{\nano\henry} both gate resistors, the losses and the
-thermal result of \cref{sec:lockedrotor} have to be recomputed.
-
-\paragraph{A.15 IPC-2152 chart values.}
-The conductor widths use the IPC-2221B closed form, which is conservative in
-this configuration. The IPC-2152 charts were not available and their values
-have not been invented. The layout was frozen without them; the one place
-where the pours were narrower than the closed form asks, a neck below each
-shunt pad, has a second pour on L6 since revision 1.1
-(\cref{sec:conductors}), so the charts are expected to confirm rather than
-change the result.
-
-\paragraph{A.16 Copper temperature rise.}
-A \SI{30}{\celsius} rise was assumed for conductor sizing
-(\cref{tab:widths}). On a board already at \SI{67}{}--\SI{85}{\celsius} this
-puts the copper near \SI{115}{\celsius}, which should be revisited against the
-mechanical thermal design. The margin here is thinner than it was: the DC bus
-current is \SI{32.0}{\ampere} rather than the \SI{22.5}{\ampere} first
-assumed, so the bus conductor has to be \SI{60}{\percent} wider.
-
-\paragraph{A.17 Dielectric strength of the prepreg, and the L1--L2 field.}
-The \SI{0.10}{\milli\metre} prepreg chosen to minimise the plane-pair
-inductance carries the full DC-link voltage, a field of
-\SI{9}{\kilo\volt\per\milli\metre} at \SI{900}{\volt} against a laminate strength assumed to be
-\SI{30}{}--\SI{40}{\kilo\volt\per\milli\metre}. This is functional
-insulation, so the standard imposes no minimum thickness, but it is the
-thinnest margin in the design and it cannot be inspected once the board is
-pressed. A layer-to-layer withstand test at \SI{2}{\kilo\volt} DC for one
-minute is specified on the fabrication drawing, which converts the assumption
-into a measurement. Doubling the prepreg would halve the field and
-cost \SI{0.19}{\nano\henry} (\cref{tab:planepair}), a trade to revisit at the
-first prototype.
-
-\paragraph{A.18 Y-capacitance permitted by the vehicle.}
-The board carries \num{2}$\times$\SI{4.7}{\nano\farad}, not the
-\num{2}$\times$\SI{22}{\nano\farad} first assumed: \SI{4.7}{\nano\farad} is
-the largest Y1 disc rated \SI{1500}{\volt} DC (D12,
-\cref{tab:captdecisions}). The function (closing the common-mode current to
-chassis at high frequency) stays; its effectiveness is a matter for the
-emission test, and the value must still be reconciled with the vehicle's
-insulation-monitoring budget, which is a system-level constraint and not a
-board-level one.
-
-\paragraph{A.19 CISPR 25 edition and limit class.}
-The estimate of \cref{sec:emcest} shows that an input filter is needed
-whatever the class; the class decides its margin. It was taken against the
-class~3 voltage-method limits of the low-voltage network as a reference,
-since the limits that apply to the high-voltage lines and the class the
-vehicle maker asks for are not fixed.
-
-\paragraph{A.24 The reinforced barrier under the isolator bodies (decided: slot).}
-A through slot is made under each of the seven drivers and four isolated
-amplifiers (\cref{tab:slotdims}), and the driver footprint is changed to the
-manufacturer's high-voltage land pattern, because the standard one left
-\SI{7.25}{\milli\metre} and not the \SI{8}{\milli\metre} assumed until then.
-The board path around each slot is at least \SI{9.8}{\milli\metre} against the
-\SI{9.5}{\milli\metre} rule. What stays assumed is the package
-surface: \SI{8.0}{} and \SI{8.5}{\milli\metre} against \SI{9.0}{\milli\metre}
-in pollution degree 2, covered by the components' own reinforced rating and,
-in the design basis, by the coating. The slot moves the barrier's weak point
-from the uninspectable gap under the body to package faces that are coated
-and inspected (\cref{sec:isoslot}).
-
-\section{Accepted limitations}
-
-These are known limits of the design as scoped, collected here so that
-nobody has to discover them by reading every chapter.
-
-\paragraph{A.L1 The active discharge depends on the auxiliary supply.}
-The seventh gate-drive channel that switches the discharge resistor is fed
-from the vehicle's \SI{12}{\volt} rail. If a crash interrupts that rail the
-active discharge does not run and only the passive bleeder remains, which
-takes \SI{121}{\second} to reach \SI{60}{\volt} from \SI{900}{\volt} against a
-\SI{5}{\second} requirement~\cite{unr100}. This is the standard
-architecture, in which the bleeder is a backstop and not a substitute, but
-the gap is
-recorded because it is a requirement unmet in that condition. A production
-design would take the discharge control power from the HV bus itself.
-See \cref{sec:dclinkmgmt}.
-
-\paragraph{A.L2 Contactors, precharge and interlock monitoring are out of
-scope.} The board receives an already-charged bus and carries the interlock
-loop through without monitoring it. Its contribution is the DC-link voltage
-measurement on which the vehicle controller closes the main contactor at
-voltage rather than on a timer. The precharge sizing is given in
-\cref{sec:scope} as a system-level result, not as a board function.
-
-\section{Would change only the transient}
-
-\paragraph{A.20 Cold-plate heat capacity and thermal resistance.}
-$C_\mathrm{hs} = \SI{1000}{\joule\per\kelvin}$ is estimated from an assumed
-plate geometry; it affects no steady-state temperature (verified by
-re-running the complete sweep), but it sets the time constant, and therefore
-how long a bench measurement must run before the reading is meaningful.
-$\Rthha = \SI{0.01}{\celsius\per\watt}$ is no longer an assumption of the
-design: it was the optimistic end of what cold plates achieve, and
-\cref{sec:cooling} replaces it with the rail as drawn, computed in three
-dimensions (equivalent to \SI{0.069}{\celsius\per\watt}). What remains
-assumed there is the channel correlation, whose $\pm\SI{20}{\percent}$ moves
-the hottest junction by \SI{0.8}{\celsius}, and a uniform flux under the
-tab.
-
-\section{Would change the safe state}
-
-\paragraph{A.21 Load type.}
-The entire report assumes a passive $RL$ bench load. With a permanent-magnet
-machine the safe state would have to be re-examined: the back-EMF can feed the
-DC-link with all devices off, and the usual answer is an active short circuit,
-which is the opposite of turning everything off.
-
-\section*{Bench verification plan}
-\addcontentsline{toc}{section}{Bench verification plan}
-
-The thresholds of this appendix are useful only if each is attached to a
-measurement with a pass mark written before the measurement is made.
-
-\begin{table}[htbp]
-\centering
-\caption{Bench verification plan: tests, pass marks and the assumption each closes.}
-\label{tab:benchplan}
-\small
-\begin{tabularx}{\textwidth}{lYYl}
+{\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{L{0.05\textwidth}L{0.36\textwidth}L{0.30\textwidth}L{0.20\textwidth}}
+\caption{Assumptions of the power stage.}
+\label{tab:assumptions}\\
 \toprule
- & Test & Pass mark & Closes \\
+No. & Assumption and value used & If it is wrong & Closed by \\
 \midrule
-B1 & Short circuit on a sacrificial device, hard fault at turn-on, \SI{950}{\volt}, \SI{175}{\celsius}, \SI{+15}{\volt}
-   & survives $\geq\SI{0.83}{\micro\second}$; design margin at $\geq\SI{1.66}{\micro\second}$ & A.5 \\
-B2 & Parasitic extraction of the power loop, PCB contribution only
-   & $\leq\SI{20}{\nano\henry}$ target; C2 lost at \SI{22.6}{\nano\henry} & A.14 \\
-B3 & Double pulse on the real board, \SI{950}{\volt}, \SI{60}{\ampere}, hot plate
-   & pin voltage $\leq\SI{1055}{\volt}$ (die $\leq\SI{1080}{\volt}$) & A.14 \\
-B4 & Switching energies at the datasheet point
-   & between the model and the datasheet (\cref{sec:kelvin}) & A.6 \\
-B5 & Case-to-plate resistance of the mounted pad, specified torque
-   & $\Rthcs \leq \SI{0.18}{\celsius\per\watt}$ design value, \SI{0.50}{\celsius\per\watt} at most (\cref{sec:coolalt}) & A.7 \\
-B6 & Locked rotor, \SI{42.4}{\ampere} DC, coolant \SI{65}{\celsius}, case thermocouple on the hottest device
-   & $\Tcase \leq \SI{106}{\celsius}$, i.e.\ $\Tj \leq \SI{120}{\celsius}$ at typical $\Rthjc$; model \SI{84.5}{\celsius} on the six-port rail with the aluminium nitride pad (\cref{tab:coolalt}) & C1 \\
-B7 & UV inspection of the coating, every board & complete coverage of the HV area & A.1 \\
+\endfirsthead
+\toprule
+No. & Assumption and value used & If it is wrong & Closed by \\
+\midrule
+\endhead
+A.1 & Pollution degree 1, from conformal coating of the high-voltage area. The drain--source creepage on the package is \SI{3.24}{\milli\metre} against \SI{2.80}{\milli\metre} required in pollution degree 1.
+    & In pollution degree 2 the requirement is \SI{9.00}{\milli\metre} on ordinary FR-4 and the board is not buildable with this device: the answer is a different package, not a different layout. The design-rule check cannot see it.
+    & coating declared on the fabrication drawing \\
+A.2 & Rated impulse withstand \SI{2.5}{\kilo\volt}, derived from the transient the converter produces (\SI{1148}{\volt} at the die in the worst simulated case), not from an overvoltage category.
+    & The design passes at \SI{4}{\kilo\volt} with \SI{8}{\percent} of margin and fails at \SI{6}{\kilo\volt}, where clearance requires \SI{5.50}{\milli\metre}.
+    & the text of IEC 60664-1, which was not available; the values come from a calculator \\
+A.3 & Short-circuit withstand time: not declared by Wolfspeed. A class value for a \SI{16}{\milli\ohm} die of the same generation is \SI{2.9}{\micro\second} at \SI{800}{\volt} and \SI{2.4}{\micro\second} at \SI{950}{\volt}, at \SI{175}{\celsius} and $+\SI{15}{\volt}$.
+    & Criterion C5 (declared $t_\mathrm{SC} \geq \SI{1.5}{\micro\second}$) stays undemonstrated, and the desaturation protection, which closes in \SI{0.83}{\micro\second} worst case, would need a faster threshold.
+    & the manufacturer's written value, or a short-circuit test on a sacrificial device \\
+A.4 & Switching energy from the datasheet. At the datasheet point the SPICE model gives $E_\mathrm{on} = \SI{748}{\micro\joule}$ against \SI{2552}{\micro\joule} measured, and $E_\mathrm{off} = \SI{509}{}$ against \SI{788}{\micro\joule}.
+    & If the model is right the thermal budget improves considerably. The overshoot results do not depend on it.
+    & a double pulse at the datasheet point \\
+A.5 & Case-to-sink resistance $\Rthcs = \SI{0.18}{\celsius\per\watt}$ design value (aluminium nitride with a phase-change interface), \SI{0.50}{\celsius\per\watt} at most.
+    & The largest single uncertainty: each tenth of a \si{\celsius\per\watt} costs about \SI{7}{\celsius} at locked rotor (\cref{sec:lockedrotor}), and above \SI{0.50}{\celsius\per\watt} C1 is lost on the rail.
+    & the resistance of a mounted sample at the specified clip force \\
+A.6 & Pad material group I, which needs CTI $\geq \SI{600}{\volt}$ on the ceramic's datasheet. Aluminium nitride and alumina do not track, but it is not confirmed on a specific part.
+    & Group II takes a free-standing pad from \SI{33}{}$\times$\SI{37}{} to \SI{41}{}$\times$\SI{45}{\milli\metre}; on the rail it means raising the rail further.
+    & the datasheet of the pad \\
+A.7 & PCB-attributable loop inductance of \SI{20}{\nano\henry} is a design input: the gate resistances were chosen at that value. Extracted from the copper: \SI{7.8}{\nano\henry}, about \SI{8.3}{\nano\henry} with the capacitor ESL; the packages add \SI{14.6}{\nano\henry}.
+    & C2 fails at \SI{22.6}{\nano\henry} at turn-off and \SI{23.6}{\nano\henry} on recovery; above that both gate resistors, the losses and the locked-rotor result have to be recomputed.
+    & the extraction (done) and a measurement on the board \\
+A.8 & Conductor widths from the IPC-2221B closed form at \SI{30}{\kelvin} of rise: \SI{10.4}{\milli\metre} for the \SI{35}{\ampere} bus, \SI{8.4}{\milli\metre} for the phases. The IPC-2152 charts were not available.
+    & The closed form is conservative. On a board at \SI{67}{}--\SI{85}{\celsius} the copper reaches about \SI{115}{\celsius}.
+    & the IPC-2152 charts; a thermal test of the board \\
+A.9 & Coolant at \SI{65}{\celsius} at the rail inlet, not given by the brief (ambient \SI{50}{\celsius}).
+    & At \SI{70}{\celsius} the locked-rotor junction rises by about \SI{6}{\celsius}; with every tolerance stacked the rail reaches \SI{117.8}{\celsius} (\cref{tab:coolalt}).
+    & a requirement on the vehicle cooling loop (\cref{tab:sysassume}) \\
+A.10 & Maximum continuous bus voltage \SI{900}{\volt}, including charging and regenerative braking.
+    & Creepage, device derating, the voltage class of the film and the divider are all sized at \SI{900}{\volt}; a pack that sits above it for long enough to count as continuous is outside the design.
+    & a requirement on the battery (\cref{tab:sysassume}) \\
+A.11 & Cold-plate heat capacity \SI{1000}{\joule\per\kelvin}, from geometry. The plate resistance of \SI{0.01}{\celsius\per\watt} is replaced by the rail drawn in \cref{sec:cooling}.
+    & It affects only the transient: every steady-state temperature is independent of it.
+    & the warm-up of the rail \\
+A.12 & Load: a passive $RL$ branch of \SI{2.5}{\milli\henry}.
+    & With a permanent-magnet machine the back-EMF can feed the DC-link with all devices off, and the safe state would be an active short circuit, the opposite of turning everything off.
+    & machine data \\
 \bottomrule
-\end{tabularx}
-\end{table}
+\end{longtable}
+}

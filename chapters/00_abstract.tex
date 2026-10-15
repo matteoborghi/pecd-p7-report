@@ -1,38 +1,33 @@
-This report documents the design of a three-phase two-level voltage-source
-inverter for an automotive traction application, rated \SI{800}{\volt} on the
-DC-link, \SI{30}{\Arms} per phase and \SI{20}{\kilo\hertz} switching
-frequency, built around the Wolfspeed \device{} silicon-carbide
-MOSFET~\cite{wolfspeed_e3m0016}. The device was selected against seven
-alternatives (other device classes, a paralleled pair, a top-side-cooled
-package and a module) on criteria fixed before any result was computed.
+This report documents the design of the power stage of a three-phase
+two-level voltage-source inverter for an automotive traction application:
+\SI{800}{\volt} on the DC-link, \SI{30}{\Arms} per phase at any load power
+factor, \SI{20}{\kilo\hertz} switching frequency, and forced-air or liquid
+cooling with a maximum ambient of \SI{50}{\celsius}. The device is the
+Wolfspeed \device{} silicon-carbide MOSFET~\cite{wolfspeed_e3m0016}, selected
+against seven alternatives (other device classes, a paralleled pair, a
+top-side-cooled package and a module) on criteria fixed before any result was
+computed.
 
-The work covers the analytical sizing of the power stage, the modulation
-strategy, a circuit-level model validated against closed-form results, the
-loss and thermal budget, and the auxiliary circuits: gate drive, protection,
-sensing and DC-link management. A schematic and a six-layer board implement
-them, frozen as revision 1.2 with no outstanding design-rule violation. The
-commutation loop extracted from the copper is about \SI{8}{\nano\henry}
-against a \SI{20}{\nano\henry} budget, and the cooling rail has been checked
-against the insulation distances. A circuit estimate of the conducted
-emission against CISPR~25 shows that the board, like any unfiltered inverter,
-needs an input filter; built from catalogue automotive parts, it fits outside
-the frozen board and brings the estimate inside class~3. A bill of materials
-puts one inverter, filter included, at about \SI{1950}{}~EUR as a prototype
-and \SI{930}{}~EUR in a series of a hundred.
+The work covers the design equations (operating point, DC-link capacitor,
+modulation, dead time), a circuit-level PLECS model validated against
+closed-form results, a SPICE study of the switching cell that fixes the gate
+resistances, the loss and thermal budget, and the schematic and layout of the
+power stage as a module of a larger board.
 
-At the design operating point the converter delivers \SI{25.48}{\kilo\watt}
-of active power and dissipates \SI{128.1}{\watt}, an efficiency of
-\SI{99.50}{\percent}. The junction temperature settles at
-\SI{81.8}{\celsius}, leaving \SI{68.2}{\celsius} of margin on the
-\SI{150}{\celsius} limit. The design is sized by the stalled motor, a case
-this design adds to the specification: with the full \SI{42.4}{\ampere} peak
-flowing as direct current through one device, its junction reaches
-\SI{111.1}{\celsius} on an ideal cold plate against a \SI{120}{\celsius}
-design criterion. On a real liquid-cooled rail, computed in three dimensions,
-the criterion is met only after the insulating interface is redesigned. With
-aluminium nitride and a phase-change material, and no change to the board,
-the hottest junction reaches \SI{97.9}{\celsius} and the simultaneous worst
-case \SI{117.8}{\celsius}.
+At the design point the converter delivers \SI{25.48}{\kilo\watt} of active
+power and dissipates \SI{128.1}{\watt}, an efficiency of \SI{99.50}{\percent},
+with a current ripple of \SI{0.84}{\percent} in RMS terms. The DC-link of
+\SI{200}{\micro\farad} keeps the voltage ripple at \SI{0.17}{\percent} at the
+rated point and at \SI{0.36}{\percent} in the worst operating condition,
+against \SI{0.5}{\percent}. The junction settles at \SI{81.8}{\celsius}. The
+design is sized by the stalled motor, a case this design adds to the brief:
+with the full \SI{42.4}{\ampere} peak flowing as direct current through one
+device, the junction reaches \SI{111.1}{\celsius} on an ideal cold plate
+against a \SI{120}{\celsius} design criterion. On a real liquid-cooled rail,
+computed in three dimensions, the criterion is met only after the insulating
+interface is redesigned: with aluminium nitride and a phase-change material
+the hottest junction reaches \SI{97.9}{\celsius}, and \SI{117.8}{\celsius}
+with every tolerance stacked.
 
 Four findings would each have produced a wrong report had they gone
 unnoticed. The device first used was industrial rather than automotive and,
@@ -45,5 +40,5 @@ more than half of the loss budget. The vendor loss tables refer to the
 body-diode free-wheeling case, while the library folder name suggests the
 external-diode case: a factor of 2.0 on the turn-on energy. And the largest
 thermal unknown is the insulating pad between the case and the cold plate,
-more precisely its two interfaces. On the real rail they decide more of the
+more precisely its two interfaces, which on the real rail decide more of the
 junction temperature than the coolant does.
