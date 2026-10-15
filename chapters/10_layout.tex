@@ -1,140 +1,100 @@
 \chapter{PCB layout}
 \label{ch:layout}
 
-The board is laid out and frozen, as revision 1.2 of 11 October 2026. The
-chapter first shows it as built and then gives the reasoning that fixed it:
-stack-up, commutation loop, conductor sizing, common mode and, at greatest
-length, insulation coordination, which is where a board at \SI{900}{\volt}
-spends most of its decisions. It closes with the design rules as they were
-implemented and the checks the frozen board passes.
+The module is laid out on a six-layer board, frozen as revision 1.2 of
+11 October 2026, that also carries the gate drives and the rest of the
+inverter electronics. Only the area of the power stage is described here: its
+floorplan, the stack-up, the commutation loop, the conductor sizing, the
+insulation of the power pins at \SI{900}{\volt} and the cooling rail.
 
-\section{The board as built}
+\section{The module on the board}
 \label{sec:asbuilt}
-
-\begin{figure}[p]
-  \centering
-  \includegraphics[width=\textwidth]{figures/kicad_3d_alto.png}
-  \caption{The board seen from above, \SI{360}{}$\times$\SI{300}{\milli\metre}
-  (3D render of the frozen design; bodies of the custom parts are blocks with
-  datasheet dimensions). Top to bottom: control connector, auxiliary supply and
-  comparators; the row of isolators and isolated supplies astride the barrier;
-  the seven TO-247-4L devices and their drivers; phase terminals and
-  commutation ceramics; the film DC-link capacitors.}
-  \label{fig:pcb-top}
-\end{figure}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{figures/kicad_3d_iso.png}
-  \caption{3D view of the frozen board. The two film capacitors, \SI{65}{\milli\metre}
-  tall, occupy the bottom fifth; the TO-247-4L stand vertically, tab towards
-  the cold plate.}
-  \label{fig:pcb-3d}
+  \includegraphics[width=\textwidth]{figures/kicad_modulo_alto.png}
+  \caption{The power-stage module seen from above (3D render of the frozen
+  design, \SI{269}{}$\times$\SI{195}{\milli\metre}; bodies of the custom parts
+  are blocks with datasheet dimensions). Top to bottom: the two devices of each
+  leg with the four commutation ceramics beside them and the shunt; the phase
+  terminals PH1--PH3; the film DC-link capacitors, the two grey blocks; DC+ and
+  DC$-$ at the right. The gate-drive components of each leg sit just above the
+  upper edge.}
+  \label{fig:pcb-top}
 \end{figure}
 
-\paragraph{Floorplan.} The power stage is the lower part of one board that
-also carries its gate drives (\cref{fig:pcb-top,fig:pcb-3d}). Each driver
-faces its own device across a few millimetres, so the gate loop never leaves
-its channel: a connector between a driver board and a power board would add a
-pair of parallel pins to every gate loop, about \SI{8}{\nano\henry} for
-\SI{10}{\milli\metre} of stacking height. The module in this report is that
-lower part; the rest of the board is outside its scope.
-
-The floorplan follows the domains from top to bottom. The low-voltage side,
-above the barrier, carries the control connector, the auxiliary supply, the
-overload comparators and the thermistor inputs. On the barrier sit the eleven
-isolators (seven \driver{}, three \isoamp{}, one \isoampv{}), each beside its
-isolated supply. Below it, each driver faces its own device across a few
-millimetres, so the gate loop never leaves its channel. The phase terminals
-and the commutation ceramics follow, and the film capacitors fill the bottom
-of the board. Six M3 fixing holes, without a net and \SI{9.5}{\milli\metre}
-from all high-voltage copper, hold a board of this size against flexing,
-which would otherwise fatigue the joints of the film capacitors.
+\paragraph{Floorplan.} The module is the lower part of one board that also
+carries its gate drives. Each driver faces its own device across a few
+millimetres, so the gate loop never leaves its channel: a connector between a
+driver board and a power board would add a pair of parallel pins to every gate
+loop, about \SI{8}{\nano\henry} for \SI{10}{\milli\metre} of stacking height.
+The module is delimited by a box on a drawing layer of the board file, with
+the \num{30} parts of the sheets \texttt{1\_power\_stage} and \texttt{leg}
+(\cref{tab:boardnumbers}). Two of the six M3 fixing holes of the board fall
+inside it; they have no net and sit \SI{9.5}{\milli\metre} from all
+high-voltage copper, and they hold the module against the flexing that would
+otherwise fatigue the joints of the film capacitors.
 
 \begin{table}[htbp]
 \centering
-\caption{The frozen board in numbers.}
+\caption{The power-stage module in numbers.}
 \label{tab:boardnumbers}
 \small
 \begin{tabularx}{\textwidth}{lY}
 \toprule
-Outline & \SI{360}{}$\times$\SI{300}{\milli\metre}, six layers, \SI{1.6}{\milli\metre} \\
-Parts & 275, all on the top side; 271 visible references (the four net ties carry none) \\
-Nets & 143, plus 52 single-pin nets of unused pins \\
-Tracks & 2168 segments, \SI{8.5}{\metre} in all, every one at \SI{0}{}, \SI{45}{} or \SI{90}{\degree} \\
-Vias & 467: 50 on the negative DC rail, 60 stitching the phase pours to L6 \\
+Area & \SI{269}{}$\times$\SI{195}{\milli\metre} of a \SI{360}{}$\times$\SI{300}{\milli\metre} board, six layers, \SI{1.6}{\milli\metre} \\
+Parts & 30: six MOSFETs, two film capacitors, twelve ceramics, three shunts, five bolted terminals, two test points \\
 Copper pours & positive DC rail on L1 (\SI{411}{\centi\metre\squared}); negative DC plane on L2
-  (\SI{627}{\centi\metre\squared}); ground on L3 and L5 (\SI{259}{\centi\metre\squared} each);
-  switching nodes and phases on L1; ten floating-reference islands and the three
-  phase pours of revision 1.1 on L6 \\
+  (\SI{627}{\centi\metre\squared}); switching nodes and phases on L1; the three phase pours of revision 1.1 on L6 \\
+Vias & 50 on the negative DC rail, 60 stitching the phase pours to L6 \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\paragraph{How the layers are used.} \Cref{fig:layers} shows the six copper
+\paragraph{How the layers are used.} \Cref{fig:layers} shows the three power
 layers. The negative DC plane on L2 lies under the power stage only, and the
-two ground planes on L3 and L5 under the low-voltage area only: the two never
-overlap in plan, so no high-voltage plane faces a ground plane across a thin
-dielectric. L4 carries the signals that cannot stay on the surface, the
-sensing pairs among them. L6 carries one copper island per floating domain,
-the seven gate references and the four sensing references, each under its
-own driver or amplifier; an island is the return path of the gate loop above
-it. Since revision 1.1 it also carries a second phase pour under each shunt
-(\cref{sec:conductors}).
+two ground planes of the low-voltage side on L3 and L5 do not overlap it in
+plan, so no high-voltage plane faces a ground plane across a thin
+dielectric. Since revision 1.1 the bottom layer also carries a second phase
+pour under each shunt (\cref{sec:conductors}).
 
 \begin{figure}[htbp]
   \centering
   \begin{subfigure}{0.49\textwidth}\centering
-    \includegraphics[page=1,width=\textwidth,trim=60mm 40mm 60mm 40mm,clip]{figures/kicad_strati.pdf}
+    \includegraphics[page=1,width=\textwidth,trim=207mm 62.5mm 118mm 163mm,clip]{figures/kicad_modulo_strati.pdf}
     \caption{L1, top: power pours, components}\end{subfigure}\hfill
   \begin{subfigure}{0.49\textwidth}\centering
-    \includegraphics[page=2,width=\textwidth,trim=60mm 40mm 60mm 40mm,clip]{figures/kicad_strati.pdf}
-    \caption{L2: negative DC plane, control signals}\end{subfigure}\\[2mm]
+    \includegraphics[page=2,width=\textwidth,trim=207mm 62.5mm 118mm 163mm,clip]{figures/kicad_modulo_strati.pdf}
+    \caption{L2: negative DC plane}\end{subfigure}\\[2mm]
   \begin{subfigure}{0.49\textwidth}\centering
-    \includegraphics[page=3,width=\textwidth,trim=60mm 40mm 60mm 40mm,clip]{figures/kicad_strati.pdf}
-    \caption{L3: ground plane}\end{subfigure}\hfill
-  \begin{subfigure}{0.49\textwidth}\centering
-    \includegraphics[page=4,width=\textwidth,trim=60mm 40mm 60mm 40mm,clip]{figures/kicad_strati.pdf}
-    \caption{L4: signals, sensing pairs}\end{subfigure}\\[2mm]
-  \begin{subfigure}{0.49\textwidth}\centering
-    \includegraphics[page=5,width=\textwidth,trim=60mm 40mm 60mm 40mm,clip]{figures/kicad_strati.pdf}
-    \caption{L5: ground plane}\end{subfigure}\hfill
-  \begin{subfigure}{0.49\textwidth}\centering
-    \includegraphics[page=6,width=\textwidth,trim=60mm 40mm 60mm 40mm,clip]{figures/kicad_strati.pdf}
-    \caption{L6, bottom: floating-reference islands, phase pours}\end{subfigure}
-  \caption{The six copper layers of the frozen board.}
+    \includegraphics[page=3,width=\textwidth,trim=207mm 62.5mm 118mm 163mm,clip]{figures/kicad_modulo_strati.pdf}
+    \caption{L6, bottom: phase pours}\end{subfigure}
+  \caption{The power layers of the module, inside the dashed box of the board
+  file.}
   \label{fig:layers}
 \end{figure}
 
-\paragraph{Routing.} Every channel was routed once and copied to its twins by
-translation, so the seven gate loops are the same copper and the three
-sensing channels the same pairs; the local low-voltage nets were routed
-partly by an autorouter fed with the class clearances and partly by hand.
-Tracks run only at \SI{0}{}, \SI{45}{} and \SI{90}{\degree}.
-
 \begin{figure}[htbp]
   \centering
   \begin{subfigure}{0.48\textwidth}\centering
-    \includegraphics[height=10.5cm,keepaspectratio]{figures/kicad_3d_ramo.png}
+    \includegraphics[width=\textwidth]{figures/kicad_modulo_ramo.png}
     \caption{3D, top}\end{subfigure}\hfill
   \begin{subfigure}{0.48\textwidth}\centering
-    \includegraphics[height=10.5cm,trim=219mm 174mm 295mm 124mm,clip]{figures/kicad_rame_canale.pdf}
+    \includegraphics[width=\textwidth,trim=219mm 174mm 295mm 163mm,clip]{figures/kicad_rame_canale.pdf}
     \caption{copper: L1 (red), L4 (cyan), L6 (blue)}\end{subfigure}
-  \caption{Leg 1 with its two driver channels: drivers on the barrier, gate
-  resistors and desaturation diode between driver and device, the shunt in
-  the source path, the four commutation ceramics on the right, the phase
-  terminal at the bottom.}
+  \caption{Leg 1: the two devices, the shunt in the source path, the four
+  commutation ceramics on the right and the phase terminal at the bottom.}
   \label{fig:pcb-leg}
 \end{figure}
 
 \paragraph{The gate loop, measured on the copper.} The target of
 \SI{25}{\milli\metre} from driver output to gate was set before routing.
 Along the tracks of the frozen board it is \SI{23.7}{\milli\metre}
-at turn-on and \SI{24.3}{\milli\metre} at turn-off, the same in all seven
-channels (\cref{fig:pcb-leg}). The turn-on path dips to L4 through two vias
-to clear the parts around the driver; there it runs \SI{0.6}{\milli\metre}
-above the reference island on L6 that carries the return, which is closer
-than a surface track could get, so the loop is narrower as well as shorter.
+at turn-on and \SI{24.3}{\milli\metre} at turn-off, the same in all six
+channels. The turn-on path dips to L4 through two vias to clear the parts
+around the driver; there it runs \SI{0.6}{\milli\metre} above the
+reference island on L6 that carries the return, which is closer than a
+surface track could get, so the loop is narrower as well as shorter.
 Extracted from the copper with the method of \cref{sec:loopextract}, the
 loop from the driver output through the gate resistor to the gate, and back
 from the Kelvin pin through the island to the driver reference, is
@@ -146,14 +106,6 @@ more than the \SI{5}{\nano\henry} the switching simulation had assumed. Its
 effect is small (\cref{tab:dptextract}): the gate resistance is above the
 critical value $2\sqrt{L/C_\mathrm{iss}}$, so the loop does not ring, and
 the peaks move by a few volts.
-
-\paragraph{The sensing pairs.} The two Kelvin connections from each shunt to
-its amplifier run side by side on L4, \SI{0.9}{\milli\metre} apart over
-\SI{90}{\percent} of their length, \SI{70}{} to \SI{80}{\milli\metre} long.
-The two halves of a pair differ in length by up to \SI{8}{\milli\metre}; at
-the bandwidth of the measurement that is irrelevant. What matters is the
-area enclosed between the two conductors, which picks up the field of the
-phase current, and keeping them together keeps it small.
 
 \section{Stack-up}
 \label{sec:stackup}
@@ -168,11 +120,11 @@ phase current, and keeping them together keeps it small.
 Layer & Copper & Function & Dielectric below \\
 \midrule
 L1 & \SI{2}{oz} & power: DC-positive, switching nodes, terminals & prepreg \SI{0.10}{\milli\metre} \\
-L2 & \SI{1}{oz} & \textbf{DC-negative plane} (power area); control signals & core \SI{0.46}{\milli\metre} \\
-L3 & \SI{1}{oz} & ground plane (low-voltage area) & prepreg \SI{0.20}{\milli\metre} \\
-L4 & \SI{1}{oz} & signals: gate turn-on path, sensing pairs, control & core \SI{0.46}{\milli\metre} \\
-L5 & \SI{1}{oz} & ground plane (low-voltage area) & prepreg \SI{0.10}{\milli\metre} \\
-L6 & \SI{2}{oz} & floating-reference islands of drivers and amplifiers & --- \\
+L2 & \SI{1}{oz} & \textbf{DC-negative plane} under the power stage & core \SI{0.46}{\milli\metre} \\
+L3 & \SI{1}{oz} & ground plane of the low-voltage side & prepreg \SI{0.20}{\milli\metre} \\
+L4 & \SI{1}{oz} & signals: gate turn-on path, sensing pairs & core \SI{0.46}{\milli\metre} \\
+L5 & \SI{1}{oz} & ground plane of the low-voltage side & prepreg \SI{0.10}{\milli\metre} \\
+L6 & \SI{2}{oz} & phase pours; floating-reference islands of the drivers & --- \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -181,18 +133,6 @@ The cores are \SI{0.46}{\milli\metre} rather than the \SI{0.40}{} first
 considered, so that the stack adds up to the standard
 \SI{1.6}{\milli\metre}; only the L1--L2 prepreg matters electrically, and it
 is unchanged.
-
-\paragraph{Six layers or four.} Before routing, a four-layer board looked
-equivalent: the negative DC plane and the ground planes never overlap in
-plan, so they could have shared one layer, with one signal layer below it.
-The routed board uses both inner signal layers: L4 carries
-\SI{3.4}{\metre} of track (the turn-on half of every gate loop and all the
-sensing pairs among it), and L2 another \SI{1.2}{\metre} of control signals
-above the barrier. A four-layer version would have to fit both into one
-layer and keep a single ground plane under the control area. That was not
-attempted, so the six layers are justified by the density the routing
-reached, not proven necessary; at a production cost review it is the first
-thing to try.
 
 The one dimension that the stack-up exists to fix is the L1--L2 prepreg. Two
 facing planes carrying a current and its return have
@@ -394,10 +334,7 @@ to the inner layers only, it takes the loop from 12 to
 \SI{7.8}{\nano\henry}, a third less, with no other change to the copper.
 Revision 1.1 adopts it: one rule, for the negative plane against
 the other high-voltage nets and the high-side domains on inner layers; the
-outer layers keep \SI{4.5}{\milli\metre} and the reinforced barrier is
-untouched. Four new cases on the rules test board check exactly that (2 and
-\SI{3}{\milli\metre} on L2, \SI{3}{\milli\metre} on L1,
-\SI{6}{\milli\metre} to ground on L2).
+outer layers keep \SI{4.5}{\milli\metre}.
 \end{finding}
 
 \section{Conductor sizing}
@@ -663,8 +600,8 @@ assembly with mechanical tolerances rather than in a photoplot.
 Conformal coating over the high-voltage area brings the pollution degree from
 2 to 1 and the requirement from \SI{9.00}{} to \SI{2.80}{\milli\metre}, a
 \SI{69}{\percent} reduction that turns a \SI{178}{\percent} shortfall into a
-\SI{16}{\percent} margin. Every insulation distance in this design, the
-reinforced barrier included, depends on it.
+\SI{16}{\percent} margin. Every insulation distance of the power stage
+depends on it.
 
 Without the coating the board is \emph{unbuildable with this device}: \SI{9.00}{\milli\metre} would be
 required where the package offers \SI{3.24}{\milli\metre}, and no layout can
@@ -673,58 +610,43 @@ passes either way, so the condition is stated at the head of the rules file
 and on the fabrication drawing.
 \end{finding}
 
-The reinforced barrier to the control side is set at \SI{8}{\milli\metre},
-which is what the components themselves
-provide~\cite{ti_ucc21750,ti_amc1302}. Read against IEC 60664-1, where
-reinforced insulation requires twice the basic creepage, that is
-\SI{5.60}{\milli\metre} in pollution degree 1 and \SI{18}{\milli\metre} in
-pollution degree 2 on ordinary FR-4, at \SI{900}{\volt}. The adopted figure
-therefore has \SI{43}{\percent} of margin under the coating assumption and
-none without it. Saying that this
-barrier is ``guaranteed by the components'' is true of the component body and
-false of the copper around it.
-
 \section{Cooling rail and mechanical integration}
 \label{sec:mechanics}
 
 The thermal chain of \cref{ch:thermal} assumes each tab pressed on a
 liquid-cooled plate through a ceramic pad, and the insulation coordination
 puts a reinforced barrier between them. Neither had been drawn. Drawing it
-changed the board, which is the reason it was done \emph{before} revision
-1.1 was frozen rather than after.
+changed the board, which is why it was done \emph{before} revision 1.1 was
+frozen.
 
 \paragraph{Concept.} The devices stand vertically with the tab towards the
 high-voltage side, so the cold plate is a rail: an aluminium
-extrusion with six coolant ports running along the row of seven devices
+extrusion with six coolant ports running along the row of devices
 (their design is in \cref{sec:cooling}),
 at chassis potential, longer than the board and fixed to the enclosure
 beyond its edges, where the coolant fittings are also kept away from the
 high-voltage area (\cref{fig:mech3d}). Aluminium nitride, with a phase-change interface material on both faces,
-separates tabs and rail (\cref{sec:coolalt}). It is laid in four segments, one
-\SI{70}{\milli\metre} long under each leg and one of \SI{35}{\milli\metre} under the
-discharge device, because ceramic substrates are not made
-\SI{345}{\milli\metre} long; each segment overhangs the tabs by
+separates tabs and rail (\cref{sec:coolalt}). It is laid in segments, one
+\SI{70}{\milli\metre} long under each leg, because ceramic substrates are not
+made \SI{345}{\milli\metre} long; each segment overhangs the tabs by
 \SI{12}{\milli\metre} at its ends, more than the \SI{9}{\milli\metre} of
-creepage the reinforced barrier needs, and \SI{20}{\milli\metre} of rail
-separate one segment from the next. One spring clip per device hooks over the rail and presses
-the plastic body, never the tab, which is the drain; this is the clip
-mounting selected in \cref{sec:insulation}. The \SI{50}{\watt} discharge
-resistor is screwed to the top of the rail, which is where its
-\SI{81}{\joule} pulse finds a heat sink.
+creepage the pad needs, and \SI{20}{\milli\metre} of rail separate one
+segment from the next. One spring clip per device hooks over the rail and
+presses the plastic body, never the tab, which is the drain; this is the clip
+mounting selected in \cref{sec:insulation}.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{figures/kicad_meccanica_3d_nord.png}
   \caption{Cooling rail, insulating strip and spring clips on the frozen board,
-  seen from the driver side (indicative bodies; the discharge resistor is
-  the block on top of the rail).}
+  seen from the driver side (indicative bodies).}
   \label{fig:mech3d}
 \end{figure}
 
 \paragraph{The profile is set by two distances.} The rail is chassis, so it
 must keep \SI{5}{\milli\metre} of air from every high-voltage conductor;
 and the creepage from tab to rail around the edge of the pad must reach the
-\SI{9.0}{\milli\metre} of a reinforced barrier in pollution degree 2. The
+\SI{9.0}{\milli\metre} of the pad's reinforced barrier in pollution degree 2. The
 pad cannot extend below the board, so the second condition is met by
 raising the rail instead: its lip starts \SI{7.5}{\milli\metre} above the
 board, and the path down the pad, under its edge and up to the rail is
