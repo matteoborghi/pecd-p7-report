@@ -25,7 +25,7 @@ single time.
 \toprule
 Sheet & Domain & Inst. & Parts & Content \\
 \midrule
-root & --- & 1 & 0 & blocks, the signals between them, the requirements on the system \\
+root & --- & 1 & 0 & the blocks of the whole project and the signals between them \\
 \texttt{1\_power\_stage} & HV & 1 & 9 & film DC-link capacitors, bus and phase terminals \\
 \quad\texttt{leg} & HV & 3 & 7 & two \device{}, four commutation ceramics, Kelvin shunt \\
 \bottomrule
@@ -82,7 +82,7 @@ Class & Nets & Clearance & Track \\
 \midrule
 \texttt{HV\_BUS}   & DC-link positive and negative & \SI{2.0}{\milli\metre} & \SI{10.4}{\milli\metre} \\
 \texttt{HV\_POWER} & switching nodes and phase outputs & \SI{2.0}{\milli\metre} & \SI{8.4}{\milli\metre} \\
-\texttt{GATE\_H1} \ldots\ \texttt{GATE\_DIS} & floating gate domains, one class each & \SI{0.3}{\milli\metre} & \SI{0.5}{\milli\metre} \\
+\texttt{GATE\_H1} \ldots\ \texttt{GATE\_L3} & six floating gate domains, one class each & \SI{0.3}{\milli\metre} & \SI{0.5}{\milli\metre} \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -91,9 +91,8 @@ Class & Nets & Clearance & Track \\
 
 References encode position in the hierarchy: the hundreds give the sheet, the
 tens the instance, the units the part within it. The high-side device of
-leg~2 is \texttt{Q121}, the driver of the high side of leg~1 is
-\texttt{U211}, the amplifier of phase~1 is \texttt{U321}, the bus amplifier
-\texttt{U601}. A reference read on the board therefore says where to look in
+leg~2 is \texttt{Q121}, and the first commutation ceramic of leg~3 is
+\texttt{C131}. A reference read on the board therefore says where to look in
 the schematic, and the same part has the same last digit in every instance.
 
 \section{Components of the power stage}

@@ -1,90 +1,75 @@
-# Report LaTeX — Project 7
+# Report LaTeX, Project 7: versione d'esame (branch `for-exam`)
 
-Progetto del report d'esame. **In inglese**, perché è il deliverable da
-discutere; i documenti di lavoro in `04 - Python/` e `05 - Ausiliari/`
-restano in italiano.
+Report della consegna d'esame: **solo lo stadio di potenza** di un inverter
+trifase a due livelli (800 V, 30 A rms a qualsiasi fattore di potenza,
+20 kHz, ondulazione di corrente trascurabile, ondulazione sul condensatore
+sotto lo 0,5 %, raffreddamento ad aria forzata o a liquido, ambiente 50 °C).
+Contiene le equazioni di progetto, la scelta dei componenti, le scelte
+progettuali e la discussione delle simulazioni. È **in inglese**; i documenti
+di lavoro in `04 - Python/` e `05 - Ausiliari/` restano in italiano.
+
+La versione completa (149 pagine: ausiliari, schema e PCB dell'intera scheda,
+EMC, costi) è sul branch `main`, tag `report-full`. Su questo branch si toglie,
+non si cancella.
 
 ## Come compilare
 
 ```bash
-python aggiorna_figure.py     # sincronizza i PDF vettoriali in figures/
-latexmk -pdf main.tex         # oppure: make
+python aggiorna_figure.py     # copia in figures/ le figure citate dal report
+pdflatex main; biber main; pdflatex main; pdflatex main
 ```
 
-**Se `latexmk` non parte** (manca perl, come su questa macchina l'11/10/2026):
-`pdflatex main`, `biber main`, `pdflatex main`, `pdflatex main`.
+`latexmk` non parte su questa macchina (manca perl): si compila a mano come
+sopra. Stato del 15/10/2026: **90 pagine, 0 errori, 0 overfull, 0 rimandi non
+definiti**.
 
-Verificato l'11/10/2026: **0 errori, 119 pagine**; un solo avviso, "float
-too large" di 5 pt sulla tabella dei requisiti di sistema (cap. 8).
-
-Le figure dei capitoli 9 e 10 vengono dal progetto KiCad: prima
-`uv run --no-project --with pillow python figure_report.py` da
-`02 - KiCAD/`, poi `aggiorna_figure.py` le copia con prefisso `kicad_`.
-
-`aggiorna_figure.py` copia i PDF dalle tre cartelle in cui vengono prodotti
-(`03 - Report/01 - PLECS figures/…` e `05 - Ausiliari/figure/`) dentro
-`figures/`, con un prefisso che dice da dove vengono. Va rilanciato dopo ogni
-rigenerazione delle figure.
+Le figure del modulo vengono dal progetto KiCad
+(`02 - KiCAD/figure_modulo.py`, che legge il riquadro del modulo sul layer
+`User.1` del PCB) e dai fogli dello schema (`figure_report.py`); le altre dal
+modello PLECS, dallo studio SPICE e dal modello termico di `04 - Python`.
+`aggiorna_figure.py` copia solo quelle citate da `\includegraphics`, con un
+prefisso che dice da dove vengono (`plecs_`, `spice_`, `kicad_`, `termica_`).
 
 ## Una nota sul preambolo
 
 Il preambolo **non usa siunitx**, pur essendo scritto con la sua sintassi.
-Su questa macchina MiKTeX ha siunitx 3.5.12 (2026-09-08) su un kernel LaTeX2e
-2023-11-01: il pacchetto usa variabili che quel kernel non definisce e
-fallisce anche su un documento minimo di quattro righe. Le macro `\SI`, `\si`,
-`\num` sono quindi reimplementate in `preamble.tex` in LaTeX puro.
-
-I punti di chiamata sono identici a siunitx: quando MiKTeX verrà aggiornato
-basta cancellare quel blocco e togliere il commento alle righe in fondo.
+Su questa macchina MiKTeX ha siunitx 3.5.12 su un kernel LaTeX2e 2023-11-01:
+il pacchetto usa variabili che quel kernel non definisce e fallisce anche su
+un documento minimo. Le macro `\SI`, `\si`, `\num` sono reimplementate in
+`preamble.tex`; quando MiKTeX verrà aggiornato basta togliere quel blocco.
 
 ## Struttura
 
 | File | Contenuto |
 |---|---|
-| `main.tex` | frontespizio, indice, sequenza dei capitoli |
+| `main.tex` | frontespizio, indici, sequenza dei capitoli |
 | `preamble.tex` | pacchetti, unità, riquadri, macro di progetto |
 | `references.bib` | datasheet, norme, letteratura |
 | `chapters/*.tex` | un file per capitolo |
-| `figures/*.pdf` | figure sincronizzate, non modificare a mano |
+| `figures/` | figure copiate da `aggiorna_figure.py` e schemi TikZ in `figures/tikz/` |
+| `coerenza.py` | una grandezza, un solo valore in tutto il testo |
+| `controllo_lingua.py` | parole italiane nelle figure |
 
-## Indice ragionato dei capitoli
+## Capitoli
 
-Stato: **scritto** = completo; **stub** = struttura e argomenti fissati, da
-riempire quando il materiale esiste.
-
-| # | Capitolo | Stato | Contenuto | Figure e tabelle |
-|---|---|---|---|---|
-| — | Abstract | **scritto** | risultati in un colpo d'occhio, e le tre discrepanze trovate | — |
-| 1 | Introduction | **scritto** | contesto, metodo in quattro stadi, dichiarazione esplicita di cosa il report non nasconde | — |
-| 2 | Specification and topology | **scritto** | requisiti; perché 2L e non multilivello; perché SiC e non IGBT; scelta del dispositivo | Tab. 2.1–2.4 |
-| 3 | Analytical design | **scritto** | punto di lavoro, limite SV-PWM, dimensionamento del DC-link per ripple e per corrente RMS, scelta di f_sw | eq. 3.1–3.4 |
-| 4 | Modulation and dead time | **scritto** | iniezione di sequenza zero; confronto con SPWM e DPWM; budget e costo del dead time | Fig. 4.1–4.5, Tab. 4.1–4.2 |
-| 5 | Simulation model and validation | **scritto** | struttura del modello, campionamento coerente per le FFT, **verifica delle tabelle di perdita**, tre validazioni indipendenti | Fig. 5.1–5.3, Tab. 5.1 |
-| 6 | Loss analysis | **scritto** | bilancio, sweep in frequenza, **correzione del dead time**, studio SPICE della cella di commutazione, valore del pin di Kelvin | Fig. 6.1–6.4, Tab. 6.1–6.5 |
-| 7 | Thermal design | **scritto** | catena termica, anello perdite-temperatura, **sensibilità su R_th,CS**, transitorio, monitoraggio | Fig. 7.1–7.2, Tab. 7.1–7.2 |
-| 8 | Auxiliary circuits | **scritto** | gate driver, protezioni, sensing e posizione dello shunt, precarica e scarica, interlock hardware | Tab. 8.1–8.5 |
-| 9 | Schematic design | **scritto** (11/10) | gerarchia, classi di net, riferimenti, decisioni D8–D14, verifica contro il modello, i dieci fogli | Tab. 9.1–9.3, fogli da KiCad |
-| 10 | PCB layout | **scritto** (11/10) | la scheda com'è (pianta, strati, loop di gate misurato), stack-up, conduttori, EMC, isolamento, regole implementate, verifiche di congelamento | viste 3D, strati, dettaglio del ramo |
-| 11 | Conclusions | **stub** | risultati contro specifica, cosa resta al banco, sviluppi | da scrivere per ultimo |
-| A | Open assumptions | **scritto** | 14 ipotesi ordinate per quanto cambierebbero il risultato | — |
-
-### Perché i tre stub sono stub
-
-Non è materiale mancante: è materiale che **non esiste ancora**. Il capitolo 9
-ha bisogno dei fogli KiCad disegnati, il 10 del board layout, e l'11 di
-entrambi. La struttura, i vincoli numerici e i riferimenti incrociati sono già
-al loro posto, quindi riempirli è scrivere testo attorno a numeri già fissati.
-
-I tre stub contengono già le parti che **non** dipendono dal disegno: il
-criterio di gerarchia, la correzione sul passo del TO-247-4L, il budget di
-induttanza di maglia e il calcolo della corrente di modo comune.
+| # | Capitolo | Che cosa risponde alla consegna |
+|---|---|---|
+| — | Abstract | i risultati contro i cinque requisiti |
+| 1 | Introduction | confini del modulo, metodo, indice sulle quattro voci della consegna |
+| 2 | Specification and topology | requisiti, ipotesi sul sistema, topologia, **scelta del dispositivo** (criteri C1–C5) |
+| 3 | Analytical design | **equazioni di progetto**: punto di lavoro, DC-link (ripple e corrente RMS), frequenza |
+| 4 | Modulation and dead time | SVPWM, tempo morto, ondulazione di corrente |
+| 5 | Simulation model and validation | modello PLECS e validazione contro le formule chiuse |
+| 6 | Loss analysis | perdite, fattore di potenza, studio SPICE della cella (Rg, livelli di gate) |
+| 7 | Thermal design | catena termica, rotore bloccato, aria contro liquido, pad, componenti |
+| 8 | Schematic design | modulo power stage: fogli, interfaccia a 23 segnali, tabella dei componenti |
+| 9 | PCB layout | piazzamento, stack-up, maglia di commutazione, conduttori, isolamento dei pin, barra di raffreddamento |
+| 10 | Conclusions | tabella risultati contro la consegna, punto aperto, sviluppi |
+| A | Open assumptions | dodici ipotesi con conseguenza e modo di chiuderle |
 
 ## Fonte unica dei numeri
 
-Tutti i valori numerici vengono dal **§9.2 di
-`05 - Ausiliari/progetto_ausiliari.md`**. Se un numero cambia là, va cambiato
-qui; nel report non c'è nessun valore calcolato indipendentemente.
-
-Nei documenti di lavoro ogni numero porta la marca [DS]/[CALC]/[SIM]/[IPOTESI];
-nel report quella marcatura diventa una citazione bibliografica normale, come
-si conviene a un documento da consegnare.
+I valori numerici vengono da `04 - Python/risultati/metriche.json`, dai
+modelli termici di `04 - Python/termica` e dal §9.2 di
+`05 - Ausiliari/progetto_ausiliari.md`. Se un numero cambia là, va cambiato
+qui: `coerenza.py` segnala una grandezza scritta con due valori diversi.

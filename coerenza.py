@@ -56,7 +56,6 @@ GRANDEZZE = [
     ("Soglia recupero C2",     23.6,  r"23\.6(?=\}\{\\nano\\henry)", []),
     ("Caso peggiore simult.", 140.5,  r"140\.5(?=\}\{\\celsius)",     []),
     ("Soglia t_SC",             0.83, r"0\.83(?=\}\{\\micro\\second)", []),
-    ("t_SC con fattore 2",      1.66, r"1\.66(?=\}\{\\micro\\second)", []),
     ("T_j DPWM-MAX",           93.9,  r"93\.\d+(?=\}\{\\celsius)",   []),
     ("R_g,off",                12.5,   r"12\.5(?=\}\{\\ohm)",      []),
     ("Tempo morto",           260.0,   r"26\d(?=\}\{\\nano\\second)", []),
@@ -68,13 +67,6 @@ GRANDEZZE = [
     # --- grandezze introdotte da D5/D7: interfaccia analogica e confine ---
     ("Ripple di fase pp",       2.463, r"\b2\.463\b",                        []),
     ("Ripple % del picco",      5.80,  r"5\.80(?=\}\{\\percent)",          ["0.004}{\\percent"]),
-    ("Errore asincrono",        4.10,  r"4\.10(?=\}\{\\percent)",          []),
-    ("Taglio del filtro",     106.3,   r"\b106\.3\b",                        []),
-    ("Ritardo del filtro",      1.50,  r"1\.50(?=\}\{\\micro\\second)",  []),
-    ("Ritardo di catena",       3.1,   r"3\.1(?=\}\{\\micro\\second)",   []),
-    ("Errore da ritardo",       1.57,  r"1\.57(?=\}\{\\percent)",          []),
-    ("Corrente ausiliari",    155.0,   r"1[25]\d(?=\}\{\\milli\\ampere)", ["124}{\\milli\\ampere"]),
-    ("Carico ausiliari",     1484.7,   r"\b1484\.7\b",                       ["1191.9"]),
     ("Creepage drain-source",   3.24,  r"\b3\.24\b",                         []),
 
     # --- coordinamento dell'isolamento (Parte 1) ---
@@ -87,7 +79,6 @@ GRANDEZZE = [
     ("Creepage PD2 gruppo II",  6.35,  r"6\.35(?=\}\{\\milli\\metre)",   []),
     ("Creepage PD2 gruppo IIIa", 9.00, r"9\.00(?=\}\{\\milli\\metre)",   ["8.00}{\\milli"]),
     ("Rinforzato PD1",          5.60,  r"[45]\.[68]0(?=\}\{\\milli\\metre)", ["4.80}{\\milli"]),
-    ("Campo solido L1-L2",      8.0,   r"8(?=\}\{\\kilo\\volt\\per\\milli\\metre)", []),
     ("Coppia di piani",         0.188, r"\b0\.188\b",                        []),
     # --- clearance e tenuta a impulso (Parte 1 del quinto giro) ---
     ("Impulso nominale",       2.5,   r"2\.5(?=\}\{\\kilo\\volt)",       []),
@@ -98,10 +89,10 @@ GRANDEZZE = [
     ("Clearance meccanica",    5.0,   r"5\.0(?=\}\{\\milli\\metre)",     []),
     # --- pad isolante in PD2, capacita' e transitorio ---
     ("Regola funzionale PCB",  4.5,   r"4\.5(?=\}\{\\milli\\metre)",     ["3.0}{\\milli\\metre"]),
-    ("C del pad, un pezzo",   43.8,   r"\b43\.8\b",                          []),
     ("C dai nodi commutanti",  131.0, r"\b131\b",                             []),
-    ("Impedenza del cavo HV",  0.104, r"0\.1[04][47](?=\}\{\\ohm)",         ["0.147}{\\ohm"]),
     ("Sovratensione a 35 A",   5.1,   r"5\.1(?=\}\{\\volt)",               []),
+    ("Perdite a cos(phi) = 1, 30 A", 131.5, r"131\.5(?=\}\{\\watt)", []),
+    ("T_j a cos(phi) = 1, 30 A",   82.3, r"82\.3(?=\}\{\\celsius)", []),
 ]
 
 
