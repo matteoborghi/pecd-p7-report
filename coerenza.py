@@ -47,7 +47,7 @@ GRANDEZZE = [
     # scambiata per una costante di tempo
     ("tau termica",            10.2047, r"10\.\d+(?=\}\{\\second)", []),
     ("Picco di corrente",      43.0,   r"\b43\.0\b",               []),
-    ("I_C caso peggiore",      16.48,  r"16\.\d+(?=\}\{\\ampere)", ["16.28"]),
+    ("I_C caso peggiore",      16.28,  r"16\.\d+(?=\}\{\\ampere)", ["16.48"]),
     ("Energia commutazione",  596.487, r"59[67](?:\.\d)?(?=\}\{\\micro\\joule)", ["231.4"]),
     ("Induttanza package",     14.6,   r"1[45]\.\d(?=\}\{\\nano\\henry)", ["15.5}{\\nano"]),
     ("Picco V_DS 20 nH",     1073.5,   r"107[34](?:\.\d)?(?=\}\{\\volt)", ["998.3"]),
@@ -91,7 +91,7 @@ GRANDEZZE = [
     ("Regola funzionale PCB",  4.5,   r"4\.5(?=\}\{\\milli\\metre)",     ["3.0}{\\milli\\metre"]),
     ("C dai nodi commutanti",  131.0, r"\b131\b",                             []),
     ("Sovratensione a 35 A",   5.1,   r"5\.1(?=\}\{\\volt)",               []),
-    ("Perdite a cos(phi) = 1, 30 A", 131.5, r"131\.5(?=\}\{\\watt)", []),
+    ("Perdite a cos(phi) = 1, 30 A", 131.4, r"131.4(?=\}\{\\watt)", []),
     ("T_j a cos(phi) = 1, 30 A",   82.3, r"82\.3(?=\}\{\\celsius)", []),
 ]
 
@@ -118,7 +118,7 @@ ECCEZIONI = {
     "Picco V_DS 20 nH": {"1073", "1074.2"},
     # 128,52 W e 81,89 degC sono lo steady-state nativo, messo a confronto
     # col metodo nel tempo nel cap. 5
-    "P_tot": {"128.52"},
+    "P_tot": {"128.52", "128.0"},   # 128,0 W: sweep a 30 A, cos phi 0,87 e 0,95
     "T_giunzione": {"81.89"},
     # 21,2 W e' la conduzione di A1 a rotore bloccato, non la perdita media
     "P per dispositivo": {"21.2"},
