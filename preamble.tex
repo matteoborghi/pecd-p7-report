@@ -115,6 +115,14 @@
 \usepackage{float}
 \usepackage{rotating}   % sidewaysfigure: fogli dello schema in orizzontale (cap. 9)
 
+% Pagine di soli float: in alto e a distanza fissa. Di default LaTeX le
+% centra in verticale e lascia mezzi fogli bianchi fra una tabella e una figura.
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{2\baselineskip}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
+
 % colonna centrata a larghezza automatica per le tabelle numeriche
 % Colonne di testo allineate a sinistra: una cella su piu' righe centrata si
 % legge male (revisione dell'11/10/2026).
@@ -122,7 +130,7 @@
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 
 % --- colori e riquadri -----------------------------------------------------
-\usepackage{xcolor}
+\usepackage[table]{xcolor}
 \definecolor{notebg}{RGB}{245,245,245}
 \definecolor{noteline}{RGB}{120,120,120}
 \usepackage[most]{tcolorbox}
@@ -150,18 +158,14 @@
 \definecolor{fgrigio}{HTML}{777777}
 
 % --- tabelle leggibili (revisione del 18/10/2026) --------------------------
-% Le righe alterne colorate (colortbl) non funzionano su questo MiKTeX:
-% colortbl 2026 chiede un array.sty piu' recente del 2023 installato, lo
-% stesso problema di siunitx. Si distinguono quindi le righe con un filetto
-% sottile (\hl a fine riga) e un po' piu' di aria (\zebra); gli esiti PASS e
-% FAIL sono etichette colorate dentro la cella.
-\newcommand{\zebra}{\renewcommand{\arraystretch}{1.18}}
-\newcommand{\hl}{\specialrule{0.1pt}{1pt}{1pt}}
-\newcommand{\esito}[2]{{\setlength{\fboxsep}{1.5pt}\colorbox{#1}{\strut #2}}}
-\newcommand{\pass}[1]{\esito{fverde!28}{#1}}
-\newcommand{\fail}[1]{\esito{farancio!28}{#1}}
-\newcommand{\aperto}[1]{\esito{yellow!45}{#1}}
-\newcommand{\nd}{\esito{black!8}{--}}
+% \zebra prima di un tabular: righe alterne grigio chiaro (colortbl, possibile
+% dopo l'aggiornamento di MiKTeX del 18/10/2026), un po' piu' di aria fra le
+% righe. Le celle PASS/FAIL hanno lo sfondo dell'esito.
+\newcommand{\zebra}{\rowcolors{2}{white}{black!6}\renewcommand{\arraystretch}{1.15}}
+\newcommand{\pass}[1]{\cellcolor{fverde!30}#1}
+\newcommand{\fail}[1]{\cellcolor{farancio!30}#1}
+\newcommand{\aperto}[1]{\cellcolor{yellow!45}#1}
+\newcommand{\nd}{\cellcolor{black!10}--}
 \usepackage{listings}
 \lstset{
   basicstyle=\ttfamily\footnotesize,
@@ -191,6 +195,8 @@
 \crefname{figure}{Figure}{Figures}
 \crefname{table}{Table}{Tables}
 \crefname{equation}{Equation}{Equations}
+% dopo \appendix i capitoli sono appendici: "Appendix A", non "Chapter A"
+\crefname{appendix}{Appendix}{Appendices}
 
 % --- macro di progetto -----------------------------------------------------
 % I nomi ricorrenti si scrivono una volta sola: se cambia il dispositivo,

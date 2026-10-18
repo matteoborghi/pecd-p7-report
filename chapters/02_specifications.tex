@@ -3,8 +3,8 @@
 
 \section{Requirements}
 
-\Cref{tab:spec} lists what the brief asks. It also contains two values that
-we choose: the output frequency and the coolant temperature.
+\Cref{tab:spec} lists what the brief asks. It also contains two values chosen
+for this design: the output frequency and the coolant temperature.
 
 \begin{table}[htbp]
 \centering
@@ -15,13 +15,13 @@ we choose: the output frequency and the coolant temperature.
 \toprule
 Quantity & Symbol & Value \\
 \midrule
-DC-link voltage, nominal & $\Vdc$        & \SI{800}{\volt} \\ \hl
-Rated phase current, any power factor & $I_\mathrm{rated}$ & \SI{30}{\Arms} \\ \hl
-Switching frequency      & $\fsw$        & \SI{20}{\kilo\hertz} \\ \hl
-Output frequency (our choice) & $f_\mathrm{ref}$ & \SI{200}{\hertz} \\ \hl
-Coolant temperature (our choice) & $T_\mathrm{liq}$ & \SI{65}{\celsius} \\ \hl
-Maximum ambient temperature & $T_\mathrm{amb}$ & \SI{50}{\celsius} \\ \hl
-Maximum junction temperature & $\Tj^{\max}$ & \SI{150}{\celsius} \\ \hl
+DC-link voltage, nominal & $\Vdc$        & \SI{800}{\volt} \\
+Rated phase current, any power factor & $I_\mathrm{rated}$ & \SI{30}{\Arms} \\
+Switching frequency      & $\fsw$        & \SI{20}{\kilo\hertz} \\
+Output frequency (design choice) & $f_\mathrm{ref}$ & \SI{200}{\hertz} \\
+Coolant temperature (design choice) & $T_\mathrm{liq}$ & \SI{65}{\celsius} \\
+Maximum ambient temperature & $T_\mathrm{amb}$ & \SI{50}{\celsius} \\
+Maximum junction temperature & $\Tj^{\max}$ & \SI{150}{\celsius} \\
 DC-link voltage ripple, worst case & $\Delta V/\Vdc$ & $\leq \SI{0.5}{\percent}$ \\
 \bottomrule
 \end{tabular}
@@ -33,18 +33,18 @@ Two notes on the table:
         \SI{6000}{rpm}, a typical traction operating point.
   \item The brief gives a maximum ambient of \SI{50}{\celsius}, not a coolant
         temperature. A liquid loop rejects its heat to the air through a
-        radiator, so the coolant is always warmer than the air. We assume
-        \SI{65}{\celsius}, the usual value of the power-electronics loop of a
+        radiator, so the coolant is always warmer than the air. The design
+        assumes \SI{65}{\celsius}, the usual value of the power-electronics loop of a
         car. The radiator then works with \SI{15}{\kelvin} of difference: for
         the \SI{128}{\watt} of the rated point it needs about
-        \SI{9}{\watt\per\kelvin}, a small radiator. We also check every
-        thermal result at \SI{70}{\celsius}.
+        \SI{9}{\watt\per\kelvin}, a small radiator. Every thermal result is
+        also checked at \SI{70}{\celsius}.
 \end{itemize}
 
 \subsection{An extra case: the locked rotor}
 
 The brief asks for \SI{30}{\Arms} at any load power factor. It does not
-mention zero output frequency, and we add this case on purpose. A car that
+mention zero output frequency, and this case is added on purpose. A car that
 stands still on a slope needs full torque with the motor stopped. One phase
 then carries the full \SI{42.4}{\ampere} peak as a DC current, and one MOSFET
 takes most of the loss. This is the worst thermal case of the inverter. The
@@ -64,15 +64,15 @@ choice is stricter than the brief, and it decides the device
 \toprule
 Level & Value & Sizes \\
 \midrule
-Nominal, $\Vdc$                         & \SI{800}{\volt} & losses, operating point \\ \hl
-Maximum continuous, $V_\mathrm{max,cont}$ & \SI{900}{\volt} & creepage, device derating, DC-link capacitors \\ \hl
-Overvoltage trip, $V_\mathrm{OV,trip}$   & \SI{950}{\volt} & switching overshoot \\ \hl
+Nominal, $\Vdc$                         & \SI{800}{\volt} & losses, operating point \\
+Maximum continuous, $V_\mathrm{max,cont}$ & \SI{900}{\volt} & creepage, device derating, DC-link capacitors \\
+Overvoltage trip, $V_\mathrm{OV,trip}$   & \SI{950}{\volt} & switching overshoot \\
 Abnormal, $V_\mathrm{abn}$              & \SI{1000}{\volt} & withstand with the bridge off \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-We apply two derating rules to the \SI{1200}{\volt} devices
+Two derating rules apply to the \SI{1200}{\volt} devices
 (\cref{tab:vhierarchy}):
 \begin{itemize}
   \item In steady state the device blocks at most \SI{80}{\percent} of its
@@ -81,7 +81,7 @@ We apply two derating rules to the \SI{1200}{\volt} devices
         rating, \SI{1080}{\volt}. At the \SI{950}{\volt} trip level this
         leaves \SI{130}{\volt} for the overshoot.
 \end{itemize}
-We check the \SI{1080}{\volt} at the die, not at the pins. The package
+The \SI{1080}{\volt} limit is checked at the die, not at the pins. The package
 inductance adds \SIrange{40}{75}{\volt} at turn-off. A check at the pins
 could pass while the die is already above the limit (\cref{sec:kelvin}).
 
@@ -100,9 +100,9 @@ The power stage depends on four values that come from outside the module.
 \toprule
 Assumption & Value & Used in \\
 \midrule
-Maximum battery voltage, also while charging and braking & \SI{900}{\volt} & \cref{sec:vhierarchy,sec:dclink,sec:insulation} \\ \hl
-Impedance of the battery and cables at \SI{20}{\kilo\hertz} & $L \geq \SI{1.5}{\micro\henry}$ or $R \geq \SI{50}{\milli\ohm}$ & \cref{sec:dclink}, \cref{ch:model} \\ \hl
-Coolant at the rail inlet & water--glycol 50/50, $\leq\SI{65}{\celsius}$, $\geq\SI{10}{\litre\per\minute}$ & \cref{sec:cooling} \\ \hl
+Maximum battery voltage, also while charging and braking & \SI{900}{\volt} & \cref{sec:vhierarchy,sec:dclink,sec:insulation} \\
+Impedance of the battery and cables at \SI{20}{\kilo\hertz} & $L \geq \SI{1.5}{\micro\henry}$ or $R \geq \SI{50}{\milli\ohm}$ & \cref{sec:dclink}, \cref{ch:model} \\
+Coolant at the rail inlet & water--glycol 50/50, $\leq\SI{65}{\celsius}$, $\geq\SI{10}{\litre\per\minute}$ & \cref{sec:cooling} \\
 Modulation at standstill & discontinuous PWM, recommended but not needed & \cref{ch:modulation}, \cref{sec:lrdpwm} \\
 \bottomrule
 \end{tabularx}
@@ -126,11 +126,11 @@ scores.
 \toprule
  & Two-level & Three-level NPC & Three-level T-type \\
 \midrule
-Devices                & 6 & 12 + 6 diodes & 12 \\ \hl
-Device voltage class   & \SI{1200}{\volt} & \SI{650}{\volt} & \SI{650}{} and \SI{1200}{\volt} \\ \hl
-Phase voltage levels   & 3 & 5 & 5 \\ \hl
-Gate drives            & 6 & 12 & 12 \\ \hl
-Commutation loops      & one per leg & several, not symmetric & several \\ \hl
+Devices                & 6 & 12 + 6 diodes & 12 \\
+Device voltage class   & \SI{1200}{\volt} & \SI{650}{\volt} & \SI{650}{} and \SI{1200}{\volt} \\
+Phase voltage levels   & 3 & 5 & 5 \\
+Gate drives            & 6 & 12 & 12 \\
+Commutation loops      & one per leg & several, not symmetric & several \\
 Neutral-point control  & not needed & needed & needed \\
 \bottomrule
 \end{tabularx}
@@ -145,7 +145,7 @@ three options.}
 \label{fig:radar-topology}
 \end{figure}
 
-We choose the two-level bridge (\cref{fig:vsi}) for these reasons:
+The two-level bridge (\cref{fig:vsi}) is chosen for these reasons:
 \begin{itemize}
   \item It needs 6 devices and 6 gate drives, against 12 or more.
   \item It has one short commutation loop per leg. \Cref{ch:layout} shows
@@ -180,12 +180,12 @@ the MOSFETs, since no external diode is fitted.}
 \toprule
  & SiC MOSFET & Si IGBT (\SI{1200}{\volt}) \\
 \midrule
-Conduction & like a resistor, $\Rdson$ & fixed voltage drop $V_\mathrm{CE(sat)}$ \\ \hl
-Loss at low current & low & the voltage drop dominates \\ \hl
-Switching energy & low & high, tail current at turn-off \\ \hl
-Usual $\fsw$ & \SIrange{20}{50}{\kilo\hertz} & \SIrange{5}{15}{\kilo\hertz} \\ \hl
-Reverse conduction & body diode or channel & external diode needed \\ \hl
-Gate drive & demanding: negative bias, small margins & simple \\ \hl
+Conduction & like a resistor, $\Rdson$ & fixed voltage drop $V_\mathrm{CE(sat)}$ \\
+Loss at low current & low & the voltage drop dominates \\
+Switching energy & low & high, tail current at turn-off \\
+Usual $\fsw$ & \SIrange{20}{50}{\kilo\hertz} & \SIrange{5}{15}{\kilo\hertz} \\
+Reverse conduction & body diode or channel & external diode needed \\
+Gate drive & demanding: negative bias, small margins & simple \\
 Cost & higher & lower \\
 \bottomrule
 \end{tabularx}
@@ -200,10 +200,10 @@ text; the others rank the two options.}
 \label{fig:radar-technology}
 \end{figure}
 
-To compare the two technologies with numbers, we apply the loss formulas of
-the course to an IGBT inverter at the same operating point. We take the
-fastest \SI{1200}{\volt}, \SI{40}{\ampere} IGBT we found, the TRENCHSTOP
-IKW40N120H3~\cite{infineon_ikw40n120h3}:
+To compare the two technologies with numbers, the loss formulas of the
+course are applied to an IGBT inverter at the same operating point. The IGBT
+is the fastest \SI{1200}{\volt}, \SI{40}{\ampere} device found, the
+TRENCHSTOP IKW40N120H3~\cite{infineon_ikw40n120h3}:
 \begin{itemize}
   \item the inverter loses \SI{643}{\watt}, five times the SiC design;
   \item each IGBT has \SI{69}{\watt} of switching loss;
@@ -213,8 +213,8 @@ IKW40N120H3~\cite{infineon_ikw40n120h3}:
 A SiC Schottky diode next to the IGBT removes the recovery loss. Even with
 zero turn-on energy the inverter still loses \SI{332}{\watt}, and the hottest
 IGBT reaches \SI{186}{\celsius} at locked rotor. The gap is a factor of 3 to
-5, much larger than the error of the formulas, so we did not simulate the
-IGBT (\cref{fig:radar-technology}).
+5, much larger than the error of the formulas, so the IGBT is not
+simulated (\cref{fig:radar-technology}).
 
 The SiC MOSFET also behaves like a resistor when it conducts. A traction
 inverter works most of the time below rated current, and there a resistor
@@ -226,7 +226,7 @@ this.
 \section{Device selection}
 \label{sec:deviceselection}
 
-We fixed five pass/fail criteria before we computed any result
+Five pass/fail criteria were fixed before any result was computed
 (\cref{tab:criteria}). Every candidate goes through the same model, the same
 load and the same thermal loop.
 
@@ -243,14 +243,14 @@ load and the same thermal loop.
 C1 & $\Tj \leq \SI{120}{\celsius}$ at locked rotor: hottest device, coolant
      \SI{65}{\celsius}, $\Rthcs = \SI{0.5}{\celsius\per\watt}$
    & the \SI{150}{\celsius} limit minus \SI{30}{\celsius} for the tolerances
-     (\cref{sec:worstcase} finds \SI{29.4}{\celsius}) \\ \hl
+     (\cref{sec:worstcase} finds \SI{29.4}{\celsius}) \\
 C2 & peak $V_\mathrm{DS}$ at the die $\leq \SI{1080}{\volt}$ at
      \SI{950}{\volt}, \SI{60}{\ampere}, \SI{20}{\nano\henry} loop
    & \SI{90}{\percent} of the rating; \SI{60}{\ampere} is the overload trip,
-     \SI{20}{\nano\henry} the layout budget \\ \hl
+     \SI{20}{\nano\henry} the layout budget \\
 C3 & drain--source creepage $\geq \SI{2.8}{\milli\metre}$ at \SI{900}{\volt}
-   & coated board (\cref{sec:insulation}) \\ \hl
-C4 & AEC-Q101 (discrete) or AQG~324 (module) & automotive use \\ \hl
+   & coated board (\cref{sec:insulation}) \\
+C4 & AEC-Q101 (discrete) or AQG~324 (module) & automotive use \\
 C5 & declared short-circuit time $t_\mathrm{SC} \geq \SI{1.5}{\micro\second}$
    & twice the reaction time of the driver protection, \SI{0.75}{\micro\second} \\
 \bottomrule
@@ -267,14 +267,14 @@ The candidates are:
   \item a top-side-cooled package~\cite{wolfspeed_e3m0032u2};
   \item two power modules~\cite{wolfspeed_ccb021,wolfspeed_edb010}.
 \end{itemize}
-For the Wolfspeed devices we use the vendor's PLECS thermal models. For the
-Infineon devices we build them from the datasheet graphs. We check C2 with the
-vendor SPICE models: Wolfspeed publishes them, Infineon does not.
+The Wolfspeed devices use the vendor's PLECS thermal models. For the
+Infineon devices these models are built from the datasheet graphs. C2 is
+checked with the vendor SPICE models: Wolfspeed publishes them, Infineon does not.
 \Cref{tab:selection} shows the result.
 
 \begin{table}[htbp]
 \centering
-\caption{Selection result. Green: pass; red: fail; yellow: not demonstrated;
+\caption{Selection result. Green: pass; orange: fail; yellow: not demonstrated;
 grey: not checked, because the candidate already fails C1. C1 values at the
 gate resistance that C2 needs, on the ideal cold plate of \cref{ch:thermal}.}
 \label{tab:selection}
@@ -285,14 +285,14 @@ gate resistance that C2 needs, on the ideal cold plate of \cref{ch:thermal}.}
 \toprule
 Candidate & C1: $\Tj$ & C2: die peak & C3 & C4 & C5 \\
 \midrule
-E3M0040120K, AIMZH120R040M1T (\SI{40}{\milli\ohm}) & \fail{\SIrange{140}{142}{\celsius}} & \nd & \nd & \pass{yes} & \nd \\ \hl
-C3M0040120K (\SI{40}{\milli\ohm}, industrial) & \fail{\SI{141}{\celsius}} & \nd & \nd & \fail{no} & \nd \\ \hl
-E3M0032120K (\SI{32}{\milli\ohm}) & \fail{\SI{124}{\celsius}} & \nd & \nd & \pass{yes} & \nd \\ \hl
-E3M0032120U2, top-side cooled & \fail{$>\SI{124}{\celsius}$} & \nd & \nd & \pass{yes} & \nd \\ \hl
-CCB021M12FM3, module & \fail{\SI{153}{\celsius}} & \nd & \nd & \fail{no} & \nd \\ \hl
-E3M0021120K (\SI{21}{\milli\ohm}) & \fail{$>\SI{121}{\celsius}$} & \pass{\SI{7.5}{}/\SI{15}{\ohm}} & \pass{yes} & \pass{yes} & \aperto{not declared} \\ \hl
-$2\times$ E3M0040120K in parallel & \pass{\SI{98}{\celsius}} & \fail{needs $>\SI{25}{\ohm}$} & \pass{yes} & \pass{yes} & \aperto{not declared} \\ \hl
-AIMZH120R020M1T (\SI{20}{\milli\ohm}) & \pass{\SIrange{97}{110}{\celsius}} & \aperto{no SPICE model} & \pass{yes} & \pass{yes} & \pass{\SI{1.5}{\micro\second}} \\ \hl
+E3M0040120K, AIMZH120R040M1T (\SI{40}{\milli\ohm}) & \fail{\SIrange{140}{142}{\celsius}} & \nd & \nd & \pass{yes} & \nd \\
+C3M0040120K (\SI{40}{\milli\ohm}, industrial) & \fail{\SI{141}{\celsius}} & \nd & \nd & \fail{no} & \nd \\
+E3M0032120K (\SI{32}{\milli\ohm}) & \fail{\SI{124}{\celsius}} & \nd & \nd & \pass{yes} & \nd \\
+E3M0032120U2, top-side cooled & \fail{$>\SI{124}{\celsius}$} & \nd & \nd & \pass{yes} & \nd \\
+CCB021M12FM3, module & \fail{\SI{153}{\celsius}} & \nd & \nd & \fail{no} & \nd \\
+E3M0021120K (\SI{21}{\milli\ohm}) & \fail{$>\SI{121}{\celsius}$} & \pass{\SI{7.5}{}/\SI{15}{\ohm}} & \pass{yes} & \pass{yes} & \aperto{not declared} \\
+$2\times$ E3M0040120K in parallel & \pass{\SI{98}{\celsius}} & \fail{needs $>\SI{25}{\ohm}$} & \pass{yes} & \pass{yes} & \aperto{not declared} \\
+AIMZH120R020M1T (\SI{20}{\milli\ohm}) & \pass{\SIrange{97}{110}{\celsius}} & \aperto{no SPICE model} & \pass{yes} & \pass{yes} & \pass{\SI{1.5}{\micro\second}} \\
 \textbf{E3M0016120K} (\SI{16}{\milli\ohm}) & \pass{\SI{111}{\celsius}} & \pass{\SI{1073}{\volt}} & \pass{\SI{3.24}{\milli\metre}} & \pass{yes} & \aperto{not declared} \\
 \bottomrule
 \end{tabularx}
@@ -343,12 +343,12 @@ the vendor provides the data or the feature.}
 \label{fig:radar-candidates}
 \end{figure}
 
-We choose the E3M0016120K~\cite{wolfspeed_e3m0016}. C2 sets both gate
+The E3M0016120K is chosen~\cite{wolfspeed_e3m0016}. C2 sets both gate
 resistors, and so the switching loss, the locked-rotor temperature and the
 dead time. Without a SPICE model all these numbers stay unverified until a
-lab test. For the E3M0016120K we have both the vendor thermal model and the
-vendor SPICE model. Its missing short-circuit time stays an open point
-(\cref{app:assumptions}, A.3). The Infineon device remains the alternative: a
+lab test. For the E3M0016120K both the vendor thermal model and the vendor
+SPICE model are available. Its missing short-circuit time stays an open point
+(\cref{app:assumptions}, item A.3). The Infineon device remains the alternative: a
 double-pulse test in the real power loop would show whether it meets C2.
 
 \begin{table}[htbp]
@@ -363,20 +363,20 @@ energies at \SI{800}{\volt}, \SI{80.28}{\ampere}, $R_{G(\mathrm{ext})} =
 \toprule
 Parameter & Symbol & Value & Condition \\
 \midrule
-Breakdown voltage      & $V_\mathrm{(BR)DSS}$ & \SI{1200}{\volt} & \\ \hl
+Breakdown voltage      & $V_\mathrm{(BR)DSS}$ & \SI{1200}{\volt} & \\
 On-resistance          & $\Rdson$   & \SI{16}{\milli\ohm}  & \SI{25}{\celsius}, typ.; \SI{22}{} max. \\
-                       &            & \SI{29}{\milli\ohm}  & \SI{175}{\celsius} \\ \hl
-Total gate charge      & $Q_g$      & \SI{223}{\nano\coulomb} & \\ \hl
-Input capacitance      & $C_\mathrm{iss}$ & \SI{6922}{\pico\farad} & \\ \hl
-Reverse transfer cap.  & $C_\mathrm{rss}$ & \SI{13}{\pico\farad} & \\ \hl
-Internal gate resistance & $R_{G(\mathrm{int})}$ & \SI{2.6}{\ohm} & \\ \hl
-Gate threshold         & $V_\mathrm{GS(th)}$ & \SI{2.5}{\volt} & typ., \SI{25}{\celsius}; \SI{1.8}{} min. \\ \hl
-Turn-on energy, SiC diode  & $\Eon$  & \SI{1287}{\micro\joule} & \\ \hl
-Turn-off energy, SiC diode & $\Eoff$ & \SI{805}{\micro\joule} & \\ \hl
-Turn-on energy, body diode  & $\Eon$  & \SI{2552}{\micro\joule} & used in this design \\ \hl
-Turn-off energy, body diode & $\Eoff$ & \SI{788}{\micro\joule} & used in this design \\ \hl
-Body-diode recovery charge & $Q_\mathrm{rr}$ & \SI{1665}{\nano\coulomb} & \SI{5.18}{\ampere\per\nano\second} \\ \hl
-Junction-to-case resistance & $\Rthjc$ & \SI{0.23}{\celsius\per\watt} & typ.; \SI{0.31}{} max. \\ \hl
+                       &            & \SI{29}{\milli\ohm}  & \SI{175}{\celsius} \\
+Total gate charge      & $Q_g$      & \SI{223}{\nano\coulomb} & \\
+Input capacitance      & $C_\mathrm{iss}$ & \SI{6922}{\pico\farad} & \\
+Reverse transfer cap.  & $C_\mathrm{rss}$ & \SI{13}{\pico\farad} & \\
+Internal gate resistance & $R_{G(\mathrm{int})}$ & \SI{2.6}{\ohm} & \\
+Gate threshold         & $V_\mathrm{GS(th)}$ & \SI{2.5}{\volt} & typ., \SI{25}{\celsius}; \SI{1.8}{} min. \\
+Turn-on energy, SiC diode  & $\Eon$  & \SI{1287}{\micro\joule} & \\
+Turn-off energy, SiC diode & $\Eoff$ & \SI{805}{\micro\joule} & \\
+Turn-on energy, body diode  & $\Eon$  & \SI{2552}{\micro\joule} & used in this design \\
+Turn-off energy, body diode & $\Eoff$ & \SI{788}{\micro\joule} & used in this design \\
+Body-diode recovery charge & $Q_\mathrm{rr}$ & \SI{1665}{\nano\coulomb} & \SI{5.18}{\ampere\per\nano\second} \\
+Junction-to-case resistance & $\Rthjc$ & \SI{0.23}{\celsius\per\watt} & typ.; \SI{0.31}{} max. \\
 Pulsed drain current   & $I_\mathrm{D,pulse}$ & \SI{321}{\ampere} & \\
 \bottomrule
 \end{tabular}

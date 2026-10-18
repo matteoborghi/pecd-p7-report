@@ -11,6 +11,9 @@
 \input{preamble}
 
 \begin{document}
+% frontespizio numerato a, b: altrimenti le sue pagine 1 e 2 hanno le stesse
+% ancore di hyperref del capitolo 1 (avviso "same identifier page.1")
+\pagenumbering{alph}
 
 % --------------------------------------------------------------- frontespizio
 \begin{titlepage}
@@ -73,6 +76,8 @@ SiC Traction Inverter\\[0.4cm]}
 
 % ---------------------------------------------------------------- appendici
 \appendix
+% da qui i capitoli sono appendici anche per \cref ("Appendix A")
+\crefalias{chapter}{appendix}
 \input{chapters/A_open_assumptions}
 
 \end{document}
