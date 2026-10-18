@@ -7,53 +7,62 @@
 \centering
 \caption[Loss budget at the design point]{Loss budget at \SI{800}{\volt}, \SI{30}{\Arms}, \SI{20}{\kilo\hertz},
 $\cos\varphi = 0.949$ (\cref{eq:powerfactor}), $R_{g,\mathrm{on}}/R_{g,\mathrm{off}}
-= \SI{5}{}/\SI{12.5}{\ohm}$, dead time \SI{260}{\nano\second}, with the
-thermal loop closed as described in \cref{ch:thermal}.}
+= \SI{5}{}/\SI{12.5}{\ohm}$, dead time \SI{260}{\nano\second}. The thermal loop
+is closed as in \cref{ch:thermal}.}
 \label{tab:losses}
+\zebra
 \begin{tabular}{lrl}
 \toprule
 Contribution & Value & Notes \\
 \midrule
 Channel conduction              & \SI{54.4}{\watt} & \\
-Body-diode surplus (dead time)  & \SI{3.2}{\watt} & already inside $P_\mathrm{cond}$ \\
-\midrule
+Body-diode surplus (dead time)  & \SI{3.2}{\watt} & included in $P_\mathrm{cond}$ \\
 \textbf{Total conduction} $P_\mathrm{cond}$ & \textbf{\SI{57.6}{\watt}} & \\
 \textbf{Switching} $P_\mathrm{sw}$          & \textbf{\SI{70.5}{\watt}}  & \\
-\midrule
 \textbf{Total} $P_\mathrm{tot}$ & \textbf{\SI{128.1}{\watt}} & \\
 Per device                      & \SI{21.3}{\watt} & six devices \\
 Switching energy per device     & \SI{596.5}{\micro\joule} & per cycle \\
-\textbf{Output power} & \SI{25.48}{\kilo\watt} & active, \cref{eq:active-sim} \\
+Output power & \SI{25.48}{\kilo\watt} & active, \cref{eq:active-sim} \\
 \textbf{Efficiency} & \textbf{\SI{99.50}{\percent}} & $P_\mathrm{out}/(P_\mathrm{out}+P_\mathrm{tot})$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Switching is \SI{55}{\percent} of the total, an unusual share for a SiC
-MOSFET at \SI{20}{\kilo\hertz}. The \SI{16}{\milli\ohm} device makes
-conduction small (\SI{57.6}{\watt} against the \SI{151}{\watt} of the
-\SI{40}{\milli\ohm} device of the first iterations), but the overshoot
-criterion of \cref{sec:kelvin} demands \SI{12.5}{\ohm} at turn-off, and the
-tables scale the switching energy with it. The trade is still a good one:
-the total is \SI{128}{\watt} against \SI{178}{\watt}, and the locked-rotor
-temperature, which is what selected the device, is \SI{30}{\celsius} lower
+Switching is \SI{55}{\percent} of the total. For a SiC MOSFET at
+\SI{20}{\kilo\hertz} this share is high, and it has a reason:
+\begin{itemize}
+  \item the \SI{16}{\milli\ohm} device keeps the conduction loss low,
+        \SI{57.6}{\watt};
+  \item the overshoot limit of \cref{sec:kelvin} needs
+        $R_{g,\mathrm{off}} = \SI{12.5}{\ohm}$, and the tables scale the
+        switching energy with the gate resistance.
+\end{itemize}
+The trade is favourable. A \SI{40}{\milli\ohm} device would conduct
+\SI{151}{\watt}, and the total would be \SI{178}{\watt} instead of
+\SI{128}{\watt}. At locked rotor it would be \SI{30}{\celsius} hotter
 (\cref{sec:lockedrotor}).
 
-\section{Frequency dependence}
+The loss of \cref{tab:losses} agrees with the formulas of
+\cref{sec:anypf}: \SI{54.4}{\watt} of channel conduction, and
+\SI{71.6}{\watt} of switching against \SI{70.5}{\watt} simulated
+(\SI{1.6}{\percent} difference).
+
+\section{Dependence on the switching frequency}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{plecs_08_perdite_vs_fsw.pdf}
 \caption{Conduction, switching and total losses against switching frequency.
-Conduction is nearly constant, switching is linear in $\fsw$.}
+The conduction loss is nearly constant and the switching loss is linear.}
 \label{fig:perdite-fsw}
 \end{figure}
 
 \begin{table}[htbp]
 \centering
-\caption{Losses and junction temperature at the rated point against switching
-frequency.}
+\caption{Losses and junction temperature at the rated point against
+switching frequency.}
 \label{tab:sweep-fsw}
+\zebra
 \begin{tabular}{lrrrrr}
 \toprule
 $\fsw$ & $P_\mathrm{cond}$ & $P_\mathrm{sw}$ & $P_\mathrm{tot}$ & $\Tj$ & Margin \\
@@ -67,70 +76,83 @@ $\fsw$ & $P_\mathrm{cond}$ & $P_\mathrm{sw}$ & $P_\mathrm{tot}$ & $\Tj$ & Margin
 \end{tabular}
 \end{table}
 
-Conduction losses are not exactly constant across the sweep: they rise by
-\SI{4.0}{\watt} from \SI{10}{} to \SI{30}{\kilo\hertz}. The cause is the
-thermal feedback: more switching loss raises the junction temperature, which raises $\Rdson$, which raises the conduction
-loss.
+The conduction loss rises by \SI{4.0}{\watt} from \SI{10}{} to
+\SI{30}{\kilo\hertz}. More switching loss heats the junction, and a hotter
+junction has a higher $\Rdson$.
 
 \section{Dependence on the load power factor}
 \label{sec:pfsweep}
 
-The brief asks for the rated current at any load power factor. The sweep of
-$\cos\varphi$ from \num{0.02} to \num{1} that validates the DC-link current
-(\cref{sec:validation}) was run with the losses and the thermal loop as well,
-at the rated modulation amplitude and on the ideal cold plate.
-\Cref{tab:sweep-pf} gives the result.
+The brief asks for the rated current at any load power factor.
+\Cref{sec:anypf} predicts that the losses do not depend on $\cos\varphi$.
+The simulation checks this. It runs eight power factors from \num{1} to
+\num{0.02}, with the load impedance adjusted until the phase current is
+\SI{30.00}{\Arms} at every point. The thermal loop is closed on the ideal
+cold plate. \Cref{tab:sweep-pf} gives the results.
 
 \begin{table}[htbp]
 \centering
-\caption{Losses and junction temperature against load power factor, at
-\SI{800}{\volt}, \SI{20}{\kilo\hertz}, modulation amplitude \SI{427}{\volt}.
-The last two columns scale each point to exactly \SI{30}{\Arms}, with
-conduction proportional to $I^2$ and switching to $I$ [estimate].}
+\caption{Losses, junction temperature and DC-link ripple against the load
+power factor at \SI{30}{\Arms}, \SI{800}{\volt}, \SI{20}{\kilo\hertz}. The
+last two columns test the ripple limit (\SI{0.5}{\percent}) and the
+junction limit (\SI{150}{\celsius}).}
 \label{tab:sweep-pf}
 \small
-\begin{tabular}{rrrrrrrr}
+\zebra[3]
+\begin{tabular}{rrrrrrrcc}
 \toprule
- & $I_\mathrm{rms}$ & $P_\mathrm{cond}$ & $P_\mathrm{sw}$ & $P_\mathrm{tot}$ & $\Tj$ & $P_\mathrm{tot}$ at \SI{30}{\Arms} & $\Tj$ at \SI{30}{\Arms} \\
-$\cos\varphi$ & [\si{\ampere}] & [\si{\watt}] & [\si{\watt}] & [\si{\watt}] & [\si{\celsius}] & [\si{\watt}] & [\si{\celsius}] \\
+$\cos\varphi$ & $P_\mathrm{cond}$ & $P_\mathrm{sw}$ & $P_\mathrm{tot}$ & $\Tj$ & $\Delta V/\Vdc$ & Peak current & Ripple & $\Tj$ \\
+ & [\si{\watt}] & [\si{\watt}] & [\si{\watt}] & [\si{\celsius}] & [\si{\percent}] & [\si{\ampere}] & test & test \\
 \midrule
-1.00 & 30.94 & 61.8 & 75.7 & 137.6 & 83.1 & 131.5 & 82.3 \\
-0.87 & 30.04 & 57.7 & 70.6 & 128.3 & 81.9 & 128.1 & 81.8 \\
-0.50 & 30.18 & 57.9 & 71.0 & 128.9 & 81.9 & 127.8 & 81.8 \\
-0.20 & 30.30 & 58.0 & 71.3 & 129.3 & 82.0 & 127.5 & 81.8 \\
-0.10 & 30.34 & 58.2 & 71.6 & 129.7 & 82.1 & 127.7 & 81.8 \\
-0.02 & 30.36 & 58.2 & 71.6 & 129.8 & 82.1 & 127.6 & 81.8 \\
+1.00 & 58.2 & 73.2 & 131.4 & 82.3 & 0.139 & 49.0 & \pass{PASS} & \pass{PASS} \\
+0.95 & 57.6 & 70.4 & 128.0 & 81.8 & 0.170 & 43.0 & \pass{PASS} & \pass{PASS} \\
+0.87 & 57.5 & 70.5 & 128.0 & 81.8 & 0.204 & 42.8 & \pass{PASS} & \pass{PASS} \\
+0.70 & 57.4 & 70.5 & 128.0 & 81.8 & 0.255 & 42.6 & \pass{PASS} & \pass{PASS} \\
+0.50 & 57.2 & 70.5 & 127.7 & 81.8 & 0.291 & 42.5 & \pass{PASS} & \pass{PASS} \\
+0.30 & 57.0 & 70.5 & 127.5 & 81.8 & 0.315 & 42.7 & \pass{PASS} & \pass{PASS} \\
+0.10 & 56.9 & 70.7 & 127.5 & 81.8 & 0.327 & 42.8 & \pass{PASS} & \pass{PASS} \\
+0.02 & 56.8 & 70.7 & 127.5 & 81.8 & 0.328 & 42.9 & \pass{PASS} & \pass{PASS} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-At a fixed modulation amplitude the load current drifts between \SI{30.0}{}
-and \SI{30.9}{\ampere} with the load, so the raw columns mix two effects.
-Brought to \SI{30}{\Arms} the losses are \SIrange{127.5}{128.1}{\watt} for
-every power factor below \num{0.9}, which is the rated-point value of
-\cref{tab:losses}, and the junction stays at \SI{81.8}{\celsius}. The
-worst case for the losses is unity power factor, at about \SI{131.5}{\watt}
-(\SI{+2.7}{\percent}) and \SI{82.3}{\celsius}: half a kelvin above the rated
-point. The rated current is therefore met at any power factor with no change
-to the thermal result, and the worst case of the power stage remains the
-stalled motor of \cref{sec:lockedrotor}.
+The results are:
+\begin{itemize}
+  \item From $\cos\varphi = 0.02$ to $0.95$ the total loss is between
+        \SI{127.5}{} and \SI{128.0}{\watt} and the junction stays at
+        \SI{81.8}{\celsius}. The formulas of \cref{sec:anypf} predict
+        this.
+  \item At unity power factor the loss is \SI{131.4}{\watt}
+        (\SI{+2.7}{\percent}) and the junction \SI{82.3}{\celsius}. The
+        load at this point has only \SI{0.1}{\milli\henry}, so the current
+        ripple is large (peak \SI{49.0}{\ampere} against \SI{43.0}{\ampere}).
+        The extra ripple adds conduction and switching loss.
+  \item The DC-link ripple is largest at low power factor, \SI{0.33}{\percent}.
+        All points are below \SI{0.5}{\percent}.
+  \item All points pass the junction limit with at least \SI{67}{\celsius}
+        of margin.
+\end{itemize}
+Regeneration ($\cos\varphi < 0$) is covered by the formulas: the channel
+current does not change with the sign of $\cos\varphi$, and the capacitor
+current depends on $\cos^2\varphi$ (\cref{sec:anypf,sec:dclink}). The
+rated current is therefore met at any power factor, and the worst case of the
+power stage remains the locked rotor (\cref{sec:lockedrotor}).
 
-\section{The dead-time loss}
+\section{Loss in the dead time}
 \label{sec:deadtime-loss}
 
-\Cref{eq:deadtime-loss} estimates the cost of the dead time analytically. The
-simulation provides an independent measurement, but obtaining it requires
-care, because the dead time does two things at once: it adds the body-diode
-drop \emph{and} it reduces the effective duty cycle, and therefore the
-current. At constant modulation depth the two effects nearly cancel and the
-conduction loss appears insensitive to the dead time. Re-trimming the
-modulation depth to hold the phase current constant separates them:
+\Cref{eq:deadtime-loss} gives the dead-time loss analytically. The
+simulation measures it. The dead time does two things: it adds the
+body-diode drop, and it reduces the voltage of the fundamental and so the
+current. To separate them, the modulation amplitude is adjusted for each
+dead time until the phase current is the same, \SI{30.366}{\Arms}.
 
 \begin{table}[htbp]
 \centering
 \caption{Conduction loss against dead time at constant phase current
-(\SI{30.366}{\Arms}), thermal boundary at the \SI{65}{\celsius} coolant.}
+(\SI{30.366}{\Arms}), thermal boundary at \SI{65}{\celsius} coolant.}
 \label{tab:deadtime-measured}
+\zebra
 \begin{tabular}{lrrr}
 \toprule
 $t_\mathrm{dead}$ & Modulation amplitude & $P_\mathrm{cond}$ & $\Delta$ \\
@@ -143,65 +165,42 @@ $t_\mathrm{dead}$ & Modulation amplitude & $P_\mathrm{cond}$ & $\Delta$ \\
 \end{tabular}
 \end{table}
 
-The response is linear, as it must be, and agrees with
-\cref{eq:deadtime-loss}, which gives \SIrange{3.26}{3.36}{\watt} at
-\SI{260}{\nano\second} for junction temperatures between \SI{80}{} and
-\SI{60}{\celsius}: within \SI{3}{\percent}. The \SI{260}{\nano\second} that
-the gate resistances impose (\cref{sec:deadtime}) therefore cost
-\SI{3.4}{\watt}, \SI{2.6}{\percent} of the budget and a small price; the larger cost of the longer dead time is the
-\SI{1.2}{\percent} of fundamental voltage it removes, which the modulation
-amplitude of \SI{427}{\volt} restores.
+The response is linear. At \SI{260}{\nano\second} it is \SI{3.37}{\watt},
+and \cref{eq:deadtime-loss} gives \SIrange{3.26}{3.36}{\watt} for junction
+temperatures between \SI{80}{} and \SI{60}{\celsius} (within
+\SI{3}{\percent}). The dead time costs \SI{2.6}{\percent} of the loss budget.
+This loss is already in $P_\mathrm{cond}$ of \cref{tab:losses}, because the
+model uses the conduction table of the body diode during the dead time. It
+must not be added a second time.
 
-\begin{finding}{The first dead-time estimate was wrong by a factor of 2.3}
-An earlier calculation in this work, on the device of the first iterations,
-gave \SI{3.2}{\watt} against \SI{1.4}{\watt} from the corrected formula
-(\SI{1.5}{\watt} measured), through two
-compounding errors. It multiplied by six devices, where only three conduct
-during the dead time, one per leg, chosen by the sign of the phase current.
-And it used the body diode's \emph{absolute} forward drop instead of the
-\emph{difference} against the channel it replaces, at the actual junction
-temperature.
-
-Worse, the \SI{3.2}{\watt} was about to be \emph{added} to the simulated
-budget. It should not be: the model applies the gate-off conduction table
-during the dead time, so this loss is already inside $P_\mathrm{cond}$.
-Adding it would have been a double count.
-\end{finding}
-
-The dead-time penalty \emph{decreases} with temperature, from \SI{3.36}{\watt} at
-\SI{60}{\celsius} to \SI{3.11}{\watt} at \SI{110}{\celsius}
-(\cref{eq:deadtime-loss} on the vendor tables). The body diode's forward
-voltage has a negative temperature coefficient while the channel resistance
-has a positive one, so the difference $\Delta V$ that the dead time costs
-shrinks, from \SI{3.94}{} to \SI{3.64}{\volt}, as the device heats up.
+The loss decreases with temperature, from \SI{3.36}{\watt} at
+\SI{60}{\celsius} to \SI{3.11}{\watt} at \SI{110}{\celsius}. The forward
+voltage of the body diode falls with temperature, while the channel
+resistance rises. The difference $\Delta V$ shrinks from \SI{3.94}{} to
+\SI{3.64}{\volt}.
 
 \section{Switching cell: SPICE study}
 \label{sec:kelvin}
 
-A double-pulse test of a single switching cell was simulated in
-LTspice~\cite{ltspice} using the official Wolfspeed
-model~\cite{wolfspeed_spice} of the \device{}, to obtain what a table-based
-model cannot give: the voltage overshoot at the die, the gate resistance
-that keeps it within the criterion of \cref{sec:vhierarchy}, and the value of
-the Kelvin source connection. The test point is the worst the converter is
-ever asked to switch in operation: \SI{950}{\volt}, the overvoltage trip,
-and \SI{60}{\ampere}, the overload trip, at \SI{175}{\celsius}, with the
-driver's \SI{-5}{}/\SI{+15}{\volt} and separate turn-on and turn-off
-resistors.
+A double-pulse test of one switching cell was simulated in
+LTspice~\cite{ltspice} with the official Wolfspeed
+model~\cite{wolfspeed_spice} of the \device{}. It gives what a table-based
+model cannot give:
+\begin{itemize}
+  \item the voltage overshoot at the die;
+  \item the gate resistances that keep it within the limit of
+        \cref{sec:vhierarchy};
+  \item the value of the Kelvin source pin.
+\end{itemize}
+The test point is the worst one the converter switches: \SI{950}{\volt} (the
+overvoltage trip) and \SI{60}{\ampere} (the overload trip), at
+\SI{175}{\celsius}. The driver gives \SI{-5}{}/\SI{+15}{\volt}, with separate
+turn-on and turn-off resistors.
 
-\begin{finding}{The first bench measured a bus that was still charging}
-The first version of the bench imposed the load current as an initial
-condition, which is the usual shortcut. When the solver failed to find the
-initial operating point, which happened silently in most runs, it started
-from a discharged DC-link and a gate at \SI{0}{\volt}: at the turn-off edge
-the bus was at \SI{814}{\volt} and still rising. Every overshoot obtained
-that way was wrong, and the one that mattered most was optimistic: the gate
-resistance it suggested, \SI{5}{\ohm}, gives \SI{1133}{\volt} at the die
-when the test is done properly. The bench now performs a real double pulse,
-with a first pulse of \SI{6.25}{\micro\second} that ramps the load current
-from zero, and every run is rejected unless bus and current are within
-\SI{2}{} and \SI{5}{\percent} of their test values just before the edge.
-\end{finding}
+The bench is a real double pulse. A first pulse of \SI{6.25}{\micro\second}
+raises the load current from zero. A run is accepted only if the bus voltage
+and the current are within \SI{2}{} and \SI{5}{\percent} of the test values
+just before the edge.
 
 \begin{figure}[htbp]
 \centering
@@ -216,10 +215,10 @@ drain current, and gate--source voltage at the die.}
 \subsection{Gate drive levels}
 \label{sec:negbias}
 
-The gate is driven between $+\SI{15}{\volt}$ and $-\SI{5}{\volt}$, a swing of
-\SI{20}{\volt}. The negative level keeps the off device off while its
-opposite is turned on: the Miller current injected through $C_\mathrm{gd}$
-raises the off gate by
+The gate is driven between $+\SI{15}{\volt}$ and $-\SI{5}{\volt}$, a swing
+of \SI{20}{\volt}. The negative level keeps the off device off while the
+other device turns on. The current injected through $C_\mathrm{gd}$ raises
+the gate of the off device by
 %
 \begin{equation}
   \Delta V_\mathrm{GS} = C_\mathrm{gd,eff}\,\frac{\mathrm{d}v}{\mathrm{d}t}\,R
@@ -227,60 +226,68 @@ raises the off gate by
   \label{eq:miller}
 \end{equation}
 %
-With $C_\mathrm{gd,eff} = Q_\mathrm{gd}/V_\mathrm{DS} = \SI{81}{\pico\farad}$,
-$C_\mathrm{iss} = \SI{6922}{\pico\farad}$, the turn-on slope that the
-double-pulse simulation gives for the opposite device,
-\SI{31.4}{\volt\per\nano\second}, and the \SI{15.4}{\ohm} of the off path,
-the gate of the off device reaches $+\SI{3.35}{\volt}$ at a bias of
-$-\SI{5}{\volt}$, above the \SI{1.8}{\volt} minimum threshold. The active
-Miller clamp of the driver brings it to $+\SI{0.58}{\volt}$, a margin of
-\SI{1.22}{\volt}; at the datasheet's typical $-\SI{4}{\volt}$ the margin
-would be \SI{0.22}{\volt}. The closed form is a bound, and the simulation,
-which resolves the internal gate network, keeps the die \SIrange{4}{5}{\volt}
-lower. The $-\SI{5}{\volt}$ leaves \SI{3}{\volt} to the absolute maximum of
-$-\SI{8}{\volt}$~\cite{wolfspeed_e3m0016} and is what a standard isolated
-gate-drive supply delivers without an extra regulator.
+The values are:
+\begin{itemize}
+  \item $C_\mathrm{gd,eff} = Q_\mathrm{gd}/V_\mathrm{DS} = \SI{81}{\pico\farad}$ and
+        $C_\mathrm{iss} = \SI{6922}{\pico\farad}$;
+  \item $\mathrm{d}v/\mathrm{d}t = \SI{31.4}{\volt\per\nano\second}$ at turn-on
+        of the opposite device, from the double-pulse simulation;
+  \item $R = \SI{15.4}{\ohm}$, the resistance of the off path.
+\end{itemize}
+The gate of the off device reaches $+\SI{3.35}{\volt}$ from a bias of
+$-\SI{5}{\volt}$. This is above the minimum threshold of \SI{1.8}{\volt}.
+The active Miller clamp of the driver brings it to $+\SI{0.58}{\volt}$, a
+margin of \SI{1.22}{\volt}. At the typical $-\SI{4}{\volt}$ the margin would
+be only \SI{0.22}{\volt}. The formula is an upper bound: the simulation, which
+includes the internal gate network, gives a value \SIrange{4}{5}{\volt}
+lower. The $-\SI{5}{\volt}$ level leaves \SI{3}{\volt} to the absolute
+maximum of $-\SI{8}{\volt}$~\cite{wolfspeed_e3m0016}, and a standard
+isolated gate-drive supply gives it without an extra regulator.
 
-\subsection{Gate resistance: fixed by the overshoot criterion}
+\subsection{Gate resistance from the overshoot limit}
 
 \begin{table}[htbp]
 \centering
-\caption{Peak voltage at the die against gate resistance ($R_{g,\mathrm{on}}
-= R_{g,\mathrm{off}}$ in the sweep), \SI{950}{\volt}, \SI{60}{\ampere},
-\SI{20}{\nano\henry}. Limit \SI{1080}{\volt}.}
+\caption{Peak voltage at the die against gate resistance
+($R_{g,\mathrm{on}} = R_{g,\mathrm{off}}$ in the sweep), \SI{950}{\volt},
+\SI{60}{\ampere}, \SI{20}{\nano\henry}. Limit \SI{1080}{\volt}.}
 \label{tab:rgsweep}
+\zebra
 \begin{tabular}{rrrrr}
 \toprule
 $R_g$ & Device turn-off & Opposite diode recovery & $\Eon$ & $\Eoff$ \\
 \midrule
-\SI{2.5}{\ohm}  & \SI{1195}{\volt} & \SI{1202}{\volt} & \SI{744}{\micro\joule}  & \SI{389}{\micro\joule} \\
-\SI{5}{\ohm}    & \SI{1133}{\volt} & \textbf{\SI{1048}{\volt}} & \SI{952}{\micro\joule}  & \SI{650}{\micro\joule} \\
-\SI{7.5}{\ohm}  & \SI{1106}{\volt} & \SI{1039}{\volt} & \SI{1182}{\micro\joule} & \SI{919}{\micro\joule} \\
-\SI{10}{\ohm}   & \SI{1087}{\volt} & \SI{995}{\volt}  & \SI{1383}{\micro\joule} & \SI{1178}{\micro\joule} \\
-\SI{12.5}{\ohm} & \textbf{\SI{1073}{\volt}} & \SI{981}{\volt} & \SI{1587}{\micro\joule} & \SI{1448}{\micro\joule} \\
-\SI{15}{\ohm}   & \SI{1061}{\volt} & \SI{977}{\volt}  & \SI{1814}{\micro\joule} & \SI{1739}{\micro\joule} \\
-\SI{20}{\ohm}   & \SI{1045}{\volt} & \SI{956}{\volt}  & \SI{2246}{\micro\joule} & \SI{2267}{\micro\joule} \\
+\SI{2.5}{\ohm}  & \fail{\SI{1195}{\volt}} & \fail{\SI{1202}{\volt}} & \SI{744}{\micro\joule}  & \SI{389}{\micro\joule} \\
+\SI{5}{\ohm}    & \fail{\SI{1133}{\volt}} & \pass{\SI{1048}{\volt}} & \SI{952}{\micro\joule}  & \SI{650}{\micro\joule} \\
+\SI{7.5}{\ohm}  & \fail{\SI{1106}{\volt}} & \pass{\SI{1039}{\volt}} & \SI{1182}{\micro\joule} & \SI{919}{\micro\joule} \\
+\SI{10}{\ohm}   & \fail{\SI{1087}{\volt}} & \pass{\SI{995}{\volt}}  & \SI{1383}{\micro\joule} & \SI{1178}{\micro\joule} \\
+\SI{12.5}{\ohm} & \pass{\SI{1073}{\volt}} & \pass{\SI{981}{\volt}}  & \SI{1587}{\micro\joule} & \SI{1448}{\micro\joule} \\
+\SI{15}{\ohm}   & \pass{\SI{1061}{\volt}} & \pass{\SI{977}{\volt}}  & \SI{1814}{\micro\joule} & \SI{1739}{\micro\joule} \\
+\SI{20}{\ohm}   & \pass{\SI{1045}{\volt}} & \pass{\SI{956}{\volt}}  & \SI{2246}{\micro\joule} & \SI{2267}{\micro\joule} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The two edges are governed by different resistors. The overshoot at turn-off
-belongs to the device's own turn-off, and it sets $R_{g,\mathrm{off}}$: the
-first value below \SI{1080}{\volt} is \SI{12.5}{\ohm}. The overshoot at
-turn-on appears on the \emph{opposite} device, as its body diode recovers,
-and it sets $R_{g,\mathrm{on}}$: \SI{5}{\ohm} already gives
-\SI{1048}{\volt}. The driver has separate source and sink outputs, so the
-two can differ, and the design uses \SI{5}{\ohm} at turn-on and
-\SI{12.5}{\ohm} at turn-off. At that pair the die reaches
-\SI{1073.5}{\volt} at turn-off and \SI{1050}{\volt} at recovery.
+The two edges depend on two different resistors:
+\begin{itemize}
+  \item The overshoot at turn-off belongs to the device itself and sets
+        $R_{g,\mathrm{off}}$. The first value below \SI{1080}{\volt} is
+        \SI{12.5}{\ohm}.
+  \item The overshoot at turn-on appears on the opposite device, when its
+        body diode recovers, and sets $R_{g,\mathrm{on}}$. Already
+        \SI{5}{\ohm} gives \SI{1048}{\volt}.
+\end{itemize}
+The driver has separate source and sink outputs, so the design uses
+\SI{5}{\ohm} at turn-on and \SI{12.5}{\ohm} at turn-off. The die then
+reaches \SI{1073.5}{\volt} at turn-off and \SI{1050}{\volt} at recovery.
 
-The margin at turn-off is six and a half volts on a switching peak at
-\SI{90}{\percent} of the rating, with the overvoltage trip and the overload
-trip at the same time, the layout at its inductance limit and the voltage
-read at the die. Raising $R_{g,\mathrm{off}}$
-to \SI{15}{\ohm} would buy twelve more volts for \SI{4}{\watt} of loss and
-\SI{2}{\celsius} at locked rotor; the thermal margin at a \SI{70}{\celsius}
-coolant was judged the scarcer of the two.
+The margin at turn-off is \SI{6.5}{\volt}. It is small, but the test point
+is severe: overvoltage trip and overload trip at the same time, a layout at
+its inductance limit, and the voltage read at the die. A resistor of
+\SI{15}{\ohm} would give \SI{12}{\volt} more margin for \SI{4}{\watt} more
+loss and \SI{2}{\celsius} more at locked rotor. The thermal margin at a
+\SI{70}{\celsius} coolant is the scarcer of the two, so \SI{12.5}{\ohm} is
+kept.
 
 \subsection{Overshoot and loop inductance}
 
@@ -289,9 +296,10 @@ coolant was judged the scarcer of the two.
 \caption{Peak voltage at turn-off against external loop inductance,
 \SI{950}{\volt}, \SI{60}{\ampere}, \SI{5}{}/\SI{12.5}{\ohm}.}
 \label{tab:overshoot}
+\zebra
 \begin{tabular}{lrrrr}
 \toprule
-$L_\mathrm{ext}$ & At the die & At the pins & Fraction of rating & Implied $\mathrm{d}i/\mathrm{d}t$ \\
+$L_\mathrm{ext}$ & At the die & At the pins & Fraction of rating & $\mathrm{d}i/\mathrm{d}t$ \\
 \midrule
 \SI{10}{\nano\henry} & \SI{1044.2}{\volt} & \SI{1017.9}{\volt} & \SI{87.0}{\percent} & \SI{3.82}{\ampere\per\nano\second} \\
 \SI{20}{\nano\henry} & \SI{1073.5}{\volt} & \SI{1048.6}{\volt} & \SI{89.5}{\percent} & \SI{3.57}{\ampere\per\nano\second} \\
@@ -301,69 +309,62 @@ $L_\mathrm{ext}$ & At the die & At the pins & Fraction of rating & Implied $\mat
 \end{table}
 
 The die sees \SIrange{22}{26}{\volt} more than the pins at every
-inductance: that is the drop across the package's own drain and source
-inductance, and it is why the criterion is taken at the die. The implied
-current slope is computed over the external inductance \emph{plus} the
-package, $L_d + L_{s2} + L_v = \SI{7.32}{\nano\henry}$ per device in the
-model, \SI{14.6}{\nano\henry} for the two devices in series; counted that
-way it stays within \SI{25}{\percent} across a fivefold change of the
-external inductance, as it should for a fixed gate drive.
+inductance. This is the voltage across the drain and source inductance of the
+package, and it is the reason why the limit is applied at the die. The
+$\mathrm{d}i/\mathrm{d}t$ is computed over the external inductance plus the
+package, \SI{14.6}{\nano\henry} for the two devices in series. It changes by
+less than \SI{25}{\percent} for a fivefold change of the external inductance.
 
-\paragraph{Where C2 fails.} Three points bracket the design
-value but do not say where the criterion is lost, and that is the number
-the finished board has to be checked against. A finer sweep around
-\SI{20}{\nano\henry} gives it:
+\Cref{tab:lthreshold} gives the inductance at which the limit is lost. This
+is the value the finished board must be checked against.
 
 \begin{table}[htbp]
 \centering
 \caption{Fine sweep of the external loop inductance around the limit,
 \SI{950}{\volt}, \SI{60}{\ampere}, \SI{5}{}/\SI{12.5}{\ohm}, peak at the die.}
 \label{tab:lthreshold}
+\zebra
 \begin{tabular}{lrr}
 \toprule
 $L_\mathrm{ext}$ & Turn-off & Recovery, opposite device \\
 \midrule
-\SI{20}{\nano\henry} & \SI{1073.5}{\volt} & \SI{1050.0}{\volt} \\
-\SI{21}{\nano\henry} & \SI{1074.2}{\volt} & \SI{1053.0}{\volt} \\
-\SI{22}{\nano\henry} & \SI{1079.0}{\volt} & \SI{1066.6}{\volt} \\
-\SI{23}{\nano\henry} & \SI{1080.6}{\volt} & \SI{1073.7}{\volt} \\
-\SI{24}{\nano\henry} & \SI{1083.3}{\volt} & \SI{1083.9}{\volt} \\
-\SI{26}{\nano\henry} & \SI{1088.5}{\volt} & \SI{1104.2}{\volt} \\
+\SI{20}{\nano\henry} & \pass{\SI{1073.5}{\volt}} & \pass{\SI{1050.0}{\volt}} \\
+\SI{21}{\nano\henry} & \pass{\SI{1074.2}{\volt}} & \pass{\SI{1053.0}{\volt}} \\
+\SI{22}{\nano\henry} & \pass{\SI{1079.0}{\volt}} & \pass{\SI{1066.6}{\volt}} \\
+\SI{23}{\nano\henry} & \fail{\SI{1080.6}{\volt}} & \pass{\SI{1073.7}{\volt}} \\
+\SI{24}{\nano\henry} & \fail{\SI{1083.3}{\volt}} & \fail{\SI{1083.9}{\volt}} \\
+\SI{26}{\nano\henry} & \fail{\SI{1088.5}{\volt}} & \fail{\SI{1104.2}{\volt}} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-C2 fails at \SI{22.6}{\nano\henry} at turn-off and at
-\SI{23.6}{\nano\henry} on recovery. The margin on the layout limit is
-therefore \SI{2.6}{\nano\henry}, \SI{13}{\percent}; with the \SI{2}{\volt}
-scatter between the converging variants of the model and a local slope of
-\SIrange{1.6}{2.7}{\volt\per\nano\henry}, the threshold is known to about
-$\pm\SI{1}{\nano\henry}$. Beyond \SI{23}{\nano\henry} the recovery peak rises at
-\SI{10}{\volt\per\nano\henry}, four times faster than the turn-off peak,
-and it is set by $R_{g,\mathrm{on}}$, not $R_{g,\mathrm{off}}$: a board
-that lands above \SI{23}{\nano\henry} cannot be rescued by the turn-off
-resistor alone, and both resistors, the losses and the locked-rotor result
-would have to be recomputed.
+The limit is lost at \SI{22.6}{\nano\henry} at turn-off and at
+\SI{23.6}{\nano\henry} at recovery. The margin on the layout limit of
+\SI{20}{\nano\henry} is \SI{2.6}{\nano\henry}, that is \SI{13}{\percent}. The
+scatter between the model variants is \SI{2}{\volt} and the local slope is
+\SIrange{1.6}{2.7}{\volt\per\nano\henry}, so the threshold is known to about
+$\pm\SI{1}{\nano\henry}$.
 
-\begin{finding}{The layout limit is not the whole loop}
-The \SI{20}{\nano\henry} of \cref{ch:layout} is the
-\emph{PCB-attributable} inductance. The packages add \SI{14.6}{\nano\henry}
-that no layout can remove, so the real commutation loop would measure around
-\SI{35}{\nano\henry} at the limit; the frozen board, extracted, gives about
-\SI{23}{\nano\henry} (\cref{sec:loopextract}). Anyone extracting parasitics from the finished board
-and comparing against ``\SI{20}{\nano\henry}'' will find a factor of 1.7 and
-conclude, wrongly, that the layout failed. The converse also holds: since the
-gate resistance was chosen at \SI{20}{\nano\henry} of PCB inductance, a board
-above that value invalidates the overshoot verification.
-\end{finding}
+Above \SI{23}{\nano\henry} the recovery peak rises by
+\SI{10}{\volt\per\nano\henry}, four times faster than the turn-off peak. It
+depends on $R_{g,\mathrm{on}}$, not on $R_{g,\mathrm{off}}$. A board above
+\SI{23}{\nano\henry} would need both resistors, the losses and the
+locked-rotor result to be computed again.
 
-\subsection{What the fourth pin is worth}
+The \SI{20}{\nano\henry} of \cref{ch:layout} is the inductance of the PCB
+only. The packages add \SI{14.6}{\nano\henry} that no layout can remove. The
+real commutation loop is therefore about \SI{35}{\nano\henry} at the limit.
+The extracted board has about \SI{23}{\nano\henry} on the PCB
+(\cref{sec:loopextract}).
+
+\subsection{Value of the Kelvin pin}
 
 \begin{table}[htbp]
 \centering
-\caption{Switching energy with the driver return on the Kelvin pin versus the
-power source pin, at the design point.}
+\caption{Switching energy with the driver return on the Kelvin pin and on
+the power source pin, at the design point.}
 \label{tab:kelvin}
+\zebra
 \begin{tabular}{lrrrr}
 \toprule
 Driver return & $\Eon$ & $\Eoff$ & Total & Peak $V_\mathrm{GS}$ at the die \\
@@ -374,36 +375,28 @@ Power source pin (TO-247-3)    & \SI{1730}{\micro\joule} & \SI{1761}{\micro\joul
 \end{tabular}
 \end{table}
 
-Giving up the fourth pin costs \SI{44}{\percent} of switching energy. The
-mechanism is the common source inductance: the power current's
-$\mathrm{d}i/\mathrm{d}t$ develops a voltage across the shared package
-inductance that opposes the gate drive and slows the device down. With the
-gate resistances this design needs, the penalty is smaller than the factor
-of 3.5 found at \SI{2.5}{\ohm} in an earlier iteration (a slower gate loop
-is less sensitive to the same inductance), but it is still the single
-cheapest reduction of switching loss available.
+Without the fourth pin the switching energy is \SI{44}{\percent} higher. The
+power current develops a voltage across the common source inductance of the
+package. This voltage opposes the gate drive and slows the device. It is
+the cheapest reduction of switching loss available.
 
-The gate--source voltage is read at the die, the node the rating applies
-to: it stays within \SI{-5.1}{} and \SI{+15.1}{\volt}, against
-\SI{-8}{}/\SI{+19}{\volt} absolute limits.
+The gate--source voltage at the die, where the rating applies, stays between
+\SI{-5.1}{} and \SI{+15.1}{\volt}, inside the absolute limits of
+\SI{-8}{}/\SI{+19}{\volt}.
 
-\subsection{Where the model and the datasheet disagree}
+\subsection{Model and datasheet}
 
 At the datasheet test point (\SI{800}{\volt}, \SI{80.28}{\ampere},
-\SI{2.5}{\ohm}, \SI{175}{\celsius}, body-diode free-wheeling) the model
-gives $\Eon = \SI{748}{\micro\joule}$ against \SI{2552}{\micro\joule}
-measured~\cite{wolfspeed_e3m0016}, a factor of 3.4, and
-$\Eoff = \SI{509}{\micro\joule}$ against \SI{788}{\micro\joule}, a factor
-of 1.55. The same discrepancy on turn-on, a factor of 3.6, had been found
-with the device of the first iteration, and it was not explained by the
-free-wheeling interval: the model's recovery charge appears to be largely
-capacitive.
-
-Since the datasheet is a measurement and the model a representation, the
-loss budget of \cref{tab:losses} uses the datasheet-derived tables, and the
-SPICE model is used for waveforms, overshoot, parasitics and the gate
-resistance. This is stated explicitly so that nobody later ``improves'' the
-thermal budget by substituting the simulated energies. Resolving it is
-listed in \cref{app:assumptions} (A.4). The variants of the model that
-converge agree within \SI{2}{\volt} on the peak and \SI{3}{\percent} on the
-energies at the design point.
+\SI{2.5}{\ohm}, \SI{175}{\celsius}, body-diode free-wheeling) the SPICE model
+gives:
+\begin{itemize}
+  \item $\Eon = \SI{748}{\micro\joule}$ against \SI{2552}{\micro\joule}
+        measured~\cite{wolfspeed_e3m0016}, a factor of 3.4;
+  \item $\Eoff = \SI{509}{\micro\joule}$ against \SI{788}{\micro\joule}, a
+        factor of 1.55.
+\end{itemize}
+The datasheet is a measurement, so the loss budget of \cref{tab:losses} uses
+the tables derived from it. The SPICE model is used for the waveforms, the
+overshoot, the parasitics and the gate resistance. The open point is listed
+in \cref{app:assumptions} (A.4). The model variants that converge agree
+within \SI{2}{\volt} on the peak and \SI{3}{\percent} on the energies.
