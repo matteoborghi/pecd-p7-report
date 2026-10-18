@@ -1,27 +1,30 @@
-% Corrente efficace nel DC-link riferita alla corrente di fase (eq. di Kolar), al variare
-% dell'indice di modulazione (riferito a mezzo bus) e del fattore di potenza.
+% Corrente efficace nel DC-link riferita alla corrente di fase (formula del
+% corso, slide DC-AC), al variare di M_f = V_M/V_DC e del fattore di potenza.
 \begin{tikzpicture}
   \begin{axis}[
     width=0.82\textwidth, height=6.2cm,
-    xmin=0, xmax=1.15, ymin=0, ymax=0.76,
-    xlabel={modulation index $m$ (half-bus convention)},
-    ylabel={$I_{C,\mathrm{rms}}/I_\mathrm{out,rms}$},
+    xmin=0, xmax=0.6, ymin=0, ymax=0.76,
+    xlabel={modulation index $M_f = V_M/\Vdc$},
+    ylabel={$I_{C,\mathrm{RMS}}/I_{o,\mathrm{RMS}}$},
     grid=major, grid style={black!10},
     legend style={font=\scriptsize, draw=none, fill=none, at={(0.98,0.03)}, anchor=south east},
     tick label style={font=\scriptsize}, label style={font=\footnotesize},
-    domain=0.001:1.15, samples=120]
-    \addplot[fblu, thick] {sqrt(max(0, 2*x*(sqrt(3)/(4*pi) + 1*(sqrt(3)/pi - 9*x/16))))};
+    domain=0.001:0.577, samples=120]
+    \addplot[fblu, thick] {sqrt(max(0, x*(sqrt(3)/pi + 1*(4*sqrt(3)/pi - 4.5*x))))};
     \addlegendentry{$\cos\varphi = 1$}
-    \addplot[farancio, thick] {sqrt(max(0, 2*x*(sqrt(3)/(4*pi) + 0.949^2*(sqrt(3)/pi - 9*x/16))))};
+    \addplot[farancio, thick] {sqrt(max(0, x*(sqrt(3)/pi + 0.949^2*(4*sqrt(3)/pi - 4.5*x))))};
     \addlegendentry{$\cos\varphi = 0.949$ (rated load)}
-    \addplot[fverde, thick, dashed] {sqrt(max(0, 2*x*(sqrt(3)/(4*pi) + 0.25*(sqrt(3)/pi - 9*x/16))))};
+    \addplot[fverde, thick, dashed] {sqrt(max(0, x*(sqrt(3)/pi + 0.25*(4*sqrt(3)/pi - 4.5*x))))};
     \addlegendentry{$\cos\varphi = 0.5$}
-    \addplot[fgrigio, thick, dotted] {sqrt(max(0, 2*x*(sqrt(3)/(4*pi))))};
+    \addplot[fgrigio, thick, dotted] {sqrt(max(0, x*(sqrt(3)/pi)))};
     \addlegendentry{$\cos\varphi = 0$}
-    % punto nominale e massimo sull'inviluppo
-    \addplot[only marks, mark=*, mark size=1.8pt, farancio] coordinates {(1.07,0.447)};
-    \node[font=\scriptsize, anchor=north east, farancio] at (axis cs:1.07,0.43) {rated point, 0.447};
-    \addplot[only marks, mark=*, mark size=1.8pt, fblu] coordinates {(0.613,0.650)};
-    \node[font=\scriptsize, anchor=south, fblu] at (axis cs:0.613,0.655) {worst case, 0.650 at $m^\ast = 0.613$};
+    % limite lineare SVPWM
+    \draw[black!50, dashed] (axis cs:0.577,0) -- (axis cs:0.577,0.76);
+    \node[font=\scriptsize, black!60, anchor=north east, rotate=90] at (axis cs:0.577,0.76) {$1/\sqrt{3}$};
+    % punto nominale e caso peggiore
+    \addplot[only marks, mark=*, mark size=1.8pt, farancio] coordinates {(0.534,0.447)};
+    \node[font=\scriptsize, anchor=north east, farancio] at (axis cs:0.534,0.43) {rated point, 0.447};
+    \addplot[only marks, mark=*, mark size=1.8pt, fblu] coordinates {(0.306,0.650)};
+    \node[font=\scriptsize, anchor=south, fblu] at (axis cs:0.306,0.655) {worst case, 0.650 at $M_f = 0.306$};
   \end{axis}
 \end{tikzpicture}
