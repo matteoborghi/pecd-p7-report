@@ -1,11 +1,16 @@
 \chapter{PCB layout}
 \label{ch:layout}
 
-The module is laid out on a six-layer board, frozen as revision 1.2 of
-11 October 2026, that also carries the gate drives and the rest of the
-inverter electronics. Only the area of the power stage is described here: its
-floorplan, the stack-up, the commutation loop, the conductor sizing, the
-insulation of the power pins at \SI{900}{\volt} and the cooling rail.
+The module is laid out on a six-layer board, frozen as revision 1.2 on
+11 October 2026. The board also carries the gate drives and the rest of the
+inverter electronics. This chapter describes only the power stage:
+\begin{itemize}
+  \item the floorplan and the stack-up;
+  \item the commutation loop;
+  \item the conductor widths;
+  \item the insulation of the power pins at \SI{900}{\volt};
+  \item the cooling rail.
+\end{itemize}
 
 \section{The module on the board}
 \label{sec:asbuilt}
@@ -13,50 +18,47 @@ insulation of the power pins at \SI{900}{\volt} and the cooling rail.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{figures/kicad_modulo_alto.png}
-  \caption{The power-stage module seen from above (3D render of the frozen
-  design, \SI{269}{}$\times$\SI{195}{\milli\metre}; bodies of the custom parts
-  are blocks with datasheet dimensions). Top to bottom: the two devices of each
-  leg with the four commutation ceramics beside them and the shunt; the phase
-  terminals PH1--PH3; the film DC-link capacitors, the two grey blocks; DC+ and
-  DC$-$ at the right. The gate-drive components of each leg sit just above the
-  upper edge.}
+  \caption{The power-stage module seen from above (3D render,
+  \SI{269}{}$\times$\SI{195}{\milli\metre}). Top to bottom: the two devices
+  of each leg with the four commutation ceramics beside them and the shunt;
+  the phase terminals PH1--PH3; the film DC-link capacitors (the two grey
+  blocks); DC+ and DC$-$ at the right. The gate-drive components of each leg
+  are just above the upper edge.}
   \label{fig:pcb-top}
 \end{figure}
 
-\paragraph{Floorplan.} The module is the lower part of one board that also
-carries its gate drives. Each driver faces its own device across a few
-millimetres, so the gate loop never leaves its channel: a connector between a
-driver board and a power board would add a pair of parallel pins to every gate
-loop, about \SI{8}{\nano\henry} for \SI{10}{\milli\metre} of stacking height.
-The module is delimited by a box on a drawing layer of the board file, with
-the \num{30} parts of the sheets \texttt{1\_power\_stage} and \texttt{leg}
-(\cref{tab:boardnumbers}). Two of the six M3 fixing holes of the board fall
-inside it; they have no net and sit \SI{9.5}{\milli\metre} from all
-high-voltage copper, and they hold the module against the flexing that would
-otherwise fatigue the joints of the film capacitors.
+The module is the lower part of one board. Each driver faces its own device
+across a few millimetres, so the gate loop stays inside its channel. A
+connector between a driver board and a power board would add about
+\SI{8}{\nano\henry} to every gate loop for \SI{10}{\milli\metre} of stacking
+height. The module is marked by a box on a drawing layer of the board file.
+It contains the 30 parts of the sheets \texttt{1\_power\_stage} and
+\texttt{leg} (\cref{tab:boardnumbers}). Two of the six M3 fixing holes of the
+board are inside it. They have no net, they are \SI{9.5}{\milli\metre} from
+all high-voltage copper, and they hold the board against the bending that
+would fatigue the joints of the film capacitors.
 
 \begin{table}[htbp]
 \centering
 \caption{The power-stage module in numbers.}
 \label{tab:boardnumbers}
 \small
+\zebra
 \begin{tabularx}{\textwidth}{lY}
 \toprule
 Area & \SI{269}{}$\times$\SI{195}{\milli\metre} of a \SI{360}{}$\times$\SI{300}{\milli\metre} board, six layers, \SI{1.6}{\milli\metre} \\
 Parts & 30: six MOSFETs, two film capacitors, twelve ceramics, three shunts, five bolted terminals, two test points \\
 Copper pours & positive DC rail on L1 (\SI{411}{\centi\metre\squared}); negative DC plane on L2
-  (\SI{627}{\centi\metre\squared}); switching nodes and phases on L1; the three phase pours of revision 1.1 on L6 \\
-Vias & 50 on the negative DC rail, 60 stitching the phase pours to L6 \\
+  (\SI{627}{\centi\metre\squared}); switching nodes and phases on L1; a second phase pour on L6 \\
+Vias & 50 on the negative DC rail, 60 joining the phase pours to L6 \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\paragraph{How the layers are used.} \Cref{fig:layers} shows the three power
-layers. The negative DC plane on L2 lies under the power stage only, and the
-two ground planes of the low-voltage side on L3 and L5 do not overlap it in
-plan, so no high-voltage plane faces a ground plane across a thin
-dielectric. Since revision 1.1 the bottom layer also carries a second phase
-pour under each shunt (\cref{sec:conductors}).
+\Cref{fig:layers} shows the three power layers. The negative DC plane on L2
+is under the power stage only. The two ground planes of the low-voltage side
+(L3 and L5) do not overlap it, so no high-voltage plane faces a ground plane
+across a thin dielectric.
 
 \begin{figure}[htbp]
   \centering
@@ -87,34 +89,22 @@ pour under each shunt (\cref{sec:conductors}).
   \label{fig:pcb-leg}
 \end{figure}
 
-\paragraph{The gate loop, measured on the copper.} The target of
-\SI{25}{\milli\metre} from driver output to gate was set before routing.
-Along the tracks of the frozen board it is \SI{23.7}{\milli\metre}
-at turn-on and \SI{24.3}{\milli\metre} at turn-off, the same in all six
-channels. The turn-on path dips to L4 through two vias to clear the parts
-around the driver; there it runs \SI{0.6}{\milli\metre} above the
-reference island on L6 that carries the return, which is closer than a
-surface track could get, so the loop is narrower as well as shorter.
-Extracted from the copper with the method of \cref{sec:loopextract}, the
-loop from the driver output through the gate resistor to the gate, and back
-from the Kelvin pin through the island to the driver reference, is
-\SI{13}{\nano\henry} (grids of 0.40, 0.30 and
-\SI{0.25}{\milli\metre}: 14.3, 13.4, \SI{13.3}{\nano\henry}). That is
-consistent with a \SI{0.5}{\milli\metre} track \SI{0.6}{\milli\metre}
-above its return, about \SI{0.5}{\nano\henry\per\milli\metre}, and it is
-more than the \SI{5}{\nano\henry} the switching simulation had assumed. Its
-effect is small (\cref{tab:dptextract}): the gate resistance is above the
-critical value $2\sqrt{L/C_\mathrm{iss}}$, so the loop does not ring, and
-the peaks move by a few volts.
+The gate loop has a target of \SI{25}{\milli\metre} from the driver output to
+the gate. Along the tracks of the board it is \SI{23.7}{\milli\metre} at
+turn-on and \SI{24.3}{\milli\metre} at turn-off, in all six channels. The
+extraction method of \cref{sec:loopextract} gives about \SI{13}{\nano\henry}
+for this loop. The gate resistance is above the critical value
+$2\sqrt{L/C_\mathrm{iss}}$, so the loop does not ring, and the overshoot
+changes by a few volts (\cref{tab:dptextract}).
 
 \section{Stack-up}
 \label{sec:stackup}
 
 \begin{table}[htbp]
 \centering
-\caption{Six-layer stack-up, as in the board file. Finished thickness
-\SI{1.6}{\milli\metre}.}
+\caption{Six-layer stack-up. Finished thickness \SI{1.6}{\milli\metre}.}
 \label{tab:stackup}
+\zebra
 \begin{tabular}{llll}
 \toprule
 Layer & Copper & Function & Dielectric below \\
@@ -129,27 +119,25 @@ L6 & \SI{2}{oz} & phase pours; floating-reference islands of the drivers & --- \
 \end{tabular}
 \end{table}
 
-The cores are \SI{0.46}{\milli\metre} rather than the \SI{0.40}{} first
-considered, so that the stack adds up to the standard
-\SI{1.6}{\milli\metre}; only the L1--L2 prepreg matters electrically, and it
-is unchanged.
-
-The one dimension that the stack-up exists to fix is the L1--L2 prepreg. Two
-facing planes carrying a current and its return have
+The stack-up fixes one dimension that matters electrically: the L1--L2
+prepreg. Two facing planes that carry a current and its return have the
+inductance
 %
 \begin{equation}
   L = \frac{\mu_0\,h\,l}{w},
   \label{eq:planepair}
 \end{equation}
 %
-proportional to the separation $h$. For the \SI{30}{\milli\metre} by
-\SI{20}{\milli\metre} region that the commutation loop occupies:
+which is proportional to the separation $h$. \Cref{tab:planepair} gives it
+for the region of \SI{30}{\milli\metre} by \SI{20}{\milli\metre} that the
+commutation loop occupies.
 
 \begin{table}[htbp]
 \centering
 \caption{Plane-pair inductance against prepreg thickness,
 $l = \SI{30}{\milli\metre}$, $w = \SI{20}{\milli\metre}$.}
 \label{tab:planepair}
+\zebra
 \begin{tabular}{lr}
 \toprule
 L1--L2 separation & Inductance \\
@@ -162,186 +150,132 @@ L1--L2 separation & Inductance \\
 \end{tabular}
 \end{table}
 
-\begin{finding}{The plane pair is not where the inductance budget is spent}
-Against a target of \SI{20}{\nano\henry} the plane pair contributes under
-\SI{0.7}{\nano\henry} even with a standard \SI{0.36}{\milli\metre} core. The
-thin prepreg is still specified, because it costs nothing and every tenth of
-a nanohenry saved stays available elsewhere, but it is not the decisive
-choice. The budget is spent on vertical transitions (vias, pads, the leads
-between board and device) and on the path to the ceramic capacitors.
-
-A corollary follows: if \SI{0.10}{\milli\metre} ever
-becomes awkward, doubling it costs \SI{0.19}{\nano\henry} and halves the
-electric stress in the solid insulation from \SI{9}{} to
-\SI{4.5}{\kilo\volt\per\milli\metre} at \SI{900}{\volt}
-(\cref{sec:insulation}). That is a good
-trade, and it should be reconsidered at the first prototype.
-\end{finding}
+The plane pair gives less than \SI{0.7}{\nano\henry} even with a standard
+core, against a target of \SI{20}{\nano\henry}. The thin prepreg costs
+nothing, so it is specified. The inductance budget is spent elsewhere:
+\cref{tab:loopbudget} lists the contributions.
 
 \begin{table}[htbp]
 \centering
-\caption{Commutation loop budget, estimated before layout; the last rows
-give the extraction from the frozen board (\cref{sec:loopextract}).}
+\caption{Commutation loop budget, estimated before the layout. The last rows
+give the extraction from the board (\cref{sec:loopextract}).}
 \label{tab:loopbudget}
 \small
+\zebra
 \begin{tabular}{lrl}
 \toprule
-Contribution & [\si{\nano\henry}] & Controlled by layout? \\
+Contribution & [\si{\nano\henry}] & Controlled by the layout? \\
 \midrule
 Device packages & 14.6 & no \\
 Leads and pads & 3--6 & partly: short leads \\
 Vias and vertical transitions & 0.4--2 & yes \\
-Plane pair L1--L2 & 0.19 & yes, and already negligible \\
+Plane pair L1--L2 & 0.19 & yes, already negligible \\
 Ceramic capacitor ESL & 1--2 & yes: more parts in parallel \\
-\midrule
-\textbf{Board-attributable total} & \textbf{5--10} & target \SI{20}{\nano\henry}: reachable \\
-\textbf{Physical loop} & \textbf{20--25} & \\
-\midrule
-Extracted, revision 1.0: board copper & 12$\pm$1 & three legs alike \\
+\textbf{Board total, estimate} & \textbf{5--10} & target \SI{20}{\nano\henry} \\
+\textbf{Physical loop, estimate} & \textbf{20--25} & \\
+Extracted, first layout: board copper & 12$\pm$1 & three legs alike \\
 \quad of which at the clearance holes & 7.7 & yes: inner-layer clearance \\
-\textbf{Extracted, revision 1.1: board copper} & \textbf{7.8} & inner-layer clearance relaxed \\
-\textbf{Revision 1.1, with capacitor ESL} & \textbf{about 8.3} & \SI{14}{\nano\henry} to the C2 threshold \\
+\textbf{Extracted, final layout: board copper} & \textbf{7.8} & inner-layer clearance relaxed \\
+\textbf{Final layout, with capacitor ESL} & \textbf{about 8.3} & \SI{14}{\nano\henry} below the C2 threshold \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \section{Commutation loop}
 
-The limit is \SI{20}{\nano\henry} of PCB-attributable inductance and the
-failure threshold \SI{22.6}{\nano\henry}. The limit is a design input: the gate resistances of \SI{5}{}/\SI{12.5}{\ohm} were
-chosen so that the die stays below \SI{1080}{\volt} at \SI{950}{\volt} and
-\SI{60}{\ampere} \emph{with} \SI{20}{\nano\henry} (\cref{sec:kelvin}). The
-frozen board's loop is extracted below (\cref{sec:loopextract}) and still
-to be measured on the finished board (\cref{app:assumptions}, A.7); both are to be checked
-against the threshold at which C2 is
-lost, \SI{22.6}{\nano\henry} at turn-off and
-\SI{23.6}{\nano\henry} on recovery (\cref{tab:lthreshold}), not only
-against the limit: the \SI{2.6}{\nano\henry} between them is the whole
-margin, and above \SI{23}{\nano\henry} the recovery peak rises four times
-faster than the turn-off one. As established there, the device packages contribute a
-further \SI{14.6}{\nano\henry} that no layout can remove, so the physical
-loop will measure around \SI{35}{\nano\henry} at the limit and
-\SIrange{20}{25}{\nano\henry} at the estimate of \cref{tab:loopbudget}.
+The design input is \SI{20}{\nano\henry} of loop inductance on the PCB. The
+gate resistances of \SI{5}{}/\SI{12.5}{\ohm} were chosen so that the die
+stays below \SI{1080}{\volt} at \SI{950}{\volt} and \SI{60}{\ampere} with
+this value (\cref{sec:kelvin}). The limit is lost at \SI{22.6}{\nano\henry}
+at turn-off and at \SI{23.6}{\nano\henry} at recovery
+(\cref{tab:lthreshold}). The margin between the design input and the
+threshold is \SI{2.6}{\nano\henry}. The packages add \SI{14.6}{\nano\henry}
+that no layout can remove, so the physical loop is about \SI{35}{\nano\henry}
+at the limit.
 
-\subsection{Extracted from the copper of the frozen board}
+\subsection{Extraction from the copper}
 \label{sec:loopextract}
 
-\paragraph{Method.} The loop of this board is made of pours, not tracks: the
-positive rail and the switching node on L1, the negative plane on L2,
-\SI{0.10}{\milli\metre} below. A track-based extraction does not see it,
-so the copper of each leg was extracted with the partial-element method
-that FastHenry uses. The filled copper of L1 and L2 is read from the board
-file on a square grid; every pair of parallel cells has a mutual partial
-inductance, computed in closed form along the cell and by integration
-across it; the high-side device and each ceramic are ideal shorts between
-their pads, and the loop is seen from the drain--source terminals of the
-low-side device. Resistance is neglected, which is the high-frequency limit
-that matters for the switching edge. The result is the \emph{board}
-contribution, to which the packages (\SI{14.6}{\nano\henry}, in the
-vendor's model) and the capacitor ESL are added.
+The loop of this board is made of pours: the positive rail and the switching
+node on L1, and the negative plane on L2, \SI{0.10}{\milli\metre} below. A
+track-based extraction does not see it. The copper of each leg is therefore
+extracted with a partial-inductance method, like the one used by FastHenry:
+\begin{itemize}
+  \item the filled copper of L1 and L2 is divided into square cells;
+  \item every pair of parallel cells has a mutual inductance computed in
+        closed form;
+  \item the high-side device and the ceramics are ideal shorts between their
+        pads;
+  \item the loop is seen from the drain--source terminals of the low-side
+        device, and the resistance is neglected.
+\end{itemize}
+The result is the board part of the loop. The packages and the ESL of the
+capacitors are added to it.
 
-The solver was checked before it was trusted: two parallel plates
+The solver was checked first. Two parallel plates of
 \SI{10}{}$\times$\SI{30}{\milli\metre} at \SI{0.10}{\milli\metre} give
-\SI{0.355}{\nano\henry} against \SI{0.364}{\nano\henry} from
-\cref{eq:planepair}, the small deficit being the fringing the formula
-ignores; a square loop of strip, a case with no plane at all, matches its
-closed form within \SI{1}{\percent}. On the board, grids from
-\SI{1.25}{} to \SI{0.8}{\milli\metre} give 11.7 to \SI{12.7}{\nano\henry}
-without a trend, the scatter coming from how the pins fall on the grid.
+\SI{0.355}{\nano\henry}, against \SI{0.364}{\nano\henry} from
+\cref{eq:planepair}. A square loop of strip, with no plane, matches its
+closed form within \SI{1}{\percent}.
 
-\paragraph{Result.} Revision 1.0 gave \SI{12}{}$\pm$\SI{1}{\nano\henry} of
-board copper, the same in the three legs, which are copies; the finding
-below explains where it was spent and why revision 1.1 brings it to
-\SI{7.8}{\nano\henry} (\SI{8.2}{\nano\henry} on the finer grid). The
-ceramic datasheet gives no ESL; from the geometry of the body over the
-plane, four in parallel add about \SI{0.5}{\nano\henry}. The
-board-attributable loop of the frozen board is therefore about
-\SI{8.3}{\nano\henry}: well below the \SI{20}{\nano\henry} on which the gate
-resistances were chosen and \SI{14}{\nano\henry} from the
-\SI{22.6}{\nano\henry} at which C2 is lost. The physical loop, packages
-included, is about \SI{23}{\nano\henry}.
+The first layout gave \SI{12}{}$\pm$\SI{1}{\nano\henry} of board copper, the
+same in the three legs. Most of it was in the strip of board under the
+device row, along the edges of the holes that the negative plane leaves
+around the pins: \SI{8.6}{} of the \SI{12}{\nano\henry}. The plane keeps
+\SI{4.5}{\milli\metre} from the switching-node and positive-rail pins and
+from the high-side gate pins. On a pitch of \SI{5.08}{\milli\metre} this
+opens a hole about \SI{10}{\milli\metre} wide under each device, and the
+return current has to go about \SI{6}{\milli\metre} below the row before it
+can run under the outgoing current. A plane without holes would give
+\SI{4.0}{\nano\henry}, so the holes cost \SI{7.7}{\nano\henry}.
 
-\paragraph{The switching simulation with the extracted values.} The
-double-pulse bench of \cref{sec:kelvin} was run again with the extracted
-loop and gate-loop inductances in place of the budget, and nothing else
-changed; it reproduces the report's case exactly when given the budget.
+The \SI{4.5}{\milli\metre} is a creepage value for a surface. Inside the
+laminate there is no surface. For internal conductors IPC-2221B asks
+\SI{0.0025}{\milli\metre\per\volt} above \SI{500}{\volt}, that is
+\SI{2.25}{\milli\metre} at \SI{900}{\volt}~\cite{ipc2221}. The final layout
+uses this value on the inner layers and keeps \SI{4.5}{\milli\metre} on the
+outer layers. The board loop falls from 12 to \SI{7.8}{\nano\henry}
+(\SI{8.2}{\nano\henry} on a finer grid). The ceramics add about
+\SI{0.5}{\nano\henry} of ESL, so the board loop is about
+\SI{8.3}{\nano\henry}. It is well below the \SI{20}{\nano\henry} design input
+and \SI{14}{\nano\henry} below the \SI{22.6}{\nano\henry} threshold. The
+physical loop, with the packages, is about \SI{23}{\nano\henry}.
+
+\subsection{Switching simulation with the extracted values}
+
+The double-pulse test of \cref{sec:kelvin} was run again with the extracted
+loop and gate-loop inductances. Nothing else changed.
 
 \begin{table}[htbp]
 \centering
 \caption{Double pulse at \SI{950}{\volt}, \SI{60}{\ampere}, \SI{175}{\celsius},
-$R_g$ \SI{5}{}/\SI{12.5}{\ohm}: the budget against the extracted board.
-Peak at the die; limit \SI{1080}{\volt}.}
+$R_g$ \SI{5}{}/\SI{12.5}{\ohm}: the budget and the extracted board. Peak at
+the die; limit \SI{1080}{\volt}.}
 \label{tab:dptextract}
 \small
+\zebra
 \begin{tabular}{lrrrr}
 \toprule
 Case & Loop & Gate loop & Turn-off peak & Recovery peak \\
 \midrule
-Budget (\cref{sec:kelvin}) & \SI{20}{\nano\henry} & \SI{5}{\nano\henry} & \SI{1073.5}{\volt} & \SI{1050.0}{\volt} \\
-Revision 1.0, extracted & \SI{12.5}{\nano\henry} & \SI{13}{\nano\henry} & \SI{1052.5}{\volt} & \SI{1046.6}{\volt} \\
-\textbf{Revision 1.1, extracted} & \SI{8.3}{\nano\henry} & \SI{13}{\nano\henry} & \textbf{\SI{1040.1}{\volt}} & \SI{1027.2}{\volt} \\
+Budget (\cref{sec:kelvin}) & \SI{20}{\nano\henry} & \SI{5}{\nano\henry} & \pass{\SI{1073.5}{\volt}} & \pass{\SI{1050.0}{\volt}} \\
+First layout, extracted & \SI{12.5}{\nano\henry} & \SI{13}{\nano\henry} & \pass{\SI{1052.5}{\volt}} & \pass{\SI{1046.6}{\volt}} \\
+\textbf{Final layout, extracted} & \SI{8.3}{\nano\henry} & \SI{13}{\nano\henry} & \pass{\textbf{\SI{1040.1}{\volt}}} & \pass{\SI{1027.2}{\volt}} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 The margin at the die goes from \SI{6.5}{} to \SI{40}{\volt}. It could be
-spent: with the extracted loop, $R_{g,\mathrm{off}}$ could come down to
-\SI{7.5}{\ohm} with the die at \SI{1064}{\volt}, and the model's turn-off
-energy would fall by \SI{38}{\percent}; at \SI{5}{\ohm} the die reaches
-\SI{1087}{\volt} and C2 is lost. The resistor is not changed. The
-margin comes from a model of the copper, not from a measurement, and
-spending it before a measurement has confirmed it would stake the most expensive
-part on the board on an unverified number. It is the first change to make
-once the loop has been measured.
+used to lower $R_{g,\mathrm{off}}$ to \SI{7.5}{\ohm} (die at \SI{1064}{\volt},
+turn-off energy \SI{38}{\percent} lower). The resistor is not changed,
+because the margin comes from a model of the copper and not from a
+measurement. It is the first change to make after the loop has been
+measured.
 
-\begin{figure}[htbp]
-  \centering
-  \begin{subfigure}{\textwidth}\centering
-    \includegraphics[width=0.92\textwidth]{figures/kicad_maglia_energia_v10.png}
-    \caption{revision 1.0: \SI{11.7}{\nano\henry}}\end{subfigure}\\[2mm]
-  \begin{subfigure}{\textwidth}\centering
-    \includegraphics[width=0.92\textwidth]{figures/kicad_maglia_energia_v11.png}
-    \caption{revision 1.1, inner-layer clearance \SI{2.25}{\milli\metre}: \SI{7.8}{\nano\henry}}\end{subfigure}
-  \caption{Magnetic energy density of the commutation loop of leg~1 at
-  \SI{1}{\milli\metre} resolution, L1 on the left, L2 on the right of each
-  pair (black: device and capacitor pads; grey: copper carrying little
-  energy; same colour scale within each pair). The energy sits at the device
-  pins and along the edges of the clearance holes that the negative plane
-  leaves around the other pins; smaller holes, less energy.}
-  \label{fig:loopenergy}
-\end{figure}
-
-\begin{finding}{The inductance is in the clearance holes, not in the plane pair}
-The estimate of \cref{tab:loopbudget} was 5 to \SI{10}{\nano\henry}; the
-extraction of revision 1.0 gave more, and \cref{fig:loopenergy} shows where. Of the
-\SI{12}{\nano\henry}, \SI{8.6}{} are spent in the strip of board under the
-device row, and almost all of it along the edges of the holes in the
-negative plane. The plane must keep \SI{4.5}{\milli\metre} from the
-switching-node and positive-rail pins and from the high-side gate pins,
-which on a \SI{5.08}{\milli\metre} pitch opens a hole about
-\SI{10}{\milli\metre} wide under each device: the return current has to
-drop some \SI{6}{\milli\metre} below the row before it can run under the
-outgoing current. With a plane free of holes (not buildable, but a useful
-bound) the same copper gives \SI{4.0}{\nano\henry}; the holes cost
-\SI{7.7}{\nano\henry}.
-
-The \SI{4.5}{\milli\metre} is a creepage figure for a surface in
-pollution degree 2, and it is applied to every layer. Inside the laminate
-there is no surface and no pollution: IPC-2221B asks
-\SI{0.0025}{\milli\metre\per\volt} above \SI{500}{\volt} for internal
-conductors, \SI{2.25}{\milli\metre} at \SI{900}{\volt}~\cite{ipc2221}. Applied
-to the inner layers only, it takes the loop from 12 to
-\SI{7.8}{\nano\henry}, a third less, with no other change to the copper.
-Revision 1.1 adopts it: one rule, for the negative plane against
-the other high-voltage nets and the high-side domains on inner layers; the
-outer layers keep \SI{4.5}{\milli\metre}.
-\end{finding}
-
-\section{Conductor sizing}
+\section{Conductor widths}
 \label{sec:conductors}
 
-Two currents have to be carried. The phase conductors carry
-\SI{30}{\Arms}; the DC bus carries the input current
+The phase conductors carry \SI{30}{\Arms}. The DC bus carries
 %
 \begin{equation}
   I_\mathrm{bus} = \frac{P_\mathrm{out} + P_\mathrm{tot}}{\Vdc}
@@ -350,13 +284,15 @@ Two currents have to be carried. The phase conductors carry
   \label{eq:ibus}
 \end{equation}
 %
-rounded up to \SI{35}{\ampere} for the ripple superimposed on it.
+rounded up to \SI{35}{\ampere} for the ripple. \Cref{tab:widths} gives the
+minimum widths from the IPC-2221B formula~\cite{ipc2221}.
 
 \begin{table}[htbp]
 \centering
-\caption{Minimum conductor width, IPC-2221B closed form~\cite{ipc2221},
-external layer, \SI{2}{oz} copper.}
+\caption{Minimum conductor width, IPC-2221B, external layer, \SI{2}{oz}
+copper.}
 \label{tab:widths}
+\zebra
 \begin{tabular}{llrr}
 \toprule
 Conductor & Current & $\Delta T = \SI{20}{\kelvin}$ & $\Delta T = \SI{30}{\kelvin}$ \\
@@ -367,85 +303,47 @@ DC bus & \SI{35}{\ampere} & \SI{13.3}{\milli\metre} & \SI{10.4}{\milli\metre} \\
 \end{tabular}
 \end{table}
 
-At these currents the conductors are copper pours, not tracks, and the
-computed widths serve as a minimum check. Two warning rules flag any
-\emph{track} on a bus or phase net narrower than \SI{10.4}{} or
-\SI{8.4}{\milli\metre}. Two kinds of connection are exempted by name,
-because they carry milliamperes and not the load current: the desaturation
-diode's lead to the drain, and the bus-voltage divider around the bus
-amplifier, marked by a rule area. Every other narrow track on those nets
-still raises the warning, and the frozen board raises none.
+At these currents the conductors are pours, so the widths are a minimum
+check. Two design rules flag any track on a bus or phase net narrower than
+\SI{10.4}{} or \SI{8.4}{\milli\metre}. Two connections are exempt, because
+they carry milliamperes: the lead of the desaturation diode and the
+bus-voltage divider.
 
-\begin{finding}{The width rule checks tracks, and the narrowest conductor is a pour}
-The positive DC rail is a single pour of \SI{411}{\centi\metre\squared} on
-L1 over the \SI{627}{\centi\metre\squared} negative plane on L2, and the
-switching-node pours are never narrower than \SI{13}{\milli\metre}. The
-phase pours were measured afterwards, section by section on the filled
-copper, because no rule looks at them: they are at least
-\SI{10.5}{\milli\metre} wide from the shunt to the terminal, but
-about \SI{8}{\milli\metre} for some \SI{4}{\milli\metre} just below
-the shunt pad, where the pour of the switching node takes the rest of the row.
+The rules check tracks and not pours, so the pours were measured on the
+filled copper. The positive rail (\SI{411}{\centi\metre\squared}) and the
+switching-node pours (at least \SI{13}{\milli\metre} wide) are wide enough.
+The phase pours are at least \SI{10.5}{\milli\metre} wide from the shunt to
+the terminal, but only about \SI{8}{\milli\metre} for \SI{4}{\milli\metre}
+just below the shunt pad. That is below the \SI{8.4}{\milli\metre} of the
+\SI{30}{\kelvin} column. A second phase pour on L6, \SI{22}{\milli\metre}
+wide and joined to L1 by twenty vias, removes the narrow section. The
+narrowest section becomes 8 plus \SI{22}{\milli\metre} of \SI{2}{oz} copper.
+The pour starts \SI{5.5}{\milli\metre} below the shunt centre, so the phase
+current on L6 does not pass under the Kelvin loop of the measurement.
 
-That is below the \SI{8.4}{\milli\metre} of the \SI{30}{\kelvin} column; by
-the same closed form a long conductor that narrow would rise by about
-\SI{33}{\kelvin} instead of \SI{30}{}. Revision 1.1 removes the
-neck without moving a part: a second phase pour on L6, the full
-\SI{22}{\milli\metre} of the phase area wide because the switching node has
-no copper on that layer, stitched to L1 by twenty vias in four rows and
-collected at the phase terminal, which is through-hole. The narrowest
-section becomes 8 plus \SI{22}{\milli\metre} of \SI{2}{oz} copper. The pour
-starts \SI{5.5}{\milli\metre} below the shunt centre, so the phase current
-on L6 does not run under the Kelvin loop of the measurement. Widening the
-L1 pour instead would have meant relaxing the \SI{4.5}{\milli\metre}
-between switching node and phase, two nets a few millivolts apart in
-operation but not if the shunt fails open. The lesson is about the check
-rather than the copper: a width rule on tracks says nothing about pours,
-and a board whose power path is all pours needs its sections measured.
-\end{finding}
+The closed formula is conservative. The IPC-2152 charts~\cite{ipc2152} would
+refine it, and they were not available (\cref{app:assumptions}, A.8).
 
-The IPC-2152 charts~\cite{ipc2152} supersede the closed form and were not
-available (\cref{app:assumptions}, A.8).
-
-\section{Insulation coordination}
+\section{Insulation}
 \label{sec:insulation}
 
-The requirements quoted below come from a third-party calculator that
-implements a stored subset of IEC 60664-1~\cite{standardclarity}, not from
-the text of the standard~\cite{iec60664}, which was not available. This is a
-secondary source: published, reproducible and parameter-addressable, but not
-the standard itself, and it describes itself as a reference estimate. Every
-case cited here is reproducible from the permalink given in the reference.
+The creepage distance is the shortest path along a surface between two
+conductors at different voltage. The requirements below come from the
+creepage tables of IEC 60664-1. They were taken from a calculator that
+implements them~\cite{standardclarity}, because the text of the standard was
+not available. The values at \SI{900}{\volt} are interpolated between the
+\SI{800}{} and \SI{1000}{\volt} rows. The standard is still to be read before
+release (\cref{app:assumptions}).
 
-It was used to check nine values that had previously been quoted from
-memory (five creepage rows, two clearance rows, the reinforced doubling rule
-and the pollution-degree floor), and all nine agree to the digit.
-That is reassuring about the memory and says nothing about the calculator's
-own coverage; the standard is still to be read before release
-(\cref{app:assumptions}).
+\subsection{Drain to source}
 
-\paragraph{\SI{900}{\volt} is not a row of the tables.} The creepage table
-of IEC 60664-1 lists \SI{800}{} and \SI{1000}{\volt}; every creepage value at
-\SI{900}{\volt} in this chapter is a \emph{linear interpolation} between
-the two, which is what the calculator does and states that it
-does~\cite{standardclarity}, rounded up to the next \SI{0.1}{\milli\metre}.
-Clearance is treated differently and needs no interpolation at all: it is
-selected by rated impulse voltage in discrete steps, and \SI{2.5}{\kilo\volt}
-is a row (\SI{1.5}{\milli\metre}; \SI{3.00}{\milli\metre} for reinforced
-insulation, taken one impulse step higher, at \SI{4}{\kilo\volt}).
-Whether the standard permits interpolating creepage is to be confirmed on
-its text. If it did not, the \SI{1000}{\volt} row would apply: in pollution
-degree 1, which is the design basis, the drain--source gap would pass by
-\SI{1}{\percent} (\SI{3.24}{} against \SI{3.2}{\milli\metre}) and every
-other barrier would keep its margin.
-
-\subsection{What the package leaves}
-
-The worst pair is drain to source on a single device, and its separation is
-fixed by the package: pads \SI{1.84}{\milli\metre} wide on a
-\SI{5.08}{\milli\metre} pitch leave \SI{3.24}{\milli\metre} of bare laminate
-at the full bus voltage. The other close pair, at \SI{0.70}{\milli\metre}, is
+The shortest path between two high-voltage nodes is drain to source on one
+device: \SI{3.24}{\milli\metre} of bare laminate, set by the package
+(\cref{ch:schematic}). The other close pair, at \SI{0.70}{\milli\metre}, is
 between source, Kelvin source and gate, which see the gate voltage and not
-the bus.
+the bus. \Cref{tab:creepage} compares the \SI{3.24}{\milli\metre} with the
+creepage required at \SI{900}{\volt}. The board is coated, which gives
+pollution degree 1.
 
 \begin{table}[htbp]
 \centering
@@ -453,234 +351,142 @@ the bus.
 ($V_\mathrm{max,cont}$, \cref{tab:vhierarchy}) against the
 \SI{3.24}{\milli\metre} available.}
 \label{tab:creepage}
+\zebra
 \begin{tabular}{lrrl}
 \toprule
-Condition & Required & Margin & \\
+Condition & Required & Margin & Test \\
 \midrule
-\textbf{Pollution degree 1}, coated & \textbf{\SI{2.80}{\milli\metre}} & $+\SI{16}{\percent}$ & \textbf{passes} \\
-PD2, material group I (CTI $\geq$ \num{600}) & \SI{4.50}{\milli\metre} & $-\SI{39}{\percent}$ & fails \\
-PD2, material group II & \SI{6.35}{\milli\metre} & $-\SI{96}{\percent}$ & fails \\
-PD2, material group IIIa (ordinary FR-4) & \SI{9.00}{\milli\metre} & $-\SI{178}{\percent}$ & fails \\
+Pollution degree 1, coated & \SI{2.80}{\milli\metre} & $+\SI{16}{\percent}$ & \pass{PASS} \\
+Pollution degree 2, material group I (CTI $\geq$ \num{600}) & \SI{4.50}{\milli\metre} & $-\SI{39}{\percent}$ & \fail{FAIL} \\
+Pollution degree 2, material group II & \SI{6.35}{\milli\metre} & $-\SI{96}{\percent}$ & \fail{FAIL} \\
+Pollution degree 2, ordinary FR-4 & \SI{9.00}{\milli\metre} & $-\SI{178}{\percent}$ & \fail{FAIL} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Clearance, and the rule that couples it to creepage}
-\label{sec:clearance}
+The conformal coating is therefore part of the design. Without it the board
+cannot be built with this device: \SI{9.00}{\milli\metre} would be required
+where the package gives \SI{3.24}{\milli\metre}, and no layout can recover
+the difference. The design rule check cannot see this, so the condition is
+written on the fabrication drawing.
 
-Creepage may not be smaller than clearance. Clearance in turn does not follow
-from the working voltage but from the assumed \emph{rated impulse withstand},
-so an assumption about impulse can raise the required creepage above the
-table value. \Cref{tab:impulse} shows the effect for the \SI{3.24}{\milli\metre}
-this board has.
+The air clearance follows from the impulse voltage that the converter
+generates itself, \SI{1148}{\volt} at the die in the worst simulated case. A
+rated impulse of \SI{2.5}{\kilo\volt} needs \SI{1.5}{\milli\metre} of
+clearance, and the \SI{3.24}{\milli\metre} of the package passes.
 
-\begin{table}[htbp]
-\centering
-\caption{Rated impulse, clearance, and the creepage that results in pollution
-degree 1, against the \SI{3.24}{\milli\metre} the package leaves.}
-\label{tab:impulse}
-\begin{tabular}{lrrl}
-\toprule
-Rated impulse & Clearance & Creepage (PD1) & Margin on \SI{3.24}{\milli\metre} \\
-\midrule
-\SI{1.5}{\kilo\volt} & \SI{0.50}{\milli\metre} & \SI{2.80}{\milli\metre} & $+\SI{16}{\percent}$ \\
-\textbf{\SI{2.5}{\kilo\volt}} (selected) & \SI{1.50}{\milli\metre} & \SI{2.80}{\milli\metre} & $+\SI{16}{\percent}$ \\
-\SI{4}{\kilo\volt} & \SI{3.00}{\milli\metre} & \SI{3.00}{\milli\metre} & $+\SI{8}{\percent}$ \\
-\SI{6}{\kilo\volt} & \SI{5.50}{\milli\metre} & \SI{5.50}{\milli\metre} & $-\SI{41}{\percent}$: fails \\
-\bottomrule
-\end{tabular}
-\end{table}
+\subsection{Insulating pad}
 
-At the selected level the air gap (\SI{1.50}{\milli\metre} required against
-\SI{3.24}{\milli\metre} available) does not constrain the design, and the
-surface path governs, which is what the coating addresses. The
-\SI{2.5}{\kilo\volt} is derived from the transient the converter generates
-itself, \SI{1148}{\volt} at the die in the worst simulated case, and not from
-an overvoltage category. Above \SI{4}{\kilo\volt} clearance becomes the
-quantity that sets creepage, and the design does not survive
-\SI{6}{\kilo\volt}.
-
-\subsection{Two air paths the design rule check cannot see}
-
-Clearance is a distance through air, and two of the air paths that matter run
-outside the board copper the design rule check measures.
-
-The tab of the TO-247 package \emph{is} the drain, at up to \SI{900}{\volt}, and it
-is clamped against a cold plate at chassis potential. The insulating pad
-handles the solid insulation; what had never been dimensioned is the surface
-path around the \emph{edge} of the pad, which is a reinforced barrier.
-
-\begin{finding}{The pad is outside the board, so it inherits nothing from the
-coating}
-Every other distance in this design is qualified in pollution degree 1
-because the board is conformally coated. The pad is not on the board: it sits
-between the package tab and the cold plate, and that surface is not coated.
-Its pollution degree depends on the sealing of the housing (a mechanical
-part outside this perimeter), not on our coating process. The two are
-independent assumptions, and treating them as one was an error.
-
-The source used here says as much: coating or sealing does not automatically
-reduce the pollution degree, and any reduction depends on the protection
-method applied~\cite{standardclarity}.
-\end{finding}
+The tab of the TO-247 is the drain, at up to \SI{900}{\volt}, and it is
+clamped to a cold plate at chassis potential. The pad is outside the board,
+so the coating does not protect it. Its surface is in pollution degree 2,
+because most automotive housings breathe and can condense. The pad is a
+reinforced barrier, and \cref{tab:pad} sizes it by the creepage around its
+edge.
 
 \begin{table}[htbp]
 \centering
 \caption{Insulating pad sized by the creepage around its edge. Reinforced
-barrier at \SI{900}{\volt}; path available is the overhang plus the
+barrier at \SI{900}{\volt}; the path available is the overhang plus the
 \SI{0.63}{\milli\metre} pad thickness; tab \SI{15.9}{}$\times$\SI{20}{\milli\metre}.}
 \label{tab:pad}
+\zebra
 \begin{tabular}{lrrl}
 \toprule
-Microenvironment at the pad & Creepage & Overhang & Pad \\
+Surface at the pad & Creepage & Overhang & Pad \\
 \midrule
-PD1, sealed housing & \SI{5.60}{\milli\metre} & \SI{4.97}{\milli\metre} & \SI{26}{}$\times$\SI{30}{\milli\metre} \\
-\textbf{PD2, material group I} (selected) & \SI{9.00}{\milli\metre} & \SI{8.37}{\milli\metre} & \textbf{\SI{33}{}$\times$\SI{37}{\milli\metre}} \\
-PD2, material group II & \SI{12.70}{\milli\metre} & \SI{12.07}{\milli\metre} & \SI{41}{}$\times$\SI{45}{\milli\metre} \\
+Pollution degree 1, sealed housing & \SI{5.60}{\milli\metre} & \SI{4.97}{\milli\metre} & \SI{26}{}$\times$\SI{30}{\milli\metre} \\
+\textbf{Pollution degree 2, material group I} (selected) & \SI{9.00}{\milli\metre} & \SI{8.37}{\milli\metre} & \textbf{\SI{33}{}$\times$\SI{37}{\milli\metre}} \\
+Pollution degree 2, material group II & \SI{12.70}{\milli\metre} & \SI{12.07}{\milli\metre} & \SI{41}{}$\times$\SI{45}{\milli\metre} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Pollution degree 2 is chosen, and the housing assumption is
-dropped. Most automotive housings carry a pressure-equalisation membrane,
-which means they breathe and therefore condense; the standard places
-occasional condensation explicitly inside pollution degree 2. Buying
-independence from a system-level assumption costs \SI{57}{\percent} more pad
-area on a component worth a few euro. This is the only point in the whole
-insulation coordination where an assumption was \emph{removed} rather than
-declared.
+The design uses pollution degree 2. It costs \SI{57}{\percent} more pad area
+on a part worth a few euros, and it does not depend on the sealing of the
+housing, which is outside this module. On the cooling rail the creepage is
+obtained by raising the rail, which gives \SI{10.1}{\milli\metre}
+(\cref{fig:mechsection}). The overhang of the pad is outside the path of the
+heat, so it does not change $\Rthcs$.
 
-The ceramic itself is assigned material group I, which a pad datasheet
-stating CTI $\geq \SI{600}{\volt}$ would confirm. Neither alumina nor the
-aluminium nitride adopted in \cref{sec:coolalt} tracks, and
-the standard is understood to exempt non-tracking inorganic materials from
-requiring creepage greater than clearance, which would give
-\SI{3.00}{\milli\metre} instead of \SI{9.00}{\milli\metre}. That exemption is
-\emph{not} taken: the secondary source available does not implement it, and
-the path runs over ceramic veiled in thermal grease, which is organic.
+Two more points:
+\begin{itemize}
+  \item The ceramic is material group I. Alumina and aluminium nitride do not
+        track, but the CTI is not confirmed on a specific part
+        (\cref{app:assumptions}, A.6).
+  \item A screw through the tab would connect the drain to the cold plate and
+        reduce the creepage from \SI{9}{\milli\metre} to zero. The devices
+        are held by a clip on the plastic body, which also gives a uniform
+        pressure.
+\end{itemize}
 
-A catalogue part sold as a TO-247 pad is typically
-\SI{20}{}$\times$\SI{25}{\milli\metre}, less than a third of the required
-area. The pad had been selected on thermal resistance alone
-(\cref{tab:rthcs}), where its size never appears. \Cref{tab:pad} sizes a pad
-standing on its own; on the cooling rail of \cref{sec:mechanics} the strip
-is \SI{35.5}{\milli\metre} tall, and the creepage below the tab is obtained by
-raising the rail rather than by extending the ceramic, which gives
-\SI{10.1}{\milli\metre} around the edge (\cref{fig:mechsection}).
-
-The thermal chain does not move. Heat enters through the tab and spreads at roughly
-\SI{45}{\degree} as it crosses the pad, so the flux widens by about one pad
-thickness (\SI{0.63}{\milli\metre}) per side. The overhang is
-\SI{8.4}{\milli\metre}, thirteen times that, and therefore lies entirely
-outside the spreading cone: it carries no heat. Adding ceramic around the
-loaded area cannot increase $\Rthcs$; it can only add a weak parallel path.
-The pad's size therefore changes no temperature in this report; its
-thermal resistance is set by the material and the interfaces
-(\cref{sec:coolalt}).
-
-\begin{finding}{A screw through the tab would short the barrier the pad
-creates}
-The TO-247 has a mounting hole in its tab, and the tab is the drain at
-up to \SI{900}{\volt}. A metal screw passing through it into the cold plate
-reduces the creepage path from \SI{9}{\milli\metre} to zero. Clip mounting on the
-plastic body is therefore selected, which also gives the uniform pressure
-that makes $\Rthcs$ reproducible. If a screw were required for mechanical
-reasons, an insulating shoulder bushing and washer would be mandatory
-components.
-\end{finding}
-
-The cold plate itself, its screws and the surrounding structure are at
-chassis potential and sit millimetres from the board, but they are not nets
-in the PCB file and no rule can check them. A mechanical clearance of
-\SI{5.0}{\milli\metre} from any high-voltage copper is specified, above the
-\SI{3.00}{\milli\metre} the standard asks, because this dimension lives in an
-assembly with mechanical tolerances rather than in a photoplot.
-
-\begin{finding}{Conformal coating is part of the design}
-Conformal coating over the high-voltage area brings the pollution degree from
-2 to 1 and the requirement from \SI{9.00}{} to \SI{2.80}{\milli\metre}, a
-\SI{69}{\percent} reduction that turns a \SI{178}{\percent} shortfall into a
-\SI{16}{\percent} margin. Every insulation distance of the power stage
-depends on it.
-
-Without the coating the board is \emph{unbuildable with this device}: \SI{9.00}{\milli\metre} would be
-required where the package offers \SI{3.24}{\milli\metre}, and no layout can
-recover the difference. The design-rule check cannot see this, since the board
-passes either way, so the condition is stated at the head of the rules file
-and on the fabrication drawing.
-\end{finding}
+The cold plate and the enclosure are at chassis potential and are not nets of
+the PCB, so no rule checks them. A clearance of \SI{5.0}{\milli\metre} from
+any high-voltage copper is specified, above the \SI{3.00}{\milli\metre} of
+the standard, because this distance depends on mechanical tolerances.
 
 \section{Cooling rail and mechanical integration}
 \label{sec:mechanics}
 
-The thermal chain of \cref{ch:thermal} assumes each tab pressed on a
-liquid-cooled plate through a ceramic pad, and the insulation coordination
-puts a reinforced barrier between them. Neither had been drawn. Drawing it
-changed the board, which is why it was done \emph{before} revision 1.1 was
-frozen.
+The thermal chain of \cref{ch:thermal} needs each tab pressed on a
+liquid-cooled plate through a ceramic pad. The insulation needs a reinforced
+barrier between them. Both were drawn before the board was frozen.
 
-\paragraph{Concept.} The devices stand vertically with the tab towards the
-high-voltage side, so the cold plate is a rail: an aluminium
-extrusion with six coolant ports running along the row of devices
-(their design is in \cref{sec:cooling}),
-at chassis potential, longer than the board and fixed to the enclosure
-beyond its edges, where the coolant fittings are also kept away from the
-high-voltage area (\cref{fig:mech3d}). Aluminium nitride, with a phase-change interface material on both faces,
-separates tabs and rail (\cref{sec:coolalt}). It is laid in segments, one
-\SI{70}{\milli\metre} long under each leg, because ceramic substrates are not
-made \SI{345}{\milli\metre} long; each segment overhangs the tabs by
-\SI{12}{\milli\metre} at its ends, more than the \SI{9}{\milli\metre} of
-creepage the pad needs, and \SI{20}{\milli\metre} of rail separate one
-segment from the next. One spring clip per device hooks over the rail and
-presses the plastic body, never the tab, which is the drain; this is the clip
-mounting selected in \cref{sec:insulation}.
+The devices stand vertically with the tab towards the high-voltage side.
+The cold plate is a rail:
+\begin{itemize}
+  \item an aluminium extrusion with six coolant ports (\cref{sec:cooling}),
+        running along the row of devices, at chassis potential;
+  \item longer than the board and fixed to the enclosure beyond its edges,
+        where the coolant fittings are kept away from the high-voltage area
+        (\cref{fig:mech3d});
+  \item aluminium nitride with a phase-change interface on both faces
+        between tabs and rail (\cref{sec:coolalt}), in segments of
+        \SI{70}{\milli\metre}, one under each leg, because ceramic
+        substrates are not made \SI{345}{\milli\metre} long;
+  \item one spring clip per device, hooked over the rail and pressing the
+        plastic body, never the tab.
+\end{itemize}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{figures/kicad_meccanica_3d_nord.png}
-  \caption{Cooling rail, insulating strip and spring clips on the frozen board,
-  seen from the driver side (indicative bodies).}
+  \caption{Cooling rail, insulating strip and spring clips on the board, seen
+  from the driver side (indicative bodies).}
   \label{fig:mech3d}
 \end{figure}
 
-\paragraph{The profile is set by two distances.} The rail is chassis, so it
-must keep \SI{5}{\milli\metre} of air from every high-voltage conductor;
-and the creepage from tab to rail around the edge of the pad must reach the
-\SI{9.0}{\milli\metre} of the pad's reinforced barrier in pollution degree 2. The
-pad cannot extend below the board, so the second condition is met by
-raising the rail instead: its lip starts \SI{7.5}{\milli\metre} above the
-board, and the path down the pad, under its edge and up to the rail is
-\SI{10.1}{\milli\metre} (\cref{fig:mechsection}). The price is that the tab
-touches the rail over \SI{81}{\percent} of its height; the uncovered strip
-is the lowest \SI{4.5}{\milli\metre}, and the tab, two millimetres of
-copper, spreads the heat into the contact area. The lip is
-\SI{7}{\milli\metre} thick so that it passes beside the commutation
-ceramics; the wide part with the channels starts \SI{13}{\milli\metre} up,
-above everything on the board.
+Two distances set the profile of the rail:
+\begin{itemize}
+  \item the rail is at chassis potential, so it keeps \SI{5}{\milli\metre} of
+        air from every high-voltage conductor;
+  \item the creepage from tab to rail around the pad must reach
+        \SI{9.0}{\milli\metre}. The pad cannot extend below the board, so
+        the lip of the rail starts \SI{7.5}{\milli\metre} above the board.
+        The path down the pad, under its edge and up to the rail is then
+        \SI{10.1}{\milli\metre} (\cref{fig:mechsection}).
+\end{itemize}
+The tab touches the rail over \SI{81}{\percent} of its height. The lip is
+\SI{7}{\milli\metre} thick, so it passes beside the commutation ceramics.
+The wide part with the channels starts \SI{13}{\milli\metre} above the board,
+over every component.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.92\textwidth]{figures/kicad_meccanica_sezione.pdf}
-  \caption{Section through the rail at the high-side device of leg~1, with
-  the creepage path around the pad and the two air clearances that set the
+  \caption{Section through the rail at the high-side device of leg~1, with the
+  creepage path around the pad and the two air clearances that set the
   profile. Dashed: parts behind the section plane.}
   \label{fig:mechsection}
 \end{figure}
 
-\paragraph{What the check found.} Every chassis part was checked in three
-dimensions against every component and copper area of a high-voltage or
-floating net, with component heights from their datasheets. The first
-profile failed twice: the gate test points of leg~1, \SI{7.6}{\milli\metre}
-tall, stood \SI{4.45}{\milli\metre} from the rail, and the commutation
-ceramics passed with \SI{0.3}{\milli\metre} of margin. Revision 1.1 moves
-the test points \SI{1.5}{\milli\metre} away and moves the switching-node test
-point out from under the rail, where no probe could reach it; the profile
-was thinned and raised. All parts now keep at least
-\SI{5.8}{\milli\metre} of air. The rail, pad and clip outlines are drawn on
-the board's documentation layer, so the assembler sees them.
+Every chassis part was checked in three dimensions against every component
+and copper area at high voltage, with the component heights from their
+datasheets. All parts keep at least \SI{5.8}{\milli\metre} of air from the
+rail. The outlines of rail, pad and clip are drawn on the documentation
+layer of the board, so the assembler sees them.
 
-\paragraph{Assembly order.} The devices are soldered \emph{after} they are
-clamped to the rail. Soldered first, the leads would carry every tolerance
-between the hole pattern and the rail, and the joints of a
-\SI{20}{\milli\metre}-tall package would crack at the first thermal cycles.
-
+The devices are soldered after they are clamped to the rail. If they were
+soldered first, the leads would take every tolerance between the hole pattern
+and the rail, and the joints of a \SI{20}{\milli\metre}-tall package would
+crack in the first thermal cycles.
