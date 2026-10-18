@@ -1,26 +1,27 @@
 \chapter{Schematic design}
 \label{ch:schematic}
 
-The power stage is two sheets of a KiCad 10.0.6 project that was frozen on
-11 October 2026, together with the board, as revision 1.2: a sheet with the
-DC-link and the terminals, and a half-bridge leg instantiated three times.
-The module has 30 parts and talks to the rest of the project through 23
-labelled signals (\cref{tab:interface}). This chapter explains how it is
-organised and what was decided while drawing it; the two sheets close the
-chapter.
+The power stage is two sheets of a KiCad 10.0.6 project, frozen on
+11 October 2026 together with the board as revision 1.2:
+\begin{itemize}
+  \item a sheet with the DC-link and the terminals;
+  \item a half-bridge leg, instantiated three times.
+\end{itemize}
+The module has 30 parts. It talks to the rest of the project through 23
+labelled signals (\cref{tab:interface}). The two sheets close the chapter.
 
 \section{Sheet hierarchy}
 
-The schematic is organised by \emph{voltage domain} rather than by function
-or by phase. The three legs are one sheet drawn once and instantiated three
-times: 21 of the 30 parts of the module sit on that sheet and were drawn a
-single time.
+The schematic is organised by voltage domain. The three legs are one sheet,
+drawn once and used three times. This sheet holds 21 of the 30 parts of the
+module.
 
 \begin{table}[htbp]
 \centering
 \caption{Sheet hierarchy. Parts are counted per instance.}
 \label{tab:sheets}
 \small
+\zebra
 \begin{tabularx}{\textwidth}{llrrY}
 \toprule
 Sheet & Domain & Inst. & Parts & Content \\
@@ -41,6 +42,7 @@ management belong to the rest of the board and are outside this module.
 sheet.}
 \label{tab:interface}
 \small
+\zebra
 \begin{tabularx}{\textwidth}{lYrl}
 \toprule
 Group & Signals & Count & Goes to \\
@@ -53,29 +55,26 @@ Shunt voltage & \texttt{SNSk\_SP}, \texttt{SNSk\_SN}, $k = 1,2,3$ & 6 & phase-cu
 \end{tabularx}
 \end{table}
 
-\section{Net naming and net classes}
+\section{Net names and net classes}
 
-Net names carry their voltage domain as a prefix, so that whether a net is
-hazardous can be read from its name and enforced by a net class. The
-floating gate references of the six devices are deliberately distinct names
-rather than a shared one: they move by hundreds of volts with respect to one
-another during commutation, and merging them would be an error that ERC
-cannot detect.
+The name of a net starts with its voltage domain, so the name shows whether
+the net is at high voltage. The floating gate references of the six devices
+have six different names. They move by hundreds of volts relative to each
+other during commutation, so merging them would be an error that the
+electrical rule check cannot detect.
 
-The net classes follow the same rule: one class per domain. A first version
-had a single class for all gate domains and asked for
-\SI{4.5}{\milli\metre} between any two of its nets. That is wrong inside a
-domain: the gate and the Kelvin source of one device are the same domain and
-sit \SI{0.70}{\milli\metre} apart on the package. With one class per domain
-the clearance \emph{inside} a class is the manufacturing value, and the
-distances \emph{between} classes are set by the rules of the board.
+There is one net class per domain. Inside a class the clearance is the
+manufacturing minimum, because the gate and the Kelvin source of one device
+belong to the same domain and are only \SI{0.70}{\milli\metre} apart on the
+package. Between classes the rules of the board apply.
 
 \begin{table}[htbp]
 \centering
 \caption{Net classes of the power stage. Clearance and track width are the
-values inside the class; between classes the rules of the board apply.}
+values inside the class.}
 \label{tab:netclasses}
 \small
+\zebra
 \begin{tabularx}{\textwidth}{lYrr}
 \toprule
 Class & Nets & Clearance & Track \\
@@ -89,20 +88,18 @@ Class & Nets & Clearance & Track \\
 
 \section{Reference designators}
 
-References encode position in the hierarchy: the hundreds give the sheet, the
-tens the instance, the units the part within it. The high-side device of
-leg~2 is \texttt{Q121}, and the first commutation ceramic of leg~3 is
-\texttt{C131}. A reference read on the board therefore says where to look in
-the schematic, and the same part has the same last digit in every instance.
+The hundreds of a reference give the sheet, the tens the instance and the
+units the part. The high-side device of leg~2 is \texttt{Q121}, and the first
+commutation ceramic of leg~3 is \texttt{C131}. A reference on the board says
+where to look in the schematic, and a part has the same last digit in every
+instance.
 
 \section{Components of the power stage}
 
-\Cref{tab:components} lists every part of the module with the reason it was
-chosen. Giving each part a unique order code meant opening its datasheet, and
-for the commutation ceramics the datasheet contradicted an assumption of the
-preceding chapters: in C0G at \SI{1200}{\volt} the largest ceramic is
-\SI{47}{\nano\farad} in a 3640~\cite{kemet_kclink}, and the \SI{220}{\nano\farad}
-of the earlier estimate does not exist in that class.
+\Cref{tab:components} lists every part of the module with the reason for the
+choice. For the commutation ceramics the datasheet sets the value: in C0G
+at \SI{1200}{\volt} the largest ceramic is \SI{47}{\nano\farad} in a
+3640~\cite{kemet_kclink}.
 
 \begin{table}[htbp]
 \centering
@@ -110,6 +107,7 @@ of the earlier estimate does not exist in that class.
 \label{tab:components}
 \label{tab:captdecisions}
 \small
+\zebra
 \begin{tabularx}{\textwidth}{L{0.16\textwidth}L{0.2\textwidth}L{0.15\textwidth}Y}
 \toprule
 Function (quantity) & Part & Key values & Chosen because \\
@@ -122,55 +120,41 @@ DC-link film (2) & MKP1848 \SI{140}{} and \SI{60}{\micro\farad}, Vishay~\cite{vi
   & ripple \SI{2.86}{\volt} in the worst case against \SI{4}{\volt}; the \SI{1100}{\volt} class carries \SI{900}{\volt} up to a \SI{98}{\celsius} hotspot (\cref{sec:dclink}) \\
 Commutation ceramics (12, four per leg) & CKC33C473\-KEGACAUTO, KEMET~\cite{kemet_kclink}
   & \SI{47}{\nano\farad} C0G, \SI{1200}{\volt}, 3640
-  & \SI{188}{\nano\farad} per leg at \SI{75}{\percent} of the rating at \SI{900}{\volt}; \SI{6.25}{\milli\metre} between pads against \SI{2.80}{\milli\metre} of creepage; no bias loss \\
+  & \SI{188}{\nano\farad} per leg at \SI{75}{\percent} of the rating at \SI{900}{\volt}; \SI{6.25}{\milli\metre} between pads; no loss of capacitance with bias \\
 Phase shunts (3) & CSS2H-3920R-L500FE, Bourns
   & \SI{0.5}{\milli\ohm}, Kelvin
   & \SI{0.45}{\watt} at rated current, \SI{0.90}{\watt} stalled, terminals at most \SI{115}{\celsius} (\cref{sec:complife}) \\
 Insulating pad (one per leg) & aluminium nitride \SI{0.63}{\milli\metre} with phase-change interface
   & $\Rthcs \leq \SI{0.18}{\celsius\per\watt}$
-  & the interfaces, not the ceramic, set the value (\cref{sec:coolalt}) \\
+  & the interfaces set the value more than the ceramic (\cref{sec:coolalt}) \\
 Cooling rail (1) & six-port aluminium extrusion, \SI{10}{\litre\per\minute}
   & $R_\mathrm{eq} = \SI{0.069}{\celsius\per\watt}$
-  & the rail as first drawn, with two channels, reaches \SI{128.7}{\celsius} at locked rotor, beyond C1 (\cref{sec:cooling}) \\
+  & two plain channels reach \SI{128.7}{\celsius} at locked rotor, beyond C1 (\cref{sec:cooling}) \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 \section{Footprint of the power device}
 
-\begin{finding}{The package pitch is not the one initially assumed}
-The TO-247-4L pad spacing is \emph{not} the uniform \SI{5.45}{\milli\metre}
-of the three-lead TO-247. From the recommended pad layout of the device
-datasheet~\cite{wolfspeed_e3m0016} it is \SI{5.08}{\milli\metre} between pins 1
-and 2 and \SI{2.54}{\milli\metre} between the remaining pins, for a total
-span of \SI{10.16}{\milli\metre}.
-
-The consequence for insulation coordination is larger than a change of
-pitch, because the pitch is not the creepage. Pins 1 and 2 are the
-drain--source pair, and with pads \SI{1.84}{\milli\metre} wide on a
-\SI{5.08}{\milli\metre} pitch the copper-to-copper gap is
-\SI{3.24}{\milli\metre}: that, and not \SI{5.45}{\milli\metre}, is the
-worst-case creepage between high-voltage nodes on the board. The gate is
+The pad spacing of the TO-247-4L is not uniform~\cite{wolfspeed_e3m0016}:
+\begin{itemize}
+  \item \SI{5.08}{\milli\metre} between pins 1 and 2, the drain and the
+        source;
+  \item \SI{2.54}{\milli\metre} between the other pins;
+  \item \SI{10.16}{\milli\metre} in total.
+\end{itemize}
+The pads are \SI{1.84}{\milli\metre} wide, so the copper-to-copper gap between
+drain and source is \SI{3.24}{\milli\metre}. This is the shortest distance
+between two high-voltage nodes on the board. Criterion C3 asks for at least
+\SI{2.8}{\milli\metre} at \SI{900}{\volt} on a coated board
+(\cref{tab:criteria}), so the margin is \SI{16}{\percent}. The gate is
 \SI{10.16}{\milli\metre} from the drain and is not the critical pair.
-
-\SI{3.24}{\milli\metre} is \SI{2.8}{} times less than the
-\SI{9.00}{\milli\metre} that IEC 60664-1~\cite{iec60664} asks for at the
-\SI{900}{\volt} working voltage in pollution degree 2 on ordinary FR-4, and
-the package leaves no room to do better. Conformal coating brings the
-pollution degree to 1, where the requirement is \SI{2.80}{\milli\metre} and
-the same \SI{3.24}{\milli\metre} passes with \SI{16}{\percent} of margin. The full
-coordination, including the reinforced barrier and the two paths that this
-first pass missed, is in \cref{sec:insulation}.
-
-The lesson concerns method: a constraint that
-the package imposes on the \emph{process} was found by measuring the
-footprint, and would not have been found by reading the pitch.
-\end{finding}
+\Cref{sec:insulation} gives the other creepage distances of the board.
 
 \section{Schematic sheets}
 
 The two sheets of the module follow, one per page, in the order of
-\cref{tab:sheets}. Of the leg sheet one instance is shown, leg~1; the others
+\cref{tab:sheets}. Of the leg sheet one instance is shown, leg~1. The others
 differ only in their references.
 
 \newcommand{\foglio}[3]{%
