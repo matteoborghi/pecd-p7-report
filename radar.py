@@ -47,6 +47,21 @@ GRAFICI = {
             ("AIMZH120R020M1T", [4, 4, 1, 5, 2, 3]),
         ],
     },
+    "raffreddamento": {
+        "assi": ["margin at\\\\locked rotor", "margin in the\\\\worst case", "small\\\\volume",
+                 "sealed\\\\enclosure", "no extra\\\\coolant loop"],
+        "serie": [
+            # stesso passante AlN con interfaccia a cambio di fase, T_j a rotore bloccato / caso peggiore:
+            # liquido 97,9 / 117,8 degC; aria forzata un ventilatore 108,3 / 129,1 degC;
+            # convezione naturale 188 degC a rotore bloccato (pad prudente), fuori da ogni limite.
+            # volume: dissipatore ad aria circa dieci volte la barra; involucro chiuso: l'aria deve
+            # attraversare la scheda; anello liquido: gia' presente sul veicolo (tab. ipotesi) ma
+            # aria e convezione non ne hanno bisogno
+            ("liquid rail", [5, 5, 5, 5, 1]),
+            ("forced air", [4, 4, 2, 2, 5]),
+            ("natural convection", [1, 1, 1, 4, 5]),
+        ],
+    },
     "modulazione": {
         "assi": ["DC-link\\\\utilisation", "low switching\\\\loss", "low current\\\\ripple",
                  "low $T_\\mathrm{j}$ at\\\\locked rotor", "simple\\\\implementation"],
