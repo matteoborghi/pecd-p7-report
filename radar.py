@@ -47,6 +47,18 @@ GRAFICI = {
             ("AIMZH120R020M1T", [4, 4, 1, 5, 2, 3]),
         ],
     },
+    "modulazione": {
+        "assi": ["DC-link\\\\utilisation", "low switching\\\\loss", "low current\\\\ripple",
+                 "low $T_\\mathrm{j}$ at\\\\locked rotor", "simple\\\\implementation"],
+        "serie": [
+            # M_f massimo 0,500 / 0,577 / 0,577; commutazione -33 % con DPWM; ripple base / simile /
+            # peggiore (tab. modulazione); T_j a rotore bloccato 111,1 / 111,1 / 93,9 degC
+            # (con tensione d'uscita nulla SPWM e SVPWM coincidono); m0 costante / max e min / logica
+            ("SPWM", [3, 3, 4, 3, 5]),
+            ("SV-PWM", [5, 3, 4, 3, 4]),
+            ("DPWM", [5, 5, 2, 5, 2]),
+        ],
+    },
 }
 
 
