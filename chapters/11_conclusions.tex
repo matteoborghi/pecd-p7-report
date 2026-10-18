@@ -3,94 +3,95 @@
 
 The power stage of a three-phase two-level SiC inverter for \SI{800}{\volt},
 \SI{30}{\Arms} and \SI{20}{\kilo\hertz} has been designed, with its cooling
-and the schematic and layout of the module. This chapter sets the results
-against the brief, names what remains open, and says where the design would
-go next.
+and the schematic and layout of the module. This chapter compares the
+results with the brief, lists the open points and gives possible
+developments.
 
 \section{Results against the brief}
 
+\Cref{tab:results} tests every requirement of the brief and the device
+criteria of \cref{tab:criteria}.
+
 \begin{table}[htbp]
 \centering
-\caption{The design against the brief and against the device criteria of
-\cref{tab:criteria}.}
+\caption{The design against the brief and the device criteria.}
 \label{tab:results}
 \small
-\begin{tabularx}{\textwidth}{L{0.26\textwidth}YL{0.2\textwidth}}
+\zebra[2]
+\begin{tabularx}{\textwidth}{L{0.25\textwidth}YcL{0.12\textwidth}}
 \toprule
-Asked & Achieved & Where \\
+Requirement & Result & Test & Where \\
 \midrule
 \SI{800}{\volt}, \SI{30}{\Arms} at any power factor &
-  \SI{25.48}{\kilo\watt}, \SI{128.1}{\watt} of loss, efficiency \SI{99.50}{\percent} at the rated point;
-  \SIrange{127.5}{128.1}{\watt} for $\cos\varphi \leq 0.87$ and \SI{131.5}{\watt} at unity & \cref{ch:losses}, \cref{sec:pfsweep} \\
+  \SI{25.48}{\kilo\watt}, loss \SI{128.1}{\watt}, efficiency \SI{99.50}{\percent} at the rated point;
+  \SIrange{127.5}{128.0}{\watt} for $\cos\varphi \leq 0.95$ and \SI{131.4}{\watt} at unity &
+  \pass{PASS} & \cref{sec:anypf,sec:pfsweep} \\
 \SI{20}{\kilo\hertz} &
-  \SIrange{90.5}{166.1}{\watt} and $\Tj$ \SIrange{76.9}{86.8}{\celsius} over \SIrange{10}{30}{\kilo\hertz} &
-  \cref{ch:losses} \\
+  loss \SIrange{90.5}{166.1}{\watt} and $\Tj$ \SIrange{76.9}{86.8}{\celsius} over \SIrange{10}{30}{\kilo\hertz} &
+  \pass{PASS} & \cref{ch:losses} \\
 Negligible output current ripple &
-  \SI{2.46}{\ampere} peak-to-peak, \SI{0.84}{\percent} in RMS terms, with \SI{2.5}{\milli\henry} of load &
-  \cref{ch:modulation} \\
+  \SI{2.46}{\ampere} peak-to-peak, \SI{0.84}{\percent} RMS, with \SI{2.5}{\milli\henry} of load &
+  \pass{PASS} & \cref{ch:modulation} \\
 DC-link voltage ripple $< \SI{0.5}{\percent}$, worst case &
-  \SI{0.17}{\percent} at the rated point; \SI{2.86}{\volt}, \SI{0.36}{\percent}, in the worst case with \SI{200}{\micro\farad} &
-  \cref{sec:dclink}, \cref{ch:model} \\
-Forced air or liquid, \SI{50}{\celsius} ambient &
-  liquid, six-port rail and AlN pad: \SI{77.1}{\celsius} at the rated point, \SI{97.9}{\celsius} at locked rotor, \SI{117.8}{\celsius} with all tolerances, against \SI{150}{\celsius};
-  one fan with the same pad: \SI{108.3}{} and \SI{129.1}{\celsius} &
-  \cref{sec:cooling} \\
-\midrule
-C1, locked rotor $\leq \SI{120}{\celsius}$ & \SI{97.9}{\celsius} & \cref{sec:coolalt} \\
+  \SI{0.17}{\percent} at the rated point; \SI{0.36}{\percent} (\SI{2.86}{\volt}) in the worst case with \SI{200}{\micro\farad}; \SI{0.33}{\percent} at most over the power-factor sweep &
+  \pass{PASS} & \cref{sec:dclink,ch:model} \\
+Forced air or liquid cooling, \SI{50}{\celsius} ambient &
+  liquid, six-port rail and AlN pad: \SI{77.1}{\celsius} at the rated point, \SI{97.9}{\celsius} at locked rotor, \SI{117.8}{\celsius} with all tolerances, against \SI{150}{\celsius}; one fan with the same pad: \SI{108.3}{} and \SI{129.1}{\celsius} &
+  \pass{PASS} & \cref{sec:cooling} \\
+C1, locked rotor $\leq \SI{120}{\celsius}$ & \SI{97.9}{\celsius} & \pass{PASS} & \cref{sec:coolalt} \\
 C2, die $\leq \SI{1080}{\volt}$ at \SI{950}{\volt}, \SI{60}{\ampere} &
-  \SI{1073.5}{\volt} at the \SI{20}{\nano\henry} budget; \SI{1040}{\volt} with the loop extracted from the copper &
-  \cref{sec:kelvin}, \cref{sec:loopextract} \\
+  \SI{1073.5}{\volt} with the \SI{20}{\nano\henry} budget; \SI{1040}{\volt} with the loop extracted from the copper &
+  \pass{PASS} & \cref{sec:kelvin,sec:loopextract} \\
 C3, drain--source creepage at \SI{900}{\volt} &
-  \SI{3.24}{\milli\metre} against \SI{2.80}{\milli\metre} in PD1, with conformal coating &
-  \cref{sec:insulation} \\
-C4, automotive & power device AEC-Q101 qualified & \cref{sec:deviceselection} \\
-C5, declared $t_\mathrm{SC} \geq \SI{1.5}{\micro\second}$ & \textbf{open}: not declared by the manufacturer & \cref{app:assumptions}, A.3 \\
+  \SI{3.24}{\milli\metre} against \SI{2.80}{\milli\metre}, with conformal coating &
+  \pass{PASS} & \cref{sec:insulation} \\
+C4, automotive qualification & AEC-Q101 power device & \pass{PASS} & \cref{sec:deviceselection} \\
+C5, declared $t_\mathrm{SC} \geq \SI{1.5}{\micro\second}$ & not declared by the manufacturer & \aperto{OPEN} & \cref{app:assumptions}, A.3 \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-The brief is met wherever the design can show it, with one open point: the
-short-circuit withstand time, which the manufacturer does not declare and
-which no simulation can replace. The stalled motor, a requirement this
-design added, sizes the design. It decided the device and the pad, and it is
-met with \SI{22}{\celsius} of margin on the criterion once the heat path is
-designed rather than assumed.
+All the requirements pass except one open point: the short-circuit withstand
+time, which the manufacturer does not declare and no simulation can replace.
+The locked rotor sizes the design. It decided the device and the pad, and it
+passes with \SI{22}{\celsius} of margin on C1.
 
-\section{What remains open}
+\section{Open points}
 
-Three assumptions carry the thermal and the switching results, and each is
-listed in \cref{app:assumptions} with the way to close it. The case-to-sink
-resistance of the mounted pad (A.5) is the largest single uncertainty. The
-loop inductance (A.7) is extracted from the copper, not measured, and the
-gate resistance was chosen at \SI{20}{\nano\henry}, \SI{12}{\nano\henry}
-above the extracted value. The switching energies (A.4) come from the
-datasheet because the model underestimates them by a factor of 3.4 at turn-on.
+Three assumptions carry the thermal and the switching results. Each is in
+\cref{app:assumptions} with the way to close it:
+\begin{itemize}
+  \item the case-to-sink resistance of the mounted pad (A.5) is the largest
+        uncertainty;
+  \item the loop inductance (A.7) is extracted from the copper and not
+        measured. The gate resistance was chosen at \SI{20}{\nano\henry},
+        \SI{12}{\nano\henry} above the extracted value;
+  \item the switching energies (A.4) come from the datasheet, because the
+        SPICE model gives a turn-on energy 3.4 times lower.
+\end{itemize}
 
 \section{Possible developments}
 
-\paragraph{Discontinuous modulation at standstill.} Clamping the phase that
-carries the peak current to the positive rail lowers the hottest junction at
-locked rotor by about \SI{12}{\celsius} on the real rail with the adopted pad
-and the converter loss by a third (\cref{sec:lrdpwm}). It stays a
-recommendation to the controller (\cref{tab:sysassume}), because hardware is
-not sized on a control strategy the module cannot guarantee.
-
-\paragraph{Internally isolated packages.} A TO-247-4 with the ceramic inside,
-under the die, removes the external pad and one interface with the same
-footprint (\cref{sec:coolalt}). When one is offered at this resistance with
-automotive qualification it is the natural next step for the power devices.
-
-\paragraph{A power module.} The discrete TO-247-4L sets two ceilings. The
-first is inductance: \SI{14.6}{\nano\henry} of package contribution that no
-layout can remove (\cref{sec:kelvin}), which forces
-$R_{g,\mathrm{off}}$ to \SI{12.5}{\ohm} and makes switching more than half
-of the loss budget. The second is insulation: the \SI{5.08}{\milli\metre}
-lead pitch leaves \SI{3.24}{\milli\metre} of creepage between drain and
-source, which passes with \SI{16}{\percent} of margin only under conformal
-coating, and which IEC 60664-4~\cite{iec606644} would derate above
-\SI{30}{\kilo\hertz}, the upper end of the sweep of \cref{tab:sweep-fsw}. A
-power module with an integrated busbar lifts both ceilings together. The
-selection study of \cref{sec:deviceselection} found none that fits at
-\SI{30}{\Arms}: the small six-packs are industrial and run hot, and the
-automotive single-switch modules are meant to be sintered onto a cooler. At a
-few times the current a module would be the only answer.
+\begin{itemize}
+  \item Discontinuous modulation at standstill lowers the hottest junction
+        at locked rotor by about \SI{12}{\celsius} on the real rail, and the
+        converter loss by one third (\cref{sec:lrdpwm}). It stays a
+        recommendation to the controller (\cref{tab:sysassume}).
+  \item A TO-247-4 with the ceramic inside removes the external pad and one
+        interface (\cref{sec:coolalt}). It is the next step when one is
+        offered at this resistance with automotive qualification.
+  \item A power module with an integrated busbar would remove two limits of
+        the discrete package:
+        \begin{itemize}
+          \item the \SI{14.6}{\nano\henry} of package inductance
+                (\cref{sec:kelvin}), which forces
+                $R_{g,\mathrm{off}} = \SI{12.5}{\ohm}$ and makes switching
+                more than half of the losses;
+          \item the \SI{3.24}{\milli\metre} of creepage between drain and
+                source, which passes only with conformal coating.
+        \end{itemize}
+        The selection of \cref{sec:deviceselection} found no module that
+        fits at \SI{30}{\Arms}: the small six-packs are industrial and run
+        hot, and the automotive modules are meant to be sintered onto a
+        cooler. At a few times the current a module would be the only choice.
+\end{itemize}

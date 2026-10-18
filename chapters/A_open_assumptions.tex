@@ -1,59 +1,59 @@
 \chapter{Open assumptions}
 \label{app:assumptions}
 
-This appendix collects the quantities that are assumed rather than measured
-or read from a datasheet, in order of how much each would change the result,
-with what happens if it is wrong and what would close it.
+This appendix lists the quantities that are assumed and not measured or read
+from a datasheet. They are ordered by how much each one would change the
+result.
 
 {\small
 \setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.3}
+\zebra
 \begin{longtable}{L{0.05\textwidth}L{0.36\textwidth}L{0.30\textwidth}L{0.20\textwidth}}
 \caption{Assumptions of the power stage.}
 \label{tab:assumptions}\\
 \toprule
-No. & Assumption and value used & If it is wrong & Closed by \\
+No. & Assumption and value used & If it is wrong & To close it \\
 \midrule
 \endfirsthead
 \toprule
-No. & Assumption and value used & If it is wrong & Closed by \\
+No. & Assumption and value used & If it is wrong & To close it \\
 \midrule
 \endhead
-A.1 & Pollution degree 1, from conformal coating of the high-voltage area. The drain--source creepage on the package is \SI{3.24}{\milli\metre} against \SI{2.80}{\milli\metre} required in pollution degree 1.
-    & In pollution degree 2 the requirement is \SI{9.00}{\milli\metre} on ordinary FR-4 and the board is not buildable with this device: the answer is a different package, not a different layout. The design-rule check cannot see it.
-    & coating declared on the fabrication drawing \\
-A.2 & Rated impulse withstand \SI{2.5}{\kilo\volt}, derived from the transient the converter produces (\SI{1148}{\volt} at the die in the worst simulated case), not from an overvoltage category.
-    & The design passes at \SI{4}{\kilo\volt} with \SI{8}{\percent} of margin and fails at \SI{6}{\kilo\volt}, where clearance requires \SI{5.50}{\milli\metre}.
-    & the text of IEC 60664-1, which was not available; the values come from a calculator \\
-A.3 & Short-circuit withstand time: not declared by Wolfspeed. A class value for a \SI{16}{\milli\ohm} die of the same generation is \SI{2.9}{\micro\second} at \SI{800}{\volt} and \SI{2.4}{\micro\second} at \SI{950}{\volt}, at \SI{175}{\celsius} and $+\SI{15}{\volt}$.
-    & Criterion C5 (declared $t_\mathrm{SC} \geq \SI{1.5}{\micro\second}$) stays undemonstrated, and the desaturation protection, which closes in \SI{0.83}{\micro\second} worst case, would need a faster threshold.
-    & the manufacturer's written value, or a short-circuit test on a sacrificial device \\
+A.1 & Pollution degree 1, from conformal coating of the high-voltage area. The drain--source creepage is \SI{3.24}{\milli\metre} against \SI{2.80}{\milli\metre} required.
+    & In pollution degree 2 the requirement is \SI{9.00}{\milli\metre} and the board cannot be built with this device. A different package would be needed, not a different layout.
+    & coating written on the fabrication drawing \\
+A.2 & Impulse withstand of \SI{2.5}{\kilo\volt}, from the transient of the converter (\SI{1148}{\volt} at the die in the worst simulated case).
+    & The design passes up to \SI{4}{\kilo\volt} and fails at \SI{6}{\kilo\volt}.
+    & the text of IEC 60664-1; the values come from a calculator \\
+A.3 & Short-circuit withstand time: not declared by Wolfspeed. A device of the same class has \SI{2.9}{\micro\second} at \SI{800}{\volt} and \SI{2.4}{\micro\second} at \SI{950}{\volt}.
+    & Criterion C5 ($t_\mathrm{SC} \geq \SI{1.5}{\micro\second}$) stays open. The desaturation protection closes in \SI{0.83}{\micro\second} in the worst case.
+    & the written value of the manufacturer, or a short-circuit test on a spare device \\
 A.4 & Switching energy from the datasheet. At the datasheet point the SPICE model gives $E_\mathrm{on} = \SI{748}{\micro\joule}$ against \SI{2552}{\micro\joule} measured, and $E_\mathrm{off} = \SI{509}{}$ against \SI{788}{\micro\joule}.
-    & If the model is right the thermal budget improves considerably. The overshoot results do not depend on it.
-    & a double pulse at the datasheet point \\
-A.5 & Case-to-sink resistance $\Rthcs = \SI{0.18}{\celsius\per\watt}$ design value (aluminium nitride with a phase-change interface), \SI{0.50}{\celsius\per\watt} at most.
-    & The largest single uncertainty: each tenth of a \si{\celsius\per\watt} costs about \SI{7}{\celsius} at locked rotor (\cref{sec:lockedrotor}), and above \SI{0.50}{\celsius\per\watt} C1 is lost on the rail.
+    & If the model is right, the thermal budget is better. The overshoot results do not depend on it.
+    & a double-pulse test at the datasheet point \\
+A.5 & Case-to-sink resistance $\Rthcs = \SI{0.18}{\celsius\per\watt}$ (aluminium nitride with a phase-change interface), \SI{0.50}{\celsius\per\watt} at most.
+    & Each \SI{0.1}{\celsius\per\watt} costs about \SI{7}{\celsius} at locked rotor (\cref{sec:lockedrotor}). Above \SI{0.50}{\celsius\per\watt} C1 is lost on the rail.
     & the resistance of a mounted sample at the specified clip force \\
-A.6 & Pad material group I, which needs CTI $\geq \SI{600}{\volt}$ on the ceramic's datasheet. Aluminium nitride and alumina do not track, but it is not confirmed on a specific part.
-    & Group II takes a free-standing pad from \SI{33}{}$\times$\SI{37}{} to \SI{41}{}$\times$\SI{45}{\milli\metre}; on the rail it means raising the rail further.
+A.6 & Pad material group I (CTI $\geq \SI{600}{\volt}$). Aluminium nitride and alumina do not track, but this is not confirmed on a specific part.
+    & With group II the pad grows from \SI{33}{}$\times$\SI{37}{} to \SI{41}{}$\times$\SI{45}{\milli\metre}.
     & the datasheet of the pad \\
-A.7 & PCB-attributable loop inductance of \SI{20}{\nano\henry} is a design input: the gate resistances were chosen at that value. Extracted from the copper: \SI{7.8}{\nano\henry}, about \SI{8.3}{\nano\henry} with the capacitor ESL; the packages add \SI{14.6}{\nano\henry}.
-    & C2 fails at \SI{22.6}{\nano\henry} at turn-off and \SI{23.6}{\nano\henry} on recovery; above that both gate resistors, the losses and the locked-rotor result have to be recomputed.
-    & the extraction (done) and a measurement on the board \\
-A.8 & Conductor widths from the IPC-2221B closed form at \SI{30}{\kelvin} of rise: \SI{10.4}{\milli\metre} for the \SI{35}{\ampere} bus, \SI{8.4}{\milli\metre} for the phases. The IPC-2152 charts were not available.
-    & The closed form is conservative. On a board at \SI{67}{}--\SI{85}{\celsius} the copper reaches about \SI{115}{\celsius}.
-    & the IPC-2152 charts; a thermal test of the board \\
-A.9 & Coolant at \SI{65}{\celsius} at the rail inlet, not given by the brief (ambient \SI{50}{\celsius}).
-    & At \SI{70}{\celsius} the locked-rotor junction rises by about \SI{6}{\celsius}; with every tolerance stacked the rail reaches \SI{117.8}{\celsius} (\cref{tab:coolalt}).
+A.7 & Loop inductance on the PCB of \SI{20}{\nano\henry}, a design input. Extracted from the copper: \SI{7.8}{\nano\henry}, about \SI{8.3}{\nano\henry} with the capacitor ESL. The packages add \SI{14.6}{\nano\henry}.
+    & C2 fails at \SI{22.6}{\nano\henry} at turn-off and \SI{23.6}{\nano\henry} at recovery. Above that, the gate resistors, the losses and the locked-rotor result must be computed again.
+    & a measurement on the board \\
+A.8 & Conductor widths from the IPC-2221B formula at \SI{30}{\kelvin} of rise: \SI{10.4}{\milli\metre} for the \SI{35}{\ampere} bus and \SI{8.4}{\milli\metre} for the phases.
+    & The formula is conservative. On a board at \SI{67}{}--\SI{85}{\celsius} the copper reaches about \SI{115}{\celsius}.
+    & the IPC-2152 charts, or a thermal test of the board \\
+A.9 & Coolant at \SI{65}{\celsius} at the rail inlet. The brief gives only the ambient, \SI{50}{\celsius}.
+    & At \SI{70}{\celsius} the junction at locked rotor rises by about \SI{6}{\celsius}. With all tolerances the rail reaches \SI{117.8}{\celsius} (\cref{tab:coolalt}).
     & a requirement on the vehicle cooling loop (\cref{tab:sysassume}) \\
-A.10 & Maximum continuous bus voltage \SI{900}{\volt}, including charging and regenerative braking.
-    & Creepage, device derating, the voltage class of the film and the divider are all sized at \SI{900}{\volt}; a pack that sits above it for long enough to count as continuous is outside the design.
+A.10 & Maximum continuous bus voltage of \SI{900}{\volt}, including charging and regenerative braking.
+    & Creepage, device derating and the voltage class of the film are sized at \SI{900}{\volt}. A battery above it for long periods is outside the design.
     & a requirement on the battery (\cref{tab:sysassume}) \\
-A.11 & Cold-plate heat capacity \SI{1000}{\joule\per\kelvin}, from geometry. The plate resistance of \SI{0.01}{\celsius\per\watt} is replaced by the rail drawn in \cref{sec:cooling}.
-    & It affects only the transient: every steady-state temperature is independent of it.
+A.11 & Heat capacity of the cold plate of \SI{1000}{\joule\per\kelvin}, from the geometry.
+    & It changes only the transient. The steady-state temperatures do not depend on it.
     & the warm-up of the rail \\
 A.12 & Load: a passive $RL$ branch of \SI{2.5}{\milli\henry}.
-    & With a permanent-magnet machine the back-EMF can feed the DC-link with all devices off, and the safe state would be an active short circuit, the opposite of turning everything off.
+    & With a permanent-magnet machine the back-EMF can feed the DC-link with all devices off, and the safe state would be an active short circuit.
     & machine data \\
 \bottomrule
 \end{longtable}

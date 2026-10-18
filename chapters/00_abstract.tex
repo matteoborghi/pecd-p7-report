@@ -1,44 +1,32 @@
-This report documents the design of the power stage of a three-phase
-two-level voltage-source inverter for an automotive traction application:
-\SI{800}{\volt} on the DC-link, \SI{30}{\Arms} per phase at any load power
-factor, \SI{20}{\kilo\hertz} switching frequency, and forced-air or liquid
-cooling with a maximum ambient of \SI{50}{\celsius}. The device is the
-Wolfspeed \device{} silicon-carbide MOSFET~\cite{wolfspeed_e3m0016}, selected
-against seven alternatives (other device classes, a paralleled pair, a
-top-side-cooled package and a module) on criteria fixed before any result was
-computed.
+This report designs the power stage of a three-phase two-level voltage-source
+inverter for an electric vehicle. The requirements are:
+\begin{itemize}
+  \item \SI{800}{\volt} on the DC-link;
+  \item \SI{30}{\Arms} per phase at any load power factor;
+  \item \SI{20}{\kilo\hertz} switching frequency;
+  \item DC-link voltage ripple below \SI{0.5}{\percent};
+  \item forced-air or liquid cooling, with a maximum ambient of \SI{50}{\celsius}.
+\end{itemize}
+The device is the Wolfspeed \device{} silicon-carbide MOSFET~\cite{wolfspeed_e3m0016}.
+It was selected among several candidates with five pass/fail criteria that
+were fixed before any result was computed.
 
-The work covers the design equations (operating point, DC-link capacitor,
-modulation, dead time), a circuit-level PLECS model validated against
-closed-form results, a SPICE study of the switching cell that fixes the gate
-resistances, the loss and thermal budget, and the schematic and layout of the
-power stage as a module of a larger board.
+The design uses the formulas of the course for the device currents, the
+DC-link capacitor and the losses. A PLECS model checks them, and a SPICE
+model of one switching cell sets the gate resistances. The thermal design
+and the schematic and layout of the power stage close the work.
 
-At the design point the converter delivers \SI{25.48}{\kilo\watt} of active
-power and dissipates \SI{128.1}{\watt}, an efficiency of \SI{99.50}{\percent},
-with a current ripple of \SI{0.84}{\percent} in RMS terms. The DC-link of
-\SI{200}{\micro\farad} keeps the voltage ripple at \SI{0.17}{\percent} at the
-rated point and at \SI{0.36}{\percent} in the worst operating condition,
-against \SI{0.5}{\percent}. The junction settles at \SI{81.8}{\celsius}. The
-design is sized by the stalled motor, a case this design adds to the brief:
-with the full \SI{42.4}{\ampere} peak flowing as direct current through one
-device, the junction reaches \SI{111.1}{\celsius} on an ideal cold plate
-against a \SI{120}{\celsius} design criterion. On a real liquid-cooled rail,
-computed in three dimensions, the criterion is met only after the insulating
-interface is redesigned: with aluminium nitride and a phase-change material
-the hottest junction reaches \SI{97.9}{\celsius}, and \SI{117.8}{\celsius}
-with every tolerance stacked.
+At the rated point the converter delivers \SI{25.48}{\kilo\watt} and
+dissipates \SI{128.1}{\watt}, an efficiency of \SI{99.50}{\percent}. The
+output current ripple is \SI{0.84}{\percent} (RMS). The DC-link of
+\SI{200}{\micro\farad} gives a voltage ripple of \SI{0.17}{\percent} at the
+rated point and \SI{0.36}{\percent} in the worst case. The losses are
+\SIrange{127.5}{131.4}{\watt} for every power factor, and the junction is at
+\SI{81.8}{\celsius}.
 
-Four findings would each have produced a wrong report had they gone
-unnoticed. The device first used was industrial rather than automotive and,
-at locked rotor, twenty degrees beyond the criterion; the selection that
-replaced it was decided by overvoltage at the die, not by temperature. The
-first double-pulse bench measured a DC bus that was still charging, which hid
-nearly \SI{70}{\volt} of overshoot; with the real bus the turn-off gate
-resistance had to rise from \SI{5}{} to \SI{12.5}{\ohm}, and switching became
-more than half of the loss budget. The vendor loss tables refer to the
-body-diode free-wheeling case, while the library folder name suggests the
-external-diode case: a factor of 2.0 on the turn-on energy. And the largest
-thermal unknown is the insulating pad between the case and the cold plate,
-more precisely its two interfaces, which on the real rail decide more of the
-junction temperature than the coolant does.
+The design is sized by an extra case, the locked rotor, where the full
+\SI{42.4}{\ampere} peak flows as direct current in one device. With a liquid
+rail of six ports, an aluminium nitride pad and a phase-change interface the
+hottest junction reaches \SI{97.9}{\celsius}, and \SI{117.8}{\celsius} with
+all tolerances, against a limit of \SI{150}{\celsius}. One criterion remains
+open: the manufacturer does not declare the short-circuit withstand time.
