@@ -148,6 +148,20 @@
 \definecolor{farancio}{HTML}{D55E00}
 \definecolor{fverde}{HTML}{009E73}
 \definecolor{fgrigio}{HTML}{777777}
+
+% --- tabelle leggibili (revisione del 18/10/2026) --------------------------
+% Le righe alterne colorate (colortbl) non funzionano su questo MiKTeX:
+% colortbl 2026 chiede un array.sty piu' recente del 2023 installato, lo
+% stesso problema di siunitx. Si distinguono quindi le righe con un filetto
+% sottile (\hl a fine riga) e un po' piu' di aria (\zebra); gli esiti PASS e
+% FAIL sono etichette colorate dentro la cella.
+\newcommand{\zebra}{\renewcommand{\arraystretch}{1.18}}
+\newcommand{\hl}{\specialrule{0.1pt}{1pt}{1pt}}
+\newcommand{\esito}[2]{{\setlength{\fboxsep}{1.5pt}\colorbox{#1}{\strut #2}}}
+\newcommand{\pass}[1]{\esito{fverde!28}{#1}}
+\newcommand{\fail}[1]{\esito{farancio!28}{#1}}
+\newcommand{\aperto}[1]{\esito{yellow!45}{#1}}
+\newcommand{\nd}{\esito{black!8}{--}}
 \usepackage{listings}
 \lstset{
   basicstyle=\ttfamily\footnotesize,
