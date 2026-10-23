@@ -5,35 +5,48 @@
 
 The converter is modelled in PLECS~\cite{plecs}. The model contains:
 \begin{itemize}
-  \item three half-bridge modules on a common heat sink;
+  \item three half-bridges with the thermal description of the \device{};
   \item the \SI{200}{\micro\farad} DC-link with its ESR;
   \item a \SI{5}{\micro\henry} source inductance for the battery cables;
-  \item an $RL$ load per phase;
-  \item the modulator of \cref{ch:modulation}.
+  \item an $RL$ load per phase, with a series voltage source when the load
+        must return power (\cref{sec:pfsweep});
+  \item the modulator of \cref{ch:modulation};
+  \item the thermal network of \cref{ch:thermal}: each MOSFET has its own
+        junction-to-case network and its own pad, and the six devices share
+        the cold plate.
 \end{itemize}
-The devices use the vendor thermal description~\cite{wolfspeed_plecs}. It
-gives the conduction and switching losses as tables of current, voltage and
-junction temperature. It scales the switching energy with the gate
-resistance. The model passes it the design values, \SI{5}{\ohm} at turn-on
-and \SI{12.5}{\ohm} at turn-off.
+The thermal description of the vendor~\cite{wolfspeed_plecs} gives the
+conduction and switching losses as tables of current, voltage and junction
+temperature. It scales the switching energy with the gate resistance. The
+model uses the design values, \SI{5}{\ohm} at turn-on and \SI{12.5}{\ohm} at
+turn-off.
 
-For the \device{} the vendor gives the description in the older two-file
-format (MOSFET and body diode), while the model uses the newer single-file
-format. A script converts one into the other. It was tested on the
-C3M0040120K, which exists in both formats: all \num{579} table values of the
-conversion equal the vendor's own single file.
+\section{Steady-state analysis}
+\label{sec:ssanalysis}
 
-All simulations run from Python through the PLECS XML-RPC interface. Every
-figure and number of this report can be reproduced with one command.
+All the thermal results of this report come from the steady-state analysis
+of PLECS. The analysis searches directly for the periodic solution of the
+whole model, electrical and thermal, instead of simulating the slow warm-up
+of the cold plate. The losses are evaluated at the junction temperatures of
+that solution, so the loop between losses and temperature is closed inside
+the model. Two settings matter:
+\begin{itemize}
+  \item the period of the analysis is the period of the output,
+        $1/f_\mathrm{ref}$, because the model is periodic only over a whole
+        output period. With the switching period $1/\fsw$ the analysis
+        returns a wrong result (about \SI{2}{\watt} of total loss);
+  \item at locked rotor the output frequency is zero and the model is
+        periodic over one switching period, $1/\fsw$.
+\end{itemize}
+\Cref{sec:validation} checks the analysis against a time-domain method.
 
 \section{Spectra}
 
-PLECS uses a variable time step, so its output is not uniformly sampled. For
-the spectra the solver is asked for a uniform grid that covers a whole number
-of output periods. The fundamental then falls exactly on one bin and no
-window is needed.
+For the spectra the waveforms are taken on a uniform time grid that covers a
+whole number of output periods. The fundamental then falls exactly on one
+bin and no window is needed.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{plecs_07_spettri_fft.pdf}
 \caption{Spectra of the phase voltage $v_{1N}$ and of the phase current
@@ -58,10 +71,8 @@ the load inductance filters the voltage harmonics.
 \label{sec:losstables}
 
 The losses of \cref{ch:losses} come from the vendor tables, so the tables
-are checked against the datasheet. The vendor library has the same device in
-two folders: a pair of files (\texttt{MOSFET} and \texttt{Diode}) and a
-single file of class \texttt{MOSFET with Diode}. The datasheet gives two
-switching energies at the test point (\SI{800}{\volt}, \SI{80.28}{\ampere},
+are checked against the datasheet. The datasheet gives two switching
+energies at the test point (\SI{800}{\volt}, \SI{80.28}{\ampere},
 \SI{175}{\celsius}, \SI{2.5}{\ohm}):
 \begin{itemize}
   \item free-wheeling through an external SiC diode: $\Eon = \SI{1287}{\micro\joule}$;
@@ -70,15 +81,15 @@ switching energies at the test point (\SI{800}{\volt}, \SI{80.28}{\ampere},
 This design has no external diode, so only the second case applies.
 \Cref{tab:losstable-check} compares the table entries with both cases.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Vendor table entries against the two datasheet
 cases~\cite{wolfspeed_e3m0016,wolfspeed_plecs}.}
 \label{tab:losstable-check}
 \zebra
-\begin{tabular}{lrrrl}
+\begin{tabular}{lcccl}
 \toprule
-Quantity & XML table & SiC diode & Body diode & Matches \\
+Quantity & Vendor table & SiC diode & Body diode & Matches \\
 \midrule
 $\Eon$  & \SI{2545.8}{\micro\joule} & \SI{1287}{\micro\joule} & \SI{2552}{\micro\joule} & body diode \\
 $\Eoff$ & \SI{784.7}{\micro\joule}  & \SI{805}{\micro\joule}  & \SI{788}{\micro\joule}  & body diode \\
@@ -87,47 +98,59 @@ $\Eoff$ & \SI{784.7}{\micro\joule}  & \SI{805}{\micro\joule}  & \SI{788}{\micro\
 \end{table}
 
 The tables match the body-diode case within \SI{0.24}{\percent} on $\Eon$
-and \SI{0.41}{\percent} on $\Eoff$. The name \texttt{MOSFET with Diode}
-means a MOSFET modelled together with its own body diode. The tables can
-therefore be used without correction.
+and \SI{0.41}{\percent} on $\Eoff$, so they can be used without correction.
 
-\section{Validation against the formulas}
+\section{Validation}
 \label{sec:validation}
-
-Four checks compare the model with the analytical results.
 
 \subsection{DC-link capacitor current}
 
-The model is run at exactly \SI{30}{\Arms} for eight power factors, with
-the modulation amplitude of \SI{427}{\volt}. \Cref{tab:ic-check} compares
-the capacitor current with \cref{eq:icrms}.
+\Cref{tab:ic-check} compares the simulated capacitor current with
+\cref{eq:icrms}, at exactly \SI{30}{\Arms} and from motoring to regeneration.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{DC-link capacitor RMS current at \SI{30}{\Arms}: simulation and
-\cref{eq:icrms}.}
+\cref{eq:icrms} at the $M_f$ of each run. Upper block: motoring, time-domain
+simulation; lower block: regeneration, steady-state analysis.}
 \label{tab:ic-check}
 \zebra
-\begin{tabular}{rrrr}
+\begin{tabular}{lccc}
 \toprule
 $\cos\varphi$ & Simulated [\si{\ampere}] & Formula [\si{\ampere}] & Difference \\
 \midrule
 0.02 & 16.28 & 16.28 & \SI{0.0}{\percent} \\
-0.10 & 16.25 & 16.24 & \SI{0.1}{\percent} \\
+0.10 & 16.25 & 16.24 & \SI{0.0}{\percent} \\
 0.30 & 16.01 & 16.01 & \SI{0.0}{\percent} \\
 0.50 & 15.56 & 15.53 & \SI{0.2}{\percent} \\
 0.70 & 14.89 & 14.79 & \SI{0.7}{\percent} \\
-0.87 & 14.15 & 13.91 & \SI{1.7}{\percent} \\
+0.87 & 14.15 & 13.91 & \SI{1.8}{\percent} \\
 0.95 & 13.74 & 13.40 & \SI{2.5}{\percent} \\
-1.00 & 14.47 & 12.67 & \SI{14}{\percent} \\
+1.00 & 14.47 & 12.67 & \SI{14.2}{\percent} \\
+\midrule
+$-0.02$ & 16.92 & 16.27 & \SI{+4.0}{\percent} \\
+$-0.10$ & 16.89 & 16.25 & \SI{+4.0}{\percent} \\
+$-0.30$ & 16.64 & 16.01 & \SI{+3.9}{\percent} \\
+$-0.50$ & 16.04 & 15.53 & \SI{+3.3}{\percent} \\
+$-0.70$ & 15.09 & 14.78 & \SI{+2.1}{\percent} \\
+$-0.87$ & 13.90 & 13.91 & \SI{0.0}{\percent} \\
+$-0.95$ & 13.20 & 13.40 & \SI{-1.5}{\percent} \\
+$-1.00$ & 12.72 & 13.05 & \SI{-2.5}{\percent} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The agreement is within \SI{2.5}{\percent} up to $\cos\varphi = 0.95$. At
-$\cos\varphi = 1$ the difference is larger. The load at this point has only
-\SI{0.1}{\milli\henry}, so the output current has a large ripple. The
-formula of the course assumes a negligible ripple.
+The results are:
+\begin{itemize}
+  \item in motoring (time-domain simulation) the agreement is within
+        \SI{2.5}{\percent} up to $\cos\varphi = 0.95$. At $\cos\varphi = 1$ the $RL$
+        load has only \SI{0.1}{\milli\henry}, so the output current has a large
+        ripple, and the formula assumes a negligible ripple;
+  \item in regeneration (steady-state analysis, load with a series voltage
+        source) the agreement is within \SI{4.0}{\percent}. The capacitor current
+        depends on $\cos^2\varphi$, so regeneration gives the same current as
+        motoring at the same $|\cos\varphi|$, as \cref{eq:icrms} predicts.
+\end{itemize}
 
 At the worst case of \cref{sec:dclink} ($\cos\varphi = 1$, $M_f = 0.306$) the
 formula gives \SI{19.49}{\ampere}. The model with the \SI{5}{\micro\henry}
@@ -135,53 +158,60 @@ source gives about \SI{19.9}{\ampere}.
 
 \subsection{Switching loss against frequency}
 
-The switching loss must be linear in $\fsw$ and zero at $\fsw = 0$. A sweep
-from \SI{10}{} to \SI{30}{\kilo\hertz} gives \SI{596.5}{\micro\joule} per
-device and per cycle, with $R^2 = \num{1.0000}$ and an intercept of
-\SI{-1.01}{\watt}.
+The switching loss must be linear in $\fsw$ and zero at $\fsw = 0$. The
+steady-state sweep of \cref{tab:sweep-fsw} gives \SI{597}{\micro\joule} per
+device and per cycle, with an intercept of \SI{-0.9}{\watt}
+(\cref{fig:perdite-fsw}).
 
 \subsection{Conduction loss}
 
-The conduction loss was recomputed in Python. The script integrates the
-vendor voltage-drop tables over a sinusoidal current of \SI{30.006}{\Arms},
-at the junction temperature of the thermal loop, \SI{81.84}{\celsius}:
+The conduction loss was recomputed independently by integrating the vendor
+voltage-drop tables over a sinusoidal current of \SI{30.006}{\Arms}, at the
+junction temperature of \SI{81.84}{\celsius}:
 \begin{itemize}
   \item channels: \SI{54.56}{\watt};
   \item extra loss in the dead time (\cref{eq:deadtime-loss}): \SI{3.21}{\watt};
-  \item total: \SI{57.77}{\watt}, against \SI{57.64}{\watt} from PLECS
-        (\SI{0.23}{\percent}).
+  \item total: \SI{57.77}{\watt}, against \SI{57.64}{\watt} from a
+        time-domain simulation at the same temperature (\SI{0.23}{\percent}).
 \end{itemize}
-The same tables are used in \cref{ch:thermal,ch:losses} for the estimates
-made outside PLECS.
 
-\subsection{Steady-state analysis of PLECS}
+\subsection{Steady-state analysis against a time-domain method}
 
-The thermal results of this report come from time-domain runs. The case
-temperature is iterated until losses and temperature agree. PLECS also has a
-steady-state analysis, as the brief suggests. It finds the periodic solution
-directly and is a second method. The period to give is $1/f_\mathrm{ref}$,
-the period of the output, not $1/\fsw$. With $1/\fsw$ the analysis returned
-\SI{2}{\watt} of total loss.
+The steady-state results were checked with a second method in the time
+domain. The case temperature is imposed as a boundary, the simulation runs
+until the losses settle, and the boundary is corrected until losses and
+temperatures agree. \Cref{tab:ss-check} compares the two methods.
 
-With the correct period, the final model gives:
-\begin{itemize}
-  \item steady-state analysis: \SI{128.52}{\watt} and $\Tj = \SI{81.89}{\celsius}$;
-  \item time-domain method: \SI{128.09}{\watt} and $\Tj = \SI{81.84}{\celsius}$.
-\end{itemize}
-The difference is \SI{0.33}{\percent} on the loss and \SI{0.05}{\celsius}
-on the junction. Over the whole sweep of $\Rthcs$ of \cref{ch:thermal}, from
-\SI{0.2}{} to \SI{1.2}{\celsius\per\watt}, the two methods agree within
-\SI{0.35}{\percent} and \SI{0.12}{\celsius}.
+\begin{table}[H]
+\centering
+\caption{Steady-state analysis against the time-domain method,
+$\Rthcs = \SI{0.5}{\celsius\per\watt}$, ideal cold plate.}
+\label{tab:ss-check}
+\zebra
+\begin{tabular}{lccc}
+\toprule
+Quantity & Steady state & Time domain & Difference \\
+\midrule
+Rated point, $P_\mathrm{tot}$ & \SI{128.52}{\watt} & \SI{128.09}{\watt} & \SI{0.34}{\percent} \\
+Rated point, $\Tj$ & \SI{81.89}{\celsius} & \SI{81.84}{\celsius} & \SI{0.05}{\celsius} \\
+Locked rotor, $\Tj$ of A1 & \SI{111.04}{\celsius} & \SI{111.05}{\celsius} & \SI{0.01}{\celsius} \\
+Locked rotor, $P_\mathrm{tot}$ & \SI{136.67}{\watt} & \SI{140.97}{\watt} & \SI{-3.1}{\percent} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-The steady-state analysis has one limit. It uses one case resistance shared
-by the six devices, which is correct at the rated point because their losses
-are equal. At locked rotor it gives \SI{90.6}{\celsius} for the hottest
-junction, against \SI{111.1}{\celsius} with one resistance per device
-(\cref{sec:lockedrotor}). Locked rotor therefore uses the per-device method.
+The two methods agree on every temperature. Over the whole sweep of $\Rthcs$
+from \SI{0.2}{} to \SI{1.2}{\celsius\per\watt} they agree within
+\SI{0.35}{\percent} on the loss and \SI{0.12}{\celsius} on the junction.
+The only difference is the total loss at locked rotor. The time-domain
+method imposes the case temperature of the hottest device on all six
+devices, so it evaluates the five cooler ones too hot. The steady-state
+analysis gives each device its own temperature, so its total is the correct
+one.
 
 \section{DC-link ripple}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{plecs_04_ripple_dc_link.pdf}
 \caption{DC-link voltage ripple at the rated point, with the

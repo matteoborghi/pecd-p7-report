@@ -1,10 +1,10 @@
 \chapter{Thermal design}
 \label{ch:thermal}
 
-\section{The thermal chain}
+\section{Thermal chain and model}
 
-The heat of each device crosses three thermal resistances in series, as in
-the course. The junction temperature is
+The heat of each device crosses three thermal resistances in series
+(\cref{fig:thermalnet}). With equal losses the junction temperature is
 %
 \begin{equation}
   \Tj = T_\mathrm{liq}
@@ -21,81 +21,97 @@ where:
         cold plate;
   \item $\Rthjc$ is the resistance from junction to case.
 \end{itemize}
-The last two carry the loss of one device, that is $P_\mathrm{tot}/6$.
+The last two carry the loss of one device.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \input{figures/tikz/rete_termica}
 \caption{\Cref{eq:thermal-chain} as a network. The losses are current sources
 and the temperatures are potentials. Each device has its own path through
-the case and the pad. The six paths meet at the heat sink.}
+the case and the pad. The six paths meet at the cold plate.}
 \label{fig:thermalnet}
 \end{figure}
 
-\begin{table}[htbp]
+The PLECS model has the same network (\cref{sec:ssanalysis}). The thermal
+description of each MOSFET contains the four elements of the vendor Cauer
+network and one more element for its own pad. The common heat sink of the
+model is the cold plate, connected to the coolant through $\Rthha$. The
+steady-state analysis then gives the temperature of every junction, also
+when the six losses are different. \Cref{tab:thermal-chain} gives the chain
+at the rated point.
+
+\begin{table}[H]
 \centering
-\caption{Thermal chain at the design point.}
+\caption{Thermal chain at the design point, steady-state analysis
+($P_\mathrm{tot} = \SI{128.52}{\watt}$, ideal cold plate).}
 \label{tab:thermal-chain}
 \zebra
-\begin{tabular}{llrr}
+\begin{tabular}{llcc}
 \toprule
 Node & Resistance & Value & Temperature \\
 \midrule
 Coolant   & ---      & ---                              & \SI{65.00}{\celsius} \\
-Cold plate & $\Rthha$ & \SI{0.01}{\celsius\per\watt}     & \SI{66.28}{\celsius} \\
-Case      & $\Rthcs$ & \SI{0.50}{\celsius\per\watt}     & \SI{76.96}{\celsius} \\
-Junction  & $\Rthjc$ & \SI{0.22864}{\celsius\per\watt}  & \textbf{\SI{81.84}{\celsius}} \\
-Limit & & & \SI{150}{\celsius} \\
-\textbf{Margin} & & & \textbf{\SI{68.16}{\celsius}} \\
+Cold plate & $\Rthha$ & \SI{0.01}{\celsius\per\watt}     & \SI{66.29}{\celsius} \\
+Case      & $\Rthcs$ & \SI{0.50}{\celsius\per\watt}     & \SI{77.00}{\celsius} \\
+\scelta Junction  & $\Rthjc$ & \SI{0.22864}{\celsius\per\watt}  & \SI{81.89}{\celsius} \\
+Margin to the \SI{150}{\celsius} limit & & & \SI{68.11}{\celsius} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The value of $\Rthjc$ is the sum of the four elements of the Cauer network
-in the vendor thermal description:
-$0.024544 + 0.077043 + 0.040982 + 0.086066 = \SI{0.22864}{\celsius\per\watt}$.
-It agrees with the typical datasheet value of
-\SI{0.23}{\celsius\per\watt}~\cite{wolfspeed_e3m0016}. The datasheet maximum is
-\SI{0.31}{\celsius\per\watt}. It adds \SI{1.7}{\celsius} at the rated point
-and \SI{5}{\celsius} at locked rotor. This is part of the \SI{30}{\celsius}
-allowance of criterion C1 (\cref{tab:criteria}).
-
-The division of the loss by six holds because the three phases are equal
-apart from a \SI{120}{\degree} shift, and the high-side and low-side devices
-of a leg exchange roles every half output period. It does not hold at zero
-output frequency, which is treated in \cref{sec:lockedrotor}.
+The value of $\Rthjc$ is the sum of the four elements of the vendor Cauer
+network: $0.024544 + 0.077043 + 0.040982 + 0.086066 =
+\SI{0.22864}{\celsius\per\watt}$. It agrees with the typical datasheet value
+of \SI{0.23}{\celsius\per\watt}~\cite{wolfspeed_e3m0016}. The datasheet
+maximum is \SI{0.31}{\celsius\per\watt}, and \cref{sec:worstcase} uses it.
 
 \section{Loop between losses and temperature}
 
-The losses depend on the temperature and the temperature depends on the
-losses. The operating point is therefore the solution of
-\cref{eq:thermal-chain} with the loss taken at the junction temperature. The
-sweep of the pad resistance below gives
+The losses depend on the temperature, because $\Rdson$ rises with it, and the
+temperature depends on the losses. The steady-state analysis solves both at
+once. The sweep of the pad below gives the strength of this loop:
 %
 \begin{equation}
-  \frac{\mathrm{d}P_\mathrm{tot}}{\mathrm{d}\Tj} = \SI{0.392}{\watt\per\celsius},
+  \frac{\mathrm{d}P_\mathrm{tot}}{\mathrm{d}\Tj} = \SI{0.394}{\watt\per\celsius},
   \qquad
   G = \frac{\mathrm{d}P_\mathrm{tot}}{\mathrm{d}\Tj}
       \left(\Rthha + \frac{\Rthcs + \Rthjc}{6}\right) = 0.052 ,
-  \qquad \frac{1}{1-G} = 1.054 .
+  \qquad \frac{1}{1-G} = 1.055 .
 \end{equation}
 %
-The loop converges and amplifies the temperature rise by only
-\SI{5}{\percent}. The solution is found by repeating the simulation until the
-assumed and the resulting case temperatures agree, which takes three or four
-runs.
+The loop amplifies the temperature rise by only \SI{5.5}{\percent}, and it
+converges.
 
 \section{Insulating pad}
 \label{sec:rthcs}
 
-Of the \SI{16.8}{\celsius} between coolant and junction at the rated point,
+Of the \SI{16.9}{\celsius} between coolant and junction at the rated point,
 the pad takes \SI{10.7}{\celsius} and $\Rthjc$ takes \SI{4.9}{\celsius}. The
 pad resistance depends on the ceramic thickness, on the area and on the
-mounting torque, and it is not known precisely. The design is therefore
+mounting force, and it is not known precisely. The design is therefore
 checked over the whole plausible range, from a good ceramic pad to a
-mediocre silicone one (\cref{fig:rthcs,tab:rthcs}).
+mediocre silicone one (\cref{tab:rthcs,fig:rthcs}).
 
-\begin{figure}[htbp]
+\begin{table}[H]
+\centering
+\caption{Sensitivity to the insulating pad at the rated point, steady-state
+analysis. Blue: value used in this chapter.}
+\label{tab:rthcs}
+\zebra
+\begin{tabular}{lcccc}
+\toprule
+$\Rthcs$ & $P_\mathrm{tot}$ & $\Tcase$ & $\Tj$ & Margin \\
+\midrule
+\SI{0.20}{\celsius\per\watt} & \SI{125.91}{\watt} & \SI{70.46}{\celsius} & \SI{75.25}{\celsius} & \SI{74.75}{\celsius} \\
+\SI{0.30}{\celsius\per\watt} & \SI{126.76}{\watt} & \SI{72.61}{\celsius} & \SI{77.44}{\celsius} & \SI{72.56}{\celsius} \\
+\SI{0.40}{\celsius\per\watt} & \SI{127.63}{\watt} & \SI{74.79}{\celsius} & \SI{79.65}{\celsius} & \SI{70.35}{\celsius} \\
+\scelta \SI{0.50}{\celsius\per\watt} & \SI{128.52}{\watt} & \SI{77.00}{\celsius} & \SI{81.89}{\celsius} & \SI{68.11}{\celsius} \\
+\SI{1.20}{\celsius\per\watt} & \SI{135.08}{\watt} & \SI{93.37}{\celsius} & \SI{98.51}{\celsius} & \SI{51.49}{\celsius} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{plecs_12_sensibilita_r_th_cs.pdf}
 \caption{Junction, case and cold-plate temperatures against the pad thermal
@@ -104,26 +120,7 @@ in which the margin is below \SI{30}{\celsius}.}
 \label{fig:rthcs}
 \end{figure}
 
-\begin{table}[htbp]
-\centering
-\caption{Sensitivity to the insulating pad at the rated point. Each row is a
-separate solution of the loss--temperature loop.}
-\label{tab:rthcs}
-\zebra
-\begin{tabular}{lrrrr}
-\toprule
-$\Rthcs$ & $P_\mathrm{tot}$ & $\Tcase$ & $\Tj$ & Margin \\
-\midrule
-\SI{0.20}{\celsius\per\watt} & \SI{125.53}{\watt} & \SI{70.44}{\celsius} & \SI{75.22}{\celsius} & \SI{74.78}{\celsius} \\
-\SI{0.30}{\celsius\per\watt} & \SI{126.35}{\watt} & \SI{72.58}{\celsius} & \SI{77.40}{\celsius} & \SI{72.60}{\celsius} \\
-\SI{0.40}{\celsius\per\watt} & \SI{127.22}{\watt} & \SI{74.75}{\celsius} & \SI{79.60}{\celsius} & \SI{70.40}{\celsius} \\
-\textbf{\SI{0.50}{\celsius\per\watt}} & \textbf{\SI{128.09}{\watt}} & \textbf{\SI{76.96}{\celsius}} & \textbf{\SI{81.84}{\celsius}} & \textbf{\SI{68.16}{\celsius}} \\
-\SI{1.20}{\celsius\per\watt} & \SI{134.61}{\watt} & \SI{93.27}{\celsius} & \SI{98.40}{\celsius} & \SI{51.60}{\celsius} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-At the rated point even the worst silicone pad leaves \SI{51.6}{\celsius} of
+At the rated point even the worst silicone pad leaves \SI{51.5}{\celsius} of
 margin. The locked rotor sets the limit. There one device carries almost
 three times its rated-point loss, and every \SI{0.1}{\celsius\per\watt} of
 pad adds about \SI{7}{\celsius} (\cref{sec:lockedrotor}). Criterion C1 is met
@@ -137,8 +134,7 @@ consequences are:
         it would put \SI{800}{\volt} on a cold plate connected to the
         chassis;
   \item \SI{0.50}{\celsius\per\watt} is used as a prudent value for the
-        comparisons of this chapter, and \SI{0.62}{\celsius\per\watt} is the
-        value not to be exceeded.
+        comparisons of this chapter.
 \end{itemize}
 \Cref{sec:cooling} replaces the ideal plate with the real rail. The pad of
 the final design is aluminium nitride with a phase-change interface, at
@@ -147,9 +143,9 @@ the final design is aluminium nitride with a phase-change interface, at
 \section{Locked rotor}
 \label{sec:lockedrotor}
 
-At zero output frequency the symmetry of \cref{eq:thermal-chain} is lost. The
-modulator holds the angle at which phase~1 is at its peak. Phase~1 carries
-the full \SI{42.4}{\ampere} as direct current, and phases 2 and 3 carry
+At zero output frequency the six losses are no longer equal. The modulator
+holds the angle at which phase~1 is at its peak. Phase~1 carries the full
+\SI{42.4}{\ampere} as direct current, and phases 2 and 3 carry
 \SI{-21.2}{\ampere} each. In phase~1 the high-side device is the active
 switch:
 \begin{itemize}
@@ -158,43 +154,42 @@ switch:
   \item the low-side device conducts the rest of the time as a synchronous
         rectifier and switches at almost zero voltage.
 \end{itemize}
-The high-side device of phase~1 is therefore the hottest of the converter,
-and C1 is written for it.
+The high-side device of phase~1 (A1) is therefore the hottest of the
+converter, and C1 is written for it.
 
-The case is simulated on the same model, with zero output frequency and the
-modulation amplitude adjusted until the phase current is \SI{42.4}{\ampere}
-(\SI{26.8}{\volt} are enough, because a stalled motor has only its winding
-resistance). The thermal boundary is applied per device: the hottest device
-sees the common cold plate, heated by the total loss, plus its own loss
-through the pad.
+The steady-state analysis runs with zero output frequency, over one
+switching period, and with the modulation amplitude adjusted until the phase
+current is \SI{42.4}{\ampere} (\SI{26.8}{\volt}, because a stalled motor has
+only its winding resistance). Each device has its own pad in the model, so
+A1 is evaluated at its own temperature.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
-\caption{Locked rotor, final design ($R_g = \SI{5}{}/\SI{12.5}{\ohm}$, dead
-time \SI{260}{\nano\second}, $\Rthcs = \SI{0.5}{\celsius\per\watt}$),
-hottest device.}
+\caption{Locked rotor, final gate resistances and dead time,
+$\Rthcs = \SI{0.5}{\celsius\per\watt}$, ideal cold plate, steady-state
+analysis; hottest device A1.}
 \label{tab:lockedrotor}
 \zebra
-\begin{tabular}{lrr}
+\begin{tabular}{lcc}
 \toprule
 Coolant & \SI{65}{\celsius} & \SI{70}{\celsius} \\
 \midrule
-Phase current (DC)          & \SI{42.43}{\ampere} & \SI{42.43}{\ampere} \\
-Loss, hottest device        & \SI{61.25}{\watt}  & \SI{62.29}{\watt} \\
-Loss, converter             & \SI{140.97}{\watt} & \SI{143.17}{\watt} \\
-Case temperature            & \SI{97.04}{\celsius} & \SI{102.58}{\celsius} \\
-\textbf{Junction temperature} & \textbf{\SI{111.05}{\celsius}} & \textbf{\SI{116.82}{\celsius}} \\
-Margin to C1 (\SI{120}{\celsius}) & \pass{\SI{8.95}{\celsius}} & \pass{\SI{3.18}{\celsius}} \\
-Margin to the \SI{150}{\celsius} limit & \pass{\SI{38.95}{\celsius}} & \pass{\SI{33.18}{\celsius}} \\
+Phase current (DC)          & \SI{42.42}{\ampere} & \SI{42.42}{\ampere} \\
+Loss, hottest device        & \SI{61.31}{\watt}  & \SI{62.35}{\watt} \\
+Loss, converter             & \SI{136.67}{\watt} & \SI{138.79}{\watt} \\
+Case temperature            & \SI{97.03}{\celsius} & \SI{102.57}{\celsius} \\
+\scelta Junction temperature & \SI{111.04}{\celsius} & \SI{116.82}{\celsius} \\
+Margin to C1 (\SI{120}{\celsius}) & \pass{\SI{8.96}{\celsius}} & \pass{\SI{3.18}{\celsius}} \\
+Margin to the \SI{150}{\celsius} limit & \pass{\SI{38.96}{\celsius}} & \pass{\SI{33.18}{\celsius}} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 The hottest device dissipates \SI{61.3}{\watt}, 2.9 times its rated-point
-share. The converter as a whole dissipates only \SI{10}{\percent} more.
-The heat of one device must cross its own pad and its own die, so a better
-cold plate cannot fix it. The cold plate is at \SI{66.4}{\celsius}, and the
-\SI{45}{\celsius} between it and the junction are spent in $\Rthcs$ and
+share. The converter as a whole dissipates only \SI{6}{\percent} more. The
+heat of one device must cross its own pad and its own die, so a better cold
+plate cannot fix it. The cold plate is at \SI{66.4}{\celsius}, and the
+\SI{44.7}{\celsius} between it and the junction are spent in $\Rthcs$ and
 $\Rthjc$.
 
 Three sensitivities complete the picture:
@@ -202,57 +197,56 @@ Three sensitivities complete the picture:
   \item Coolant temperature: \SI{+5}{\celsius} at the inlet gives
         \SI{+5.8}{\celsius} at the junction. C1 holds at \SI{70}{\celsius}
         with \SI{3.2}{\celsius} to spare (\cref{app:assumptions}, A.9).
-  \item Pad: from \SI{0.5}{} to \SI{0.6}{} and \SI{0.7}{\celsius\per\watt} the
-        junction rises to \SI{118.3}{} and \SI{125.8}{\celsius}. C1 is lost
-        beyond \SI{0.62}{\celsius\per\watt}.
+  \item Pad: at \SI{0.60}{}, \SI{0.62}{} and \SI{0.70}{\celsius\per\watt} the
+        junction is \SI{118.3}{}, \SI{119.8}{} and \SI{125.8}{\celsius}. C1
+        is lost beyond \SI{0.62}{\celsius\per\watt}.
   \item Turn-off gate resistance: raising it from \SI{12.5}{} to \SI{15}{\ohm}
         costs \SI{2.0}{\celsius}.
 \end{itemize}
-The die and the pad reach steady state in less than a second. The cold plate
-needs tens of seconds, but it accounts for only \SI{1.4}{\celsius}. Holding
-a vehicle on a slope lasts longer, so the steady-state value is the correct
-criterion.
+The die and the pad reach steady state in less than a second, and the cold
+plate in tens of seconds. Holding a vehicle on a slope lasts longer, so the
+steady-state value is the correct criterion.
 
 \subsection{Loss of the hottest device}
 \label{sec:lrdpwm}
 
-The loss of the hottest device is \SI{61.25}{\watt}. Running the same case
-with only one type of loss at a time gives \SI{21.2}{\watt} of conduction and
-\SI{40.0}{\watt} of switching. Switching dominates, as at the rated point.
-The opposite device of the leg conducts for the rest of the period and
-carries only \SI{18.4}{\watt}.
+The loss of A1 is \SI{61.3}{\watt}: \SI{21.2}{\watt} of conduction and
+\SI{40.1}{\watt} of switching. Switching dominates, as at the rated point.
+The opposite device of the leg (A2) conducts for the rest of the period and
+loses only \SI{18.4}{\watt}.
 
 Discontinuous modulation acts on this split. DPWM-MAX clamps phase~1 to the
-positive rail. The high-side device stops switching, but it conducts for the
-whole period instead of \SI{53}{\percent} of it. DPWM-MIN clamps phases 2
-and 3 to the negative rail instead. \Cref{tab:lrdpwm} gives the results.
+positive rail. A1 stops switching, but it conducts for the whole period
+instead of \SI{53}{\percent} of it. DPWM-MIN clamps phases 2 and 3 to the
+negative rail instead. \Cref{tab:lrdpwm} gives the results.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Locked rotor with three offsets $m_0$, coolant \SI{65}{\celsius},
-$\Rthcs = \SI{0.5}{\celsius\per\watt}$, same model as \cref{tab:lockedrotor};
-the hottest device is A1 in all three cases. The switching loss of the
-clamped device is zero, which verifies the clamp.}
+$\Rthcs = \SI{0.5}{\celsius\per\watt}$, steady-state analysis; hottest
+device A1. The switching loss of the clamped device is zero, which verifies
+the clamp. Blue: modulation used in the design.}
 \label{tab:lrdpwm}
 \small
 \zebra
-\begin{tabular}{lrrrrr}
+\begin{tabular}{lccccc}
 \toprule
 Modulation & Conduction & Switching & Total & $\Tj$ & Converter \\
 \midrule
-\textbf{SV-PWM (adopted)} & \SI{21.2}{\watt} & \SI{40.0}{\watt} & \SI{61.3}{\watt} & \textbf{\SI{111.1}{\celsius}} & \SI{141.0}{\watt} \\
-DPWM-MAX & \SI{38.3}{\watt} & 0 & \SI{38.3}{\watt} & \textbf{\SI{93.9}{\celsius}} & \SI{96.0}{\watt} \\
-DPWM-MIN & \SI{1.5}{\watt} & \SI{38.6}{\watt} & \SI{40.1}{\watt} & \SI{95.2}{\celsius} & \SI{95.9}{\watt} \\
+\scelta SV-PWM & \SI{21.2}{\watt} & \SI{40.1}{\watt} & \SI{61.3}{\watt} & \SI{111.0}{\celsius} & \SI{136.7}{\watt} \\
+DPWM-MAX & \SI{38.3}{\watt} & 0 & \SI{38.3}{\watt} & \SI{93.8}{\celsius} & \SI{94.4}{\watt} \\
+DPWM-MIN & \SI{1.5}{\watt} & \SI{38.4}{\watt} & \SI{39.9}{\watt} & \SI{95.0}{\celsius} & \SI{94.0}{\watt} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 DPWM-MAX lowers the hottest junction by \SI{17.2}{\celsius}, to
-\SI{93.9}{\celsius}, and the converter loss by one third. The saving on the
-hottest device is \SI{23}{\watt}, not \SI{40}{\watt}, because
-\SI{17}{\watt} of conduction move onto the same device. DPWM-MIN is almost as
-good. The design does not rely on it: the modulation is chosen by the
-controller, and \cref{tab:sysassume} lists it as a recommendation.
+\SI{93.8}{\celsius}, and the converter loss by \SI{31}{\percent}. The saving
+on A1 is \SI{23.0}{\watt}, not \SI{40.1}{\watt}, because \SI{17.1}{\watt} of
+conduction move onto the same device. With DPWM-MIN the two devices of
+phase~1 end at \SI{95.0}{} and \SI{92.7}{\celsius}. The design does not rely
+on either: the modulation is chosen by the controller, and
+\cref{tab:sysassume} lists it as a recommendation.
 
 \section{Simultaneous worst case}
 \label{sec:worstcase}
@@ -265,63 +259,66 @@ for four tolerances (\cref{tab:criteria}):
   \item coolant at \SI{70}{\celsius};
   \item pad $+\SI{20}{\percent}$.
 \end{itemize}
-Taken together they raise each other, because each one increases the
-temperature that increases the others. \Cref{tab:worstcase} gives them one
-at a time and together, with the loop between loss and temperature closed.
+In the model, maximum $\Rdson$ scales the channel voltage drop of the vendor
+tables by \num{22}/\num{16}, the ratio of maximum to typical value in the
+datasheet, and maximum $\Rthjc$ scales the Cauer network to
+\SI{0.31}{\celsius\per\watt}. The tolerances raise each other, because each
+one increases the temperature that increases the others.
+\Cref{tab:worstcase} gives them one at a time and together.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Locked rotor, hottest device: the four tolerances one at a time and
-together. The maximum $\Rdson$ is the typical curve scaled by
-\num{22}/\num{16}, the ratio of the datasheet at \SI{25}{\celsius}.}
+together, steady-state analysis.}
 \label{tab:worstcase}
 \zebra
-\begin{tabular}{lrr}
+\begin{tabular}{lcc}
 \toprule
 Case & $\Tj$ & Increase \\
 \midrule
-Nominal: \SI{65}{\celsius}, typical $\Rthjc$, pad \SI{0.50}{\celsius\per\watt} & \SI{111.1}{\celsius} & --- \\
-Coolant \SI{70}{\celsius} & \SI{116.9}{\celsius} & $+\SI{5.8}{\celsius}$ \\
-$\Rthjc = \SI{0.31}{\celsius\per\watt}$ (datasheet maximum) & \SI{117.0}{\celsius} & $+\SI{5.9}{\celsius}$ \\
+Nominal: \SI{65}{\celsius}, typical $\Rthjc$, pad \SI{0.50}{\celsius\per\watt} & \SI{111.0}{\celsius} & --- \\
+Coolant \SI{70}{\celsius} & \SI{116.8}{\celsius} & $+\SI{5.8}{\celsius}$ \\
+$\Rthjc = \SI{0.31}{\celsius\per\watt}$ (datasheet maximum) & \SI{116.9}{\celsius} & $+\SI{5.9}{\celsius}$ \\
 Pad $+\SI{20}{\percent}$, \SI{0.60}{\celsius\per\watt} & \SI{118.3}{\celsius} & $+\SI{7.2}{\celsius}$ \\
 Maximum $\Rdson$ & \SI{118.2}{\celsius} & $+\SI{7.1}{\celsius}$ \\
 Sum of the four & & $+\SI{26.0}{\celsius}$ \\
-\textbf{All four together, loop closed} & \pass{\textbf{\SI{140.5}{\celsius}}} & $\mathbf{+\SI{29.4}{\celsius}}$ \\
-Same, pad at the mounting limit \SI{0.62}{\celsius\per\watt} & \pass{\SI{142.4}{\celsius}} & $+\SI{31.3}{\celsius}$ \\
-Same, with DPWM-MAX & \pass{\SI{126.4}{\celsius}} & $+\SI{15.3}{\celsius}$ \\
+\scelta All four together & \pass{\SI{140.4}{\celsius}} & $+\SI{29.4}{\celsius}$ \\
+Same, pad \SI{0.62}{\celsius\per\watt} (C1 limit on the ideal plate) & \pass{\SI{142.3}{\celsius}} & $+\SI{31.3}{\celsius}$ \\
+Same, with DPWM-MAX & \pass{\SI{124.9}{\celsius}} & $+\SI{13.9}{\celsius}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 All four together cost \SI{29.4}{\celsius}, against the \SI{30}{\celsius}
-allowed. The junction reaches \SI{140.5}{\celsius}, \SI{9.5}{\celsius} below
-the \SI{150}{\celsius} limit. The four together cost \SI{3.4}{\celsius} more
-than their sum, because the loop between loss and temperature acts on a
-larger loss. With the pad at its mounting limit the margin to
-\SI{150}{\celsius} is \SI{7.6}{\celsius}.
-
-The table comes from an analytical model of the locked rotor. On the nominal
-case this model agrees with the circuit model within \SI{0.1}{\celsius}
-(\SI{111.1}{} against \SI{111.07}{\celsius}). The circuit model can take
-three of the tolerances directly. With coolant at \SI{70}{\celsius}, maximum
-$\Rthjc$ and pad at \SI{0.62}{\celsius\per\watt} it gives
-\SI{131.9}{\celsius}, against \SI{132.1}{\celsius} from the analytical model.
+allowed. The junction reaches \SI{140.4}{\celsius}, \SI{9.6}{\celsius} below
+the \SI{150}{\celsius} limit. Together they cost \SI{3.4}{\celsius} more than
+their sum, because the loop between loss and temperature acts on a larger
+loss. With the pad at \SI{0.62}{\celsius\per\watt} the margin to \SI{150}{\celsius} is
+\SI{7.7}{\celsius}.
 
 \section{Cooling solution}
 \label{sec:cooling}
 
 The temperatures so far use one number for the whole heat sink,
-$\Rthha = \SI{0.01}{\celsius\per\watt}$ (\cref{app:assumptions}, A.11). The
-real part is the aluminium rail of \cref{sec:mechanics}, \SI{374}{\milli\metre}
-long, with the six TO-247 clamped along one face. A three-dimensional
-thermal model of the rail gives the temperature of each junction, with the
-loss of each device from the analytical locked-rotor model. The model
-checks itself in two ways:
+$\Rthha = \SI{0.01}{\celsius\per\watt}$. The real part is the aluminium rail
+of \cref{sec:mechanics}, with the six TO-247 clamped along one face. Under
+each tab the heat flux is about \SI{20}{\watt\per\centi\metre\squared}. The
+heat must spread in the metal before the coolant can take it, and this
+spreading depends on the geometry of the rail.
+
+The rail is therefore treated like a heat sink with a datasheet:
 \begin{itemize}
-  \item the heat taken by the coolant equals the injected power;
-  \item halving the mesh size moves the contact temperatures by at most
-        \SI{0.7}{\celsius}.
+  \item a three-dimensional thermal model of the rail gives the temperature
+        of the rail face under the hottest device at locked rotor;
+  \item this temperature rise, divided by the total loss, is the equivalent
+        resistance $R_\mathrm{eq}$ of the rail;
+  \item PLECS uses $R_\mathrm{eq}$ as $\Rthha$, and the steady-state analysis
+        gives all the junction temperatures;
+  \item the junction temperature of the 3D model is kept as a check.
 \end{itemize}
+$R_\mathrm{eq}$ is defined at locked rotor, where the heat is concentrated
+under one device. At the rated point the heat is spread over six devices, so
+the rated-point temperatures of this section are conservative.
 
 \subsection{Rail and heat-sink type}
 
@@ -330,71 +327,71 @@ convection with the prudent pad of \SI{0.50}{\celsius\per\watt}. The tests
 are C1 ($\Tj \leq \SI{120}{\celsius}$ at locked rotor) and the
 \SI{150}{\celsius} limit in the simultaneous worst case.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
-\caption{Hottest junction with the pad $\Rthcs = \SI{0.50}{\celsius\per\watt}$.
-$R_\mathrm{eq}$ is the plate resistance that gives the same junction
-temperature in \cref{eq:thermal-chain}. Worst case: the four tolerances of
-\cref{sec:worstcase}, coolant at \SI{70}{\celsius}, air at its maximum of
-\SI{50}{\celsius}.}
+\caption{Hottest junction with the pad $\Rthcs = \SI{0.50}{\celsius\per\watt}$,
+steady-state analysis of PLECS with $\Rthha = R_\mathrm{eq}$. Worst case: the
+four tolerances of \cref{sec:worstcase}, coolant at \SI{70}{\celsius}, air
+at its maximum of \SI{50}{\celsius}. Last column: locked rotor from the 3D
+model, as a check.}
 \label{tab:cooling}
 \small
 \zebra[3]
-\begin{tabular}{lrrrr}
+\begin{tabular}{lccccc}
 \toprule
- & $R_\mathrm{eq}$ & Locked rotor & Worst case & Rated point \\
-Cooling & [\si{\celsius\per\watt}] & [\si{\celsius}] & [\si{\celsius}] & [\si{\celsius}] \\
+ & $R_\mathrm{eq}$ & Locked rotor & Worst case & Rated point & 3D model \\
+Cooling & [\si{\celsius\per\watt}] & [\si{\celsius}] & [\si{\celsius}] & [\si{\celsius}] & [\si{\celsius}] \\
 \midrule
-Ideal plate (\cref{tab:lockedrotor}) & 0.010 & \pass{111.1} & \pass{140.5} & 81.8 \\
-Two channels, \SI{6}{\litre\per\minute} & 0.118 & \fail{128.7} & \fail{164.7} & 87.8 \\
-Two channels, \SI{10}{\litre\per\minute} & 0.097 & \fail{125.3} & \fail{159.9} & 86.2 \\
-\textbf{Six-port rail, \SI{10}{\litre\per\minute}} & \textbf{0.069} & \fail{\textbf{120.6}} & \fail{\textbf{153.4}} & \textbf{84.3} \\
-Best forced-air sink, two fans & 0.204 & \fail{124.9} & \fail{157.7} & 81.6 \\
-Natural convection & --- & \fail{188} & \nd & \nd \\
+Ideal plate (\cref{tab:lockedrotor}) & 0.010 & \pass{111.0} & \pass{140.4} & 81.9 & --- \\
+Two channels, \SI{6}{\litre\per\minute} & 0.118 & \fail{128.9} & \fail{164.4} & 97.2 & 128.7 \\
+Two channels, \SI{10}{\litre\per\minute} & 0.098 & \fail{125.4} & \fail{159.6} & 94.2 & 125.3 \\
+Six-port rail, \SI{10}{\litre\per\minute} & 0.069 & \fail{120.6} & \fail{153.1} & 90.1 & 120.6 \\
+Best forced-air sink, two fans & 0.204 & \fail{125.5} & \fail{157.7} & 93.3 & 124.9 \\
+Natural convection & --- & \nd & \nd & \nd & \fail{188} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 The results are:
 \begin{itemize}
-  \item The ideal plate passes, but it hides the real rail. Under each tab
-        the heat flux is about \SI{20}{\watt\per\centi\metre\squared}. The
-        heat must spread in the metal before the coolant can take it, and a
-        single plate resistance does not show this. A rail with two plain
-        channels has an equivalent resistance twelve times larger.
-  \item More flow helps little: \SI{125.3}{\celsius} at
-        \SI{10}{\litre\per\minute} against \SI{128.7}{\celsius} at
+  \item PLECS and the 3D model agree within \SI{0.6}{\celsius} at locked
+        rotor.
+  \item The ideal plate passes, but it hides the real rail. A rail with two
+        plain channels has an equivalent resistance twelve times larger.
+  \item More flow helps little: \SI{125.4}{\celsius} at
+        \SI{10}{\litre\per\minute} against \SI{128.9}{\celsius} at
         \SI{6}{\litre\per\minute}.
-  \item The adopted rail is an extrusion with six ports of
-        \SI{10}{}$\times$\SI{2}{\milli\metre}. It has a \SI{2}{\milli\metre}
-        wall towards the tabs and \SI{1}{\milli\metre} webs perpendicular to
-        the face. The webs carry the heat into the depth of the rail. The
-        pressure drop is \SI{4.7}{\kilo\pascal}.
-  \item Even this rail misses C1 by \SI{0.6}{\celsius} with the prudent pad.
+  \item The six-port rail is an extrusion with six ports of
+        \SI{10}{}$\times$\SI{2}{\milli\metre}, a \SI{2}{\milli\metre} wall
+        towards the tabs and \SI{1}{\milli\metre} webs perpendicular to the
+        face. The webs carry the heat into the depth of the rail. The pressure
+        drop is \SI{4.7}{\kilo\pascal}. Even this rail misses C1 by
+        \SI{0.6}{\celsius} with the prudent pad.
+  \item Forced air with fins behind the tabs (base \SI{20}{\milli\metre},
+        fins \SI{87}{\milli\metre} tall, two fans) misses C1 by
+        \SI{5.5}{\celsius}. Natural convection reaches \SI{188}{\celsius} in
+        the 3D model, so it is not considered further.
 \end{itemize}
-
-Forced air with fins attached behind the tabs (base \SI{20}{\milli\metre},
-fins \SI{87}{\milli\metre} tall, two fans) misses C1 by \SI{4.9}{\celsius}.
-Natural convection reaches \SI{188}{\celsius}, so it is not possible.
 
 \Cref{fig:radar-cooling} compares the three types with the improved pad of
 the next subsection.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \input{figures/tikz/radar_raffreddamento}
-\caption{Cooling types compared on a scale from 1 (worst) to 5 (best), with
-aluminium nitride and a phase-change interface. The two temperature margins
-come from \cref{tab:coolalt}; the other axes rank the three types.}
+\caption{Cooling types compared on a scale from 1 (worst) to 5 (best); a
+larger area is better. Aluminium nitride pad with a phase-change interface.
+The two temperature margins come from \cref{tab:coolalt}; the other axes rank
+the three types.}
 \label{fig:radar-cooling}
 \end{figure}
 
 \subsection{Pad and interface}
 \label{sec:coolalt}
 
-At locked rotor, on the six-port rail, the hottest device spends
-\SI{14.4}{\celsius} in $\Rthjc$, \SI{31.6}{\celsius} in the pad and
-\SI{9.6}{\celsius} between the rail face and the coolant. The pad is the
+At locked rotor, on the six-port rail, the hottest device spends about
+\SI{14}{\celsius} in $\Rthjc$, \SI{32}{\celsius} in the pad and
+\SI{10}{\celsius} between the rail face and the coolant. The pad is the
 largest term and the cheapest to change. It is a ceramic between two
 interfaces:
 %
@@ -411,50 +408,52 @@ force reaches \SI{0.25}{\kelvin\centi\metre\squared\per\watt}. Aluminium
 nitride ($k = \SI{170}{\watt\per\metre\per\kelvin}$) removes most of the
 ceramic term. \Cref{tab:coolalt} compares the options on the same rail.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Options for the pad and the cooling on the six-port rail at
 \SI{10}{\litre\per\minute} and \SI{65}{\celsius} (air at \SI{50}{\celsius}
-where stated). Tests as in \cref{tab:cooling}. The worst case uses maximum
-$\Rthjc$, pad $+\SI{20}{\percent}$, maximum $\Rdson$, coolant at
-\SI{70}{\celsius}.}
+where stated), steady-state analysis of PLECS. Tests as in
+\cref{tab:cooling}; DPWM: locked rotor with DPWM-MAX; 3D: locked rotor from
+the 3D model, as a check. Blue: chosen option.}
 \label{tab:coolalt}
-\small
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
 \zebra[3]
-\begin{tabular}{lrrrl}
+\begin{tabular}{lcccccl}
 \toprule
- & $\Rthcs$ & Locked rotor & Worst case & \\
-Option (TO-247-4 unless stated) & [\si{\celsius\per\watt}] & [\si{\celsius}] & [\si{\celsius}] & Decision \\
+ & $\Rthcs$ & Locked rotor & Worst case & DPWM & 3D & \\
+Option (TO-247-4 unless stated) & [\si{\celsius\per\watt}] & [\si{\celsius}] & [\si{\celsius}] & [\si{\celsius}] & [\si{\celsius}] & Decision \\
 \midrule
-Alumina, prudent value & 0.50 & \fail{120.6} & \fail{153.4} & rejected \\
-Alumina + phase-change interface & 0.25 & \pass{102.9} & \pass{125.4} & possible \\
-\textbf{AlN + phase-change interface} & \textbf{0.18} & \pass{\textbf{97.9}} & \pass{\textbf{117.8}} & \textbf{chosen} \\
-Copper spreader + AlN & 0.16 & \pass{92.6} & \pass{110.9} & not worth it \\
-Internally isolated package$^a$ & 0.08 & \pass{98.3} & \pass{116.7} & \aperto{not AEC-Q101} \\
-Forced air, one fan, AlN + interface$^b$ & 0.18 & \pass{108.3} & \pass{129.1} & rejected \\
-Top-side-cooled Q-DPAK$^c$ & 0.61 & \fail{139.4} & \fail{179.9} & rejected \\
+Alumina, prudent value & 0.50 & \fail{120.6} & \fail{153.1} & 100.2 & 120.6 & rejected \\
+Alumina + phase-change interface & 0.25 & \pass{102.7} & \pass{125.0} & 89.2 & 102.9 & possible \\
+\scelta AlN + phase-change interface & 0.18 & \pass{97.6} & \pass{117.4} & 86.1 & 97.9 & chosen \\
+Copper spreader + AlN & 0.16 & \pass{92.4} & \pass{110.5} & 82.6 & 92.6 & not worth it \\
+Internally isolated package$^a$ & 0.08 & \pass{98.0} & \pass{116.3} & 86.3 & 98.3 & \aperto{not AEC-Q101} \\
+Forced air, one fan, AlN + interface$^b$ & 0.18 & \pass{108.2} & \pass{128.5} & 87.9 & 108.3 & rejected \\
+Top-side-cooled Q-DPAK$^c$ & 0.61 & \fail{140.4} & \fail{180.6} & 112.4 & 139.4 & rejected \\
 \bottomrule
-\multicolumn{5}{l}{\footnotesize $^a$ internal ceramic counted as \SI{+0.10}{\celsius\per\watt} on $\Rthjc$; grease only outside.} \\
-\multicolumn{5}{l}{\footnotesize $^b$ fins behind the rail, \SI{20}{\milli\metre} base, \SI{87\times 60}{\milli\metre} fins.} \\
-\multicolumn{5}{l}{\footnotesize $^c$ AIMCQ120R020M1T; $\Rthjc \approx \SI{0.26}{\celsius\per\watt}$ from its power rating.}
+\hiderowcolors
+\multicolumn{7}{p{0.95\textwidth}}{\footnotesize $^a$ internal ceramic counted as \SI{+0.10}{\celsius\per\watt} on $\Rthjc$; grease only outside.} \\
+\multicolumn{7}{p{0.95\textwidth}}{\footnotesize $^b$ fins behind the rail, \SI{20}{\milli\metre} base, \SI{87\times 60}{\milli\metre} fins.} \\
+\multicolumn{7}{p{0.95\textwidth}}{\footnotesize $^c$ AIMCQ120R020M1T; $\Rthjc \approx \SI{0.26}{\celsius\per\watt}$ from its power rating, losses of the \device{}.}
 \end{tabular}
 \end{table}
 
 The reasons for each decision are:
 \begin{itemize}
   \item The interface decides more than the ceramic. Alumina with the
-        phase-change interface gains \SI{17.7}{\celsius}. Aluminium nitride
-        adds \SI{5}{\celsius}. The board does not change, the cost is a few
+        phase-change interface gains \SI{17.9}{\celsius}. Aluminium nitride
+        adds \SI{5.0}{\celsius}. The board does not change, the cost is a few
         euros, and the value becomes a mounting specification, confirmed by
         measuring the mounted pad.
-  \item A copper spreader gains another \SI{5}{\celsius}, but it needs a
+  \item A copper spreader gains another \SI{5.3}{\celsius}, but it needs a
         second clamped joint. It is not worth it.
   \item Internally isolated TO-247-4 packages~\cite{littelfuse_iso247,navitas_uhviso}
         match the AlN pad with one interface less. None is offered at
         \SI{16}{\milli\ohm} with AEC-Q101 qualification, so it fails C4.
   \item Top-side-cooled packages~\cite{infineon_aimcq} have a pad about half
-        the area of a TO-247 tab, and thermally they are worse here by
-        \SI{19}{\celsius}. They would also need a new board.
+        the area of a TO-247 tab, and thermally they are worse here by about
+        \SI{20}{\celsius}. They would also need a new board.
   \item Forced air passes with one fan, but it has three disadvantages:
         the fins sit over the high-voltage board, so the enclosure must let
         outside air flow across it; the fan can fail, and at standstill the
@@ -467,27 +466,29 @@ The adopted solution is therefore the six-port liquid rail at
 \SI{10}{\litre\per\minute}, with \SI{0.63}{\milli\metre} aluminium nitride
 and a phase-change interface on both faces under a specified clip force
 ($\Rthcs \leq \SI{0.18}{\celsius\per\watt}$ as design value). The hottest
-junction at locked rotor is \SI{97.9}{\celsius}, and \SI{117.8}{\celsius} in
-the simultaneous worst case, \SI{32.2}{\celsius} below the limit. The value
-of the pad not to be exceeded at assembly is \SI{0.50}{\celsius\per\watt},
-at which C1 is still met on the real rail. The results computed on the
-ideal plate remain valid for comparing the candidates. The absolute
-temperatures of the design are those of \cref{tab:coolalt}.
+junction at locked rotor is \SI{97.6}{\celsius}, and \SI{117.4}{\celsius} in
+the simultaneous worst case, \SI{32.6}{\celsius} below the limit. Between
+the rows of \cref{tab:coolalt} the locked-rotor temperature rises by about
+\SI{7}{\celsius} for every \SI{0.1}{\celsius\per\watt} of pad, so C1 holds on
+the rail up to about \SI{0.49}{\celsius\per\watt} (linear interpolation).
+The value of the mounted pad not to be exceeded at assembly is set at
+\SI{0.45}{\celsius\per\watt}. The results on the ideal plate
+remain valid for comparing the candidates. The absolute temperatures of the
+design are those of \cref{tab:coolalt}.
 
 \section{Thermal transient}
 
-The thermal time constant of the cold plate is of the order of seconds,
-while the solver step is about \SI{1}{\micro\second}. A short window is
-simulated and an exponential is fitted to it. The heat capacity of
-\SI{1000}{\joule\per\kelvin} is estimated from the geometry: an aluminium
-plate of \SI{200}{}$\times$\SI{150}{}$\times$\SI{12}{\milli\metre} with
-\SI{15}{\percent} of its volume taken by channels gives
+The steady-state analysis gives no time constant. A short time-domain run
+gives it: the thermal time constant of the cold plate is of the order of
+seconds, and an exponential is fitted to the start of the warm-up. The heat
+capacity of \SI{1000}{\joule\per\kelvin} is estimated from the geometry: an
+aluminium plate of \SI{200}{}$\times$\SI{150}{}$\times$\SI{12}{\milli\metre}
+with \SI{15}{\percent} of its volume taken by channels gives
 \SI{744}{\joule\per\kelvin}, the coolant \SI{204}{\joule\per\kelvin} and the
 fittings about \SI{90}{\joule\per\kelvin}. The fit gives
-$\tau = \SI{10.20}{\second}$ against \SI{10.00}{\second} expected, and the
-temperature rise agrees with $P_\mathrm{tot}\Rthha$ within
-\SI{1.6}{\percent}. The heat capacity affects only the transient: the
-steady-state results do not change if it is doubled.
+$\tau = \SI{10.20}{\second}$ against \SI{10.00}{\second} expected. The heat
+capacity affects only the transient: the steady-state results do not depend
+on it.
 
 \section{Other components: temperature and life}
 \label{sec:complife}
@@ -503,7 +504,7 @@ and the shunts. Two assumptions apply:
         years of a passenger car.
 \end{itemize}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Stress, temperature and margin of the components that carry high
 voltage or ripple current. Air inside the enclosure \SI{70}{\celsius}, hot
@@ -524,7 +525,7 @@ Shunts, \SI{0.5}{\milli\ohm} & \SI{0.45}{}/\SI{0.90}{\watt} rated/stalled & term
 \end{tabularx}
 \end{table}
 
-The film capacitors are the only components whose life is consumed.
+The film capacitors are the only components whose life is consumed:
 \begin{itemize}
   \item The manufacturer gives the life as a family of curves, life against
         the ratio of operating to rated voltage, at \SI{70}{}, \SI{85}{} and
@@ -540,7 +541,7 @@ The film capacitors are the only components whose life is consumed.
         the same temperature.
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{termica_componenti_vita_film.pdf}
 \caption{Expected life of the DC-link film capacitors against the air
