@@ -3,7 +3,7 @@
 
 \section{Modulation}
 
-The course writes the modulating signal of each leg as the normalised phase
+The modulating signal of each leg is written as the normalised phase
 reference plus a common offset $m_0$:
 %
 \begin{equation}
@@ -33,7 +33,7 @@ modulations:
 The converter uses SV-PWM. \Cref{fig:modulanti} shows the three modulating
 signals against the triangular carrier.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{plecs_05_segnali_modulanti.pdf}
 \caption{Modulating signals with the SV-PWM offset of \cref{eq:zero-seq},
@@ -46,7 +46,7 @@ against the triangular carrier.}
 \Cref{tab:modulation} and \cref{fig:radar-modulation} compare the three
 options.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Carrier-based modulations.}
 \label{tab:modulation}
@@ -54,22 +54,22 @@ options.
 \zebra
 \begin{tabularx}{\textwidth}{lYYY}
 \toprule
- & SPWM & \textbf{SV-PWM} & DPWM \\
+ & SPWM & SV-PWM (chosen) & DPWM \\
 \midrule
 Offset $m_0$ & 0.5 & $(1-\max-\min)/2$ & $1-\max$ or $-\min$ \\
-Maximum linear $M_f$ & 0.500 & \textbf{0.577} & 0.577 \\
-DC-link utilisation & baseline & \textbf{+\SI{15.5}{\percent}} & +\SI{15.5}{\percent} \\
+Maximum linear $M_f$ & 0.500 & 0.577 & 0.577 \\
+DC-link utilisation & baseline & +\SI{15.5}{\percent} & +\SI{15.5}{\percent} \\
 Switching losses & baseline & baseline & $-\SI{33}{\percent}$ \\
 Current ripple & baseline & similar & higher \\
-Implementation & simple & \textbf{one max and one min per period} & clamping logic \\
+Implementation & simple & one max and one min per period & clamping logic \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \input{figures/tikz/radar_modulazione}
-\caption{Modulations compared on a scale from 1 (worst) to 5 (best).
+\caption{Modulations compared on a scale from 1 (worst) to 5 (best); a larger area is better.
 Utilisation, switching loss and locked-rotor temperature come from the
 numbers of this chapter and of \cref{sec:lrdpwm}; the other axes rank the
 three options.}
@@ -85,14 +85,14 @@ SV-PWM is chosen for these reasons:
 \end{itemize}
 
 DPWM would cut the switching loss by about one third. At the rated point
-this is about \SI{23}{\watt} of the \SI{70.5}{\watt} of switching
+this is about \SI{23}{\watt} of the \SI{70.6}{\watt} of switching
 (\cref{tab:losses}) [estimate]. The junction is at \SI{81.8}{\celsius}, so
 the rated point does not need this reduction, and DPWM would increase the
 current ripple.
 
 At locked rotor DPWM helps more (\cref{sec:lrdpwm}). If the phase at peak
-current is clamped, the hottest junction falls from \SI{111.1}{} to
-\SI{93.9}{\celsius}. The design, however, does not count on it:
+current is clamped, the hottest junction falls from \SI{111.0}{} to
+\SI{93.8}{\celsius}. The design, however, does not count on it:
 \begin{itemize}
   \item the modulation is set by the controller, which is outside the
         power stage;
@@ -103,7 +103,7 @@ current is clamped, the hottest junction falls from \SI{111.1}{} to
 
 \section{Output waveforms}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{plecs_02_tensione_di_fase.pdf}
 \caption[Phase voltage referred to the load neutral]{Phase voltage $v_{1N}$ referred to the load neutral, with the five
@@ -115,7 +115,7 @@ Each pole voltage $v_{k0}$ has only two values, $0$ and $\Vdc$. The load
 neutral floats, so the phase voltage $v_{1N} = v_{10} - v_{N0}$ has the five
 levels of \cref{fig:tensioni}.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{plecs_03_correnti_di_fase.pdf}
 \caption{Phase currents. The switching ripple is \SI{2.463}{\ampere}
@@ -147,28 +147,29 @@ turn-on of the other. \Cref{tab:deadtime} adds the three contributions:
 \begin{itemize}
   \item the difference between the turn-off and turn-on delays of the
         MOSFET;
-  \item the pulse-width distortion of one driver;
-  \item the skew between two drivers.
+  \item the pulse-width distortion of the gate signals;
+  \item the skew between the gate signals of the two devices.
 \end{itemize}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
-\caption{Dead-time budget. Driver values are maxima from~\cite{ti_ucc21750}.
+\caption{Dead-time budget. Gate-signal tolerances are maxima of a typical
+isolated gate driver~\cite{ti_ucc21750}; blue: chosen value.
 Device values are typical, read from the switching-time curves
 of~\cite{wolfspeed_e3m0016} at the design gate resistances,
 \SI{5}{\ohm} at turn-on and \SI{12.5}{\ohm} at turn-off.}
 \label{tab:deadtime}
 \zebra
-\begin{tabular}{lrl}
+\begin{tabular}{lcl}
 \toprule
 Contribution & Value & Source \\
 \midrule
 $t_\mathrm{d(off)} - t_\mathrm{d(on)}$ of the MOSFET, $144 - 38$ & \SI{106}{\nano\second} & \cite{wolfspeed_e3m0016} \\
-Pulse-width distortion of the driver & \SI{30}{\nano\second} & \cite{ti_ucc21750} \\
-Skew between two drivers & \SI{30}{\nano\second} & \cite{ti_ucc21750} \\
-\textbf{Minimum} & \textbf{\SI{166}{\nano\second}} & \\
+Pulse-width distortion of the gate signals & \SI{30}{\nano\second} & \cite{ti_ucc21750} \\
+Skew between the two gate signals & \SI{30}{\nano\second} & \cite{ti_ucc21750} \\
+Minimum & \SI{166}{\nano\second} & \\
 Minimum with the fall time $t_f = \SI{32}{\nano\second}$ & \SI{198}{\nano\second} & \\
-\textbf{Chosen} & \textbf{\SI{260}{\nano\second}} & factor 1.57 (1.31 with $t_f$) \\
+\scelta Chosen & \SI{260}{\nano\second} & factor 1.57 (1.31 with $t_f$) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -177,7 +178,7 @@ The largest term is the delay of the MOSFET. It grows with the gate
 resistance, so the dead time must be checked again whenever $R_g$ changes.
 The gate resistances come from the overshoot limit (\cref{sec:kelvin}).
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{plecs_06_dead_time.pdf}
 \caption{One commutation with the \SI{260}{\nano\second} interval in which

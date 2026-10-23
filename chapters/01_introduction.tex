@@ -17,9 +17,18 @@ This report designs the power stage of a three-phase SiC traction inverter:
   \item the cooling;
   \item the schematic and the board layout of the power stage.
 \end{itemize}
-\Cref{fig:system} shows what the module contains. The battery, the gate
+\Cref{fig:system} shows what the power stage contains. The battery, the gate
 drive and the controller are outside it. What crosses the boundary is listed
 as an assumption in \cref{tab:sysassume}.
+
+\begin{figure}[H]
+\centering
+\input{figures/tikz/sistema}
+\caption{The power stage and its boundaries. Orange: inside the power stage;
+dashed grey: outside it, with the interface stated as assumptions
+(\cref{tab:sysassume}).}
+\label{fig:system}
+\end{figure}
 
 The brief asks for four things, and each has its chapters:
 \begin{itemize}
@@ -31,36 +40,27 @@ The brief asks for four things, and each has its chapters:
 Every value in the report comes from a datasheet, from a formula shown in the
 text, or from a simulation whose model is described.
 
-\begin{figure}[htbp]
-\centering
-\input{figures/tikz/sistema}
-\caption{The power stage and its boundaries. Orange: inside the module; dashed
-grey: outside it, with the interface stated as assumptions
-(\cref{tab:sysassume}).}
-\label{fig:system}
-\end{figure}
-
 \section{Method and structure}
 
 The design follows the steps of \cref{fig:flow}:
 \begin{enumerate}
   \item Specification and selection criteria (\cref{ch:spec}).
-  \item Analytical sizing with the formulas of the course: operating point,
-        DC-link capacitance, device currents and modulation
-        (\cref{ch:analytical,ch:modulation}).
-  \item Circuit simulation in PLECS, compared with the formulas
+  \item Analytical sizing: operating point, DC-link capacitance, device
+        currents and modulation (\cref{ch:analytical,ch:modulation}).
+  \item Circuit simulation in PLECS, compared with the analytical results
         (\cref{ch:model,ch:losses}). A SPICE model of one switching cell sets
         the gate resistances.
-  \item Thermal design (\cref{ch:thermal}). The on-resistance of the device
-        rises by \SI{80}{\percent} from \SI{25}{\celsius} to
-        \SI{175}{\celsius}, so losses and temperature are solved together.
+  \item Thermal design with the steady-state analysis of PLECS
+        (\cref{ch:thermal}). The on-resistance of the device rises by
+        \SI{80}{\percent} from \SI{25}{\celsius} to \SI{175}{\celsius}, so
+        losses and temperature are solved together.
   \item Schematic and layout of the power stage in KiCad
         (\cref{ch:schematic,ch:layout}).
 \end{enumerate}
 \Cref{ch:conclusions} compares the results with the brief.
 \Cref{app:assumptions} lists the values that still need a measurement.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \input{figures/tikz/flusso}
 \caption{Design flow. Blue: the steps and their chapters; orange: the

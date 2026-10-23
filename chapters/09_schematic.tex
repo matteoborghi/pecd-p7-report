@@ -7,22 +7,22 @@ The power stage is two sheets of a KiCad 10.0.6 project, frozen on
   \item a sheet with the DC-link and the terminals;
   \item a half-bridge leg, instantiated three times.
 \end{itemize}
-The module has 30 parts. It talks to the rest of the project through 23
+The power stage has 30 parts. It talks to the rest of the project through 23
 labelled signals (\cref{tab:interface}). The two sheets close the chapter.
 
 \section{Sheet hierarchy}
 
 The schematic is organised by voltage domain. The three legs are one sheet,
 drawn once and used three times. This sheet holds 21 of the 30 parts of the
-module.
+power stage.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Sheet hierarchy. Parts are counted per instance.}
 \label{tab:sheets}
 \small
 \zebra
-\begin{tabularx}{\textwidth}{llrrY}
+\begin{tabularx}{\textwidth}{llccY}
 \toprule
 Sheet & Domain & Inst. & Parts & Content \\
 \midrule
@@ -33,24 +33,24 @@ root & --- & 1 & 0 & the blocks of the whole project and the signals between the
 \end{tabularx}
 \end{table}
 
-The sheets of gate drive, sensing, auxiliary supply, control and DC-link
-management belong to the rest of the board and are outside this module.
+The other sheets of the project belong to the rest of the board and are
+outside the brief.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
-\caption{Interface of the power-stage module: the 23 signals that leave its
+\caption{Interface of the power stage: the 23 signals that leave its
 sheet.}
 \label{tab:interface}
 \small
 \zebra
-\begin{tabularx}{\textwidth}{lYrl}
+\begin{tabularx}{\textwidth}{lYcl}
 \toprule
 Group & Signals & Count & Goes to \\
 \midrule
-DC-link & \texttt{HV\_DCP}, \texttt{HV\_DCN} & 2 & gate drive, DC-link management \\
-Switching nodes & \texttt{HV\_SW1}, \texttt{HV\_SW2}, \texttt{HV\_SW3} & 3 & gate drive \\
-Gate and Kelvin source & \texttt{GHk\_GATE}, \texttt{GHk\_COM}, \texttt{GLk\_GATE}, \texttt{GLk\_COM}, $k = 1,2,3$ & 12 & gate drive \\
-Shunt voltage & \texttt{SNSk\_SP}, \texttt{SNSk\_SN}, $k = 1,2,3$ & 6 & phase-current sensing \\
+DC-link & \texttt{HV\_DCP}, \texttt{HV\_DCN} & 2 & rest of the board \\
+Switching nodes & \texttt{HV\_SW1}, \texttt{HV\_SW2}, \texttt{HV\_SW3} & 3 & rest of the board \\
+Gate and Kelvin source & \texttt{GHk\_GATE}, \texttt{GHk\_COM}, \texttt{GLk\_GATE}, \texttt{GLk\_COM}, $k = 1,2,3$ & 12 & rest of the board \\
+Shunt voltage & \texttt{SNSk\_SP}, \texttt{SNSk\_SN}, $k = 1,2,3$ & 6 & rest of the board \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -68,14 +68,14 @@ manufacturing minimum, because the gate and the Kelvin source of one device
 belong to the same domain and are only \SI{0.70}{\milli\metre} apart on the
 package. Between classes the rules of the board apply.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Net classes of the power stage. Clearance and track width are the
 values inside the class.}
 \label{tab:netclasses}
 \small
 \zebra
-\begin{tabularx}{\textwidth}{lYrr}
+\begin{tabularx}{\textwidth}{lYcc}
 \toprule
 Class & Nets & Clearance & Track \\
 \midrule
@@ -96,12 +96,12 @@ instance.
 
 \section{Components of the power stage}
 
-\Cref{tab:components} lists every part of the module with the reason for the
+\Cref{tab:components} lists every part of the power stage with the reason for the
 choice. For the commutation ceramics the datasheet sets the value: in C0G
 at \SI{1200}{\volt} the largest ceramic is \SI{47}{\nano\farad} in a
 3640~\cite{kemet_kclink}.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Components of the power stage, with the basis of each choice.}
 \label{tab:components}
@@ -129,7 +129,7 @@ Insulating pad (one per leg) & aluminium nitride \SI{0.63}{\milli\metre} with ph
   & the interfaces set the value more than the ceramic (\cref{sec:coolalt}) \\
 Cooling rail (1) & six-port aluminium extrusion, \SI{10}{\litre\per\minute}
   & $R_\mathrm{eq} = \SI{0.069}{\celsius\per\watt}$
-  & two plain channels reach \SI{128.7}{\celsius} at locked rotor, beyond C1 (\cref{sec:cooling}) \\
+  & two plain channels reach \SI{128.9}{\celsius} at locked rotor, beyond C1 (\cref{sec:cooling}) \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -153,7 +153,7 @@ between two high-voltage nodes on the board. Criterion C3 asks for at least
 
 \section{Schematic sheets}
 
-The two sheets of the module follow, one per page, in the order of
+The two sheets of the power stage follow, one per page, in the order of
 \cref{tab:sheets}. Of the leg sheet one instance is shown, leg~1. The others
 differ only in their references.
 

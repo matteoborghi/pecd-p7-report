@@ -15,6 +15,9 @@
 \usepackage{fancyhdr}
 \usepackage{emptypage}
 \setlength{\parskip}{0.4em}
+% Con i float fissi [H] le pagine non sono tutte piene: senza \raggedbottom
+% LaTeX allungherebbe gli spazi fra paragrafi ed elenchi per riempirle.
+\raggedbottom
 
 \setlength{\headheight}{14pt}   % richiesto da fancyhdr
 \pagestyle{fancy}
@@ -167,6 +170,9 @@
 \newcommand{\fail}[1]{\cellcolor{farancio!30}#1}
 \newcommand{\aperto}[1]{\cellcolor{yellow!45}#1}
 \newcommand{\nd}{\cellcolor{black!10}--}
+% Riga della scelta di progetto: sfondo azzurro su tutta la riga, nessun
+% grassetto nelle celle (il grassetto su \SI rendeva in neretto solo l'unita').
+\newcommand{\scelta}{\rowcolor{fblu!14}}
 \usepackage{listings}
 \lstset{
   basicstyle=\ttfamily\footnotesize,

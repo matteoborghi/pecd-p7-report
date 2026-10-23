@@ -11,22 +11,23 @@ The device is the Wolfspeed \device{} silicon-carbide MOSFET~\cite{wolfspeed_e3m
 It was selected among several candidates with five pass/fail criteria that
 were fixed before any result was computed.
 
-The design uses the formulas of the course for the device currents, the
-DC-link capacitor and the losses. A PLECS model checks them, and a SPICE
-model of one switching cell sets the gate resistances. The thermal design
-and the schematic and layout of the power stage close the work.
+The design uses closed-form relations for the device currents, the DC-link
+capacitor and the losses. A PLECS model checks them, and its steady-state
+analysis gives all the losses and junction temperatures. A SPICE model of one
+switching cell sets the gate resistances. The schematic and the layout of the
+power stage close the work.
 
 At the rated point the converter delivers \SI{25.48}{\kilo\watt} and
-dissipates \SI{128.1}{\watt}, an efficiency of \SI{99.50}{\percent}. The
+dissipates \SI{128.5}{\watt}, an efficiency of \SI{99.50}{\percent}. The
 output current ripple is \SI{0.84}{\percent} (RMS). The DC-link of
 \SI{200}{\micro\farad} gives a voltage ripple of \SI{0.17}{\percent} at the
-rated point and \SI{0.36}{\percent} in the worst case. The losses are
-\SIrange{127.5}{131.4}{\watt} for every power factor, and the junction is at
-\SI{81.8}{\celsius}.
+rated point and \SI{0.36}{\percent} in the worst case. At \SI{30}{\Arms} the
+losses and the junction temperature are practically the same at every power
+factor, in motoring and in regeneration.
 
 The design is sized by an extra case, the locked rotor, where the full
 \SI{42.4}{\ampere} peak flows as direct current in one device. With a liquid
 rail of six ports, an aluminium nitride pad and a phase-change interface the
-hottest junction reaches \SI{97.9}{\celsius}, and \SI{117.8}{\celsius} with
+hottest junction reaches \SI{97.6}{\celsius}, and \SI{117.4}{\celsius} with
 all tolerances, against a limit of \SI{150}{\celsius}. One criterion remains
 open: the manufacturer does not declare the short-circuit withstand time.

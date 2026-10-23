@@ -3,16 +3,17 @@
 
 The power stage of a three-phase two-level SiC inverter for \SI{800}{\volt},
 \SI{30}{\Arms} and \SI{20}{\kilo\hertz} has been designed, with its cooling
-and the schematic and layout of the module. This chapter compares the
+and the schematic and layout of the power stage. This chapter compares the
 results with the brief, lists the open points and gives possible
 developments.
 
 \section{Results against the brief}
 
 \Cref{tab:results} tests every requirement of the brief and the device
-criteria of \cref{tab:criteria}.
+criteria of \cref{tab:criteria}. All temperatures come from the
+steady-state analysis of PLECS.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{The design against the brief and the device criteria.}
 \label{tab:results}
@@ -23,11 +24,11 @@ criteria of \cref{tab:criteria}.
 Requirement & Result & Test & Where \\
 \midrule
 \SI{800}{\volt}, \SI{30}{\Arms} at any power factor &
-  \SI{25.48}{\kilo\watt}, loss \SI{128.1}{\watt}, efficiency \SI{99.50}{\percent} at the rated point;
-  \SIrange{127.5}{128.0}{\watt} for $\cos\varphi \leq 0.95$ and \SI{131.4}{\watt} at unity &
+  \SI{25.48}{\kilo\watt}, loss \SI{128.5}{\watt}, efficiency \SI{99.50}{\percent} at the rated point;
+  \SIrange{126.5}{128.5}{\watt} for $|\cos\varphi| \leq 0.95$, in motoring and regeneration &
   \pass{PASS} & \cref{sec:anypf,sec:pfsweep} \\
 \SI{20}{\kilo\hertz} &
-  loss \SIrange{90.5}{166.1}{\watt} and $\Tj$ \SIrange{76.9}{86.8}{\celsius} over \SIrange{10}{30}{\kilo\hertz} &
+  loss \SIrange{90.8}{147.6}{\watt} and $\Tj$ \SIrange{76.9}{84.4}{\celsius} over \SIrange{10}{25}{\kilo\hertz} &
   \pass{PASS} & \cref{ch:losses} \\
 Negligible output current ripple &
   \SI{2.46}{\ampere} peak-to-peak, \SI{0.84}{\percent} RMS, with \SI{2.5}{\milli\henry} of load &
@@ -36,9 +37,9 @@ DC-link voltage ripple $< \SI{0.5}{\percent}$, worst case &
   \SI{0.17}{\percent} at the rated point; \SI{0.36}{\percent} (\SI{2.86}{\volt}) in the worst case with \SI{200}{\micro\farad}; \SI{0.33}{\percent} at most over the power-factor sweep &
   \pass{PASS} & \cref{sec:dclink,ch:model} \\
 Forced air or liquid cooling, \SI{50}{\celsius} ambient &
-  liquid, six-port rail and AlN pad: \SI{77.1}{\celsius} at the rated point, \SI{97.9}{\celsius} at locked rotor, \SI{117.8}{\celsius} with all tolerances, against \SI{150}{\celsius}; one fan with the same pad: \SI{108.3}{} and \SI{129.1}{\celsius} &
+  liquid, six-port rail and AlN pad: \SI{97.6}{\celsius} at locked rotor and \SI{117.4}{\celsius} with all tolerances, against \SI{150}{\celsius}; forced air with one fan and the same pad: \SI{108.2}{} and \SI{128.5}{\celsius} &
   \pass{PASS} & \cref{sec:cooling} \\
-C1, locked rotor $\leq \SI{120}{\celsius}$ & \SI{97.9}{\celsius} & \pass{PASS} & \cref{sec:coolalt} \\
+C1, locked rotor $\leq \SI{120}{\celsius}$ & \SI{97.6}{\celsius} & \pass{PASS} & \cref{sec:coolalt} \\
 C2, die $\leq \SI{1080}{\volt}$ at \SI{950}{\volt}, \SI{60}{\ampere} &
   \SI{1073.5}{\volt} with the \SI{20}{\nano\henry} budget; \SI{1040}{\volt} with the loop extracted from the copper &
   \pass{PASS} & \cref{sec:kelvin,sec:loopextract} \\
@@ -54,7 +55,7 @@ C5, declared $t_\mathrm{SC} \geq \SI{1.5}{\micro\second}$ & not declared by the 
 All the requirements pass except one open point: the short-circuit withstand
 time, which the manufacturer does not declare and no simulation can replace.
 The locked rotor sizes the design. It decided the device and the pad, and it
-passes with \SI{22}{\celsius} of margin on C1.
+passes with \SI{22.4}{\celsius} of margin on C1.
 
 \section{Open points}
 
@@ -73,9 +74,18 @@ Three assumptions carry the thermal and the switching results. Each is in
 \section{Possible developments}
 
 \begin{itemize}
+  \item The power stage is laid out as one area of a six-layer board
+        (\cref{ch:layout}). The same board can hold the circuits that the
+        brief leaves out: the gate drives next to each device, the isolated
+        gate supplies, the current and voltage sensing and the control
+        interface. Integrating them keeps each gate loop inside its own
+        channel and gives a complete inverter on one board.
+  \item An external SiC Schottky diode in parallel with each MOSFET saves
+        \SI{22.5}{\watt} at the rated point and \SI{6.7}{\celsius} at locked
+        rotor (\cref{sec:sbd}). It becomes useful if the current rating rises.
   \item Discontinuous modulation at standstill lowers the hottest junction
-        at locked rotor by about \SI{12}{\celsius} on the real rail, and the
-        converter loss by one third (\cref{sec:lrdpwm}). It stays a
+        at locked rotor by \SI{11.5}{\celsius} on the final cooling, and the
+        converter loss by about one third (\cref{sec:lrdpwm}). It stays a
         recommendation to the controller (\cref{tab:sysassume}).
   \item A TO-247-4 with the ceramic inside removes the external pad and one
         interface (\cref{sec:coolalt}). It is the next step when one is

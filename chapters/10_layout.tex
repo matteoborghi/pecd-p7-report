@@ -1,9 +1,10 @@
 \chapter{PCB layout}
 \label{ch:layout}
 
-The module is laid out on a six-layer board, frozen as revision 1.2 on
-11 October 2026. The board also carries the gate drives and the rest of the
-inverter electronics. This chapter describes only the power stage:
+The power stage is laid out as one area of a six-layer board, frozen as
+revision 1.2 on 11 October 2026. The other areas of that board are outside
+the brief and are not described here; \cref{ch:conclusions} lists them as a
+development. This chapter covers:
 \begin{itemize}
   \item the floorplan and the stack-up;
   \item the commutation loop;
@@ -12,35 +13,30 @@ inverter electronics. This chapter describes only the power stage:
   \item the cooling rail.
 \end{itemize}
 
-\section{The module on the board}
+\section{The power-stage area}
 \label{sec:asbuilt}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{figures/kicad_modulo_alto.png}
-  \caption{The power-stage module seen from above (3D render,
+  \caption{The power stage seen from above (3D render,
   \SI{269}{}$\times$\SI{195}{\milli\metre}). Top to bottom: the two devices
   of each leg with the four commutation ceramics beside them and the shunt;
   the phase terminals PH1--PH3; the film DC-link capacitors (the two grey
-  blocks); DC+ and DC$-$ at the right. The gate-drive components of each leg
-  are just above the upper edge.}
+  blocks); DC+ and DC$-$ at the right.}
   \label{fig:pcb-top}
 \end{figure}
 
-The module is the lower part of one board. Each driver faces its own device
-across a few millimetres, so the gate loop stays inside its channel. A
-connector between a driver board and a power board would add about
-\SI{8}{\nano\henry} to every gate loop for \SI{10}{\milli\metre} of stacking
-height. The module is marked by a box on a drawing layer of the board file.
+The power stage is marked by a box on a drawing layer of the board file.
 It contains the 30 parts of the sheets \texttt{1\_power\_stage} and
 \texttt{leg} (\cref{tab:boardnumbers}). Two of the six M3 fixing holes of the
 board are inside it. They have no net, they are \SI{9.5}{\milli\metre} from
 all high-voltage copper, and they hold the board against the bending that
 would fatigue the joints of the film capacitors.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
-\caption{The power-stage module in numbers.}
+\caption{The power stage in numbers.}
 \label{tab:boardnumbers}
 \small
 \zebra
@@ -55,12 +51,12 @@ Vias & 50 on the negative DC rail, 60 joining the phase pours to L6 \\
 \end{tabularx}
 \end{table}
 
-\Cref{fig:layers} shows the three power layers. The negative DC plane on L2
-is under the power stage only. The two ground planes of the low-voltage side
-(L3 and L5) do not overlap it, so no high-voltage plane faces a ground plane
-across a thin dielectric.
+\Cref{fig:layers} shows the three layers that the power stage uses: L1, L2
+and L6. The negative DC plane on L2 is under the power stage only. Layers L3
+to L5 carry no copper of the power stage, so no high-voltage plane faces a
+low-voltage plane across a thin dielectric.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
   \begin{subfigure}{0.49\textwidth}\centering
     \includegraphics[page=1,width=\textwidth,trim=207mm 62.5mm 118mm 163mm,clip]{figures/kicad_modulo_strati.pdf}
@@ -71,38 +67,37 @@ across a thin dielectric.
   \begin{subfigure}{0.49\textwidth}\centering
     \includegraphics[page=3,width=\textwidth,trim=207mm 62.5mm 118mm 163mm,clip]{figures/kicad_modulo_strati.pdf}
     \caption{L6, bottom: phase pours}\end{subfigure}
-  \caption{The power layers of the module, inside the dashed box of the board
-  file.}
+  \caption{The three layers used by the power stage, inside the dashed box
+  of the board file.}
   \label{fig:layers}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
   \begin{subfigure}{0.48\textwidth}\centering
     \includegraphics[width=\textwidth]{figures/kicad_modulo_ramo.png}
     \caption{3D, top}\end{subfigure}\hfill
   \begin{subfigure}{0.48\textwidth}\centering
     \includegraphics[width=\textwidth,trim=219mm 174mm 295mm 163mm,clip]{figures/kicad_rame_canale.pdf}
-    \caption{copper: L1 (red), L4 (cyan), L6 (blue)}\end{subfigure}
+    \caption{copper: L1 (red), L6 (blue); cyan: gate connection}\end{subfigure}
   \caption{Leg 1: the two devices, the shunt in the source path, the four
   commutation ceramics on the right and the phase terminal at the bottom.}
   \label{fig:pcb-leg}
 \end{figure}
 
-The gate loop has a target of \SI{25}{\milli\metre} from the driver output to
-the gate. Along the tracks of the board it is \SI{23.7}{\milli\metre} at
-turn-on and \SI{24.3}{\milli\metre} at turn-off, in all six channels. The
-extraction method of \cref{sec:loopextract} gives about \SI{13}{\nano\henry}
-for this loop. The gate resistance is above the critical value
-$2\sqrt{L/C_\mathrm{iss}}$, so the loop does not ring, and the overshoot
-changes by a few volts (\cref{tab:dptextract}).
+The gate of each device is connected through the gate resistors, which are
+outside the power stage. The extraction method of \cref{sec:loopextract}
+gives about \SI{13}{\nano\henry} for this gate loop. The gate resistance is
+above the critical value $2\sqrt{L/C_\mathrm{iss}}$, so the loop does not
+ring. \Cref{tab:dptextract} includes this value in the switching simulation.
 
 \section{Stack-up}
 \label{sec:stackup}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
-\caption{Six-layer stack-up. Finished thickness \SI{1.6}{\milli\metre}.}
+\caption{Six-layer stack-up of the board. Finished thickness
+\SI{1.6}{\milli\metre}.}
 \label{tab:stackup}
 \zebra
 \begin{tabular}{llll}
@@ -110,11 +105,11 @@ changes by a few volts (\cref{tab:dptextract}).
 Layer & Copper & Function & Dielectric below \\
 \midrule
 L1 & \SI{2}{oz} & power: DC-positive, switching nodes, terminals & prepreg \SI{0.10}{\milli\metre} \\
-L2 & \SI{1}{oz} & \textbf{DC-negative plane} under the power stage & core \SI{0.46}{\milli\metre} \\
-L3 & \SI{1}{oz} & ground plane of the low-voltage side & prepreg \SI{0.20}{\milli\metre} \\
-L4 & \SI{1}{oz} & signals: gate turn-on path, sensing pairs & core \SI{0.46}{\milli\metre} \\
-L5 & \SI{1}{oz} & ground plane of the low-voltage side & prepreg \SI{0.10}{\milli\metre} \\
-L6 & \SI{2}{oz} & phase pours; floating-reference islands of the drivers & --- \\
+L2 & \SI{1}{oz} & DC-negative plane under the power stage & core \SI{0.46}{\milli\metre} \\
+L3 & \SI{1}{oz} & not used by the power stage & prepreg \SI{0.20}{\milli\metre} \\
+L4 & \SI{1}{oz} & not used by the power stage & core \SI{0.46}{\milli\metre} \\
+L5 & \SI{1}{oz} & not used by the power stage & prepreg \SI{0.10}{\milli\metre} \\
+L6 & \SI{2}{oz} & second phase pours & --- \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -132,13 +127,13 @@ which is proportional to the separation $h$. \Cref{tab:planepair} gives it
 for the region of \SI{30}{\milli\metre} by \SI{20}{\milli\metre} that the
 commutation loop occupies.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Plane-pair inductance against prepreg thickness,
 $l = \SI{30}{\milli\metre}$, $w = \SI{20}{\milli\metre}$.}
 \label{tab:planepair}
 \zebra
-\begin{tabular}{lr}
+\begin{tabular}{lc}
 \toprule
 L1--L2 separation & Inductance \\
 \midrule
@@ -155,14 +150,15 @@ core, against a target of \SI{20}{\nano\henry}. The thin prepreg costs
 nothing, so it is specified. The inductance budget is spent elsewhere:
 \cref{tab:loopbudget} lists the contributions.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
-\caption{Commutation loop budget, estimated before the layout. The last rows
-give the extraction from the board (\cref{sec:loopextract}).}
+\caption{Commutation loop on the PCB: estimate before the layout and
+extraction from the board (\cref{sec:loopextract}). The device packages are
+in the SPICE model and not in this budget; blue: final value.}
 \label{tab:loopbudget}
 \small
 \zebra
-\begin{tabular}{lrl}
+\begin{tabular}{lcl}
 \toprule
 Contribution & [\si{\nano\henry}] & Controlled by the layout? \\
 \midrule
@@ -171,27 +167,33 @@ Leads and pads & 3--6 & partly: short leads \\
 Vias and vertical transitions & 0.4--2 & yes \\
 Plane pair L1--L2 & 0.19 & yes, already negligible \\
 Ceramic capacitor ESL & 1--2 & yes: more parts in parallel \\
-\textbf{Board total, estimate} & \textbf{5--10} & target \SI{20}{\nano\henry} \\
-\textbf{Physical loop, estimate} & \textbf{20--25} & \\
+Board total, estimate & 5--10 & target \SI{20}{\nano\henry} \\
 Extracted, first layout: board copper & 12$\pm$1 & three legs alike \\
 \quad of which at the clearance holes & 7.7 & yes: inner-layer clearance \\
-\textbf{Extracted, final layout: board copper} & \textbf{7.8} & inner-layer clearance relaxed \\
-\textbf{Final layout, with capacitor ESL} & \textbf{about 8.3} & \SI{14}{\nano\henry} below the C2 threshold \\
+Extracted, final layout: board copper & 7.8 & inner-layer clearance relaxed \\
+\scelta Final layout, with capacitor ESL & about 8.3 & \SI{14}{\nano\henry} below the C2 threshold \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \section{Commutation loop}
 
-The design input is \SI{20}{\nano\henry} of loop inductance on the PCB. The
-gate resistances of \SI{5}{}/\SI{12.5}{\ohm} were chosen so that the die
-stays below \SI{1080}{\volt} at \SI{950}{\volt} and \SI{60}{\ampere} with
-this value (\cref{sec:kelvin}). The limit is lost at \SI{22.6}{\nano\henry}
-at turn-off and at \SI{23.6}{\nano\henry} at recovery
-(\cref{tab:lthreshold}). The margin between the design input and the
-threshold is \SI{2.6}{\nano\henry}. The packages add \SI{14.6}{\nano\henry}
-that no layout can remove, so the physical loop is about \SI{35}{\nano\henry}
-at the limit.
+All inductances in this section are those of the PCB copper and of the
+capacitors. The \SI{14.6}{\nano\henry} of the two device packages are a
+separate part of the SPICE model and are always included in the switching
+simulation. The budget works as follows:
+\begin{itemize}
+  \item the design input is \SI{20}{\nano\henry} on the PCB. The gate
+        resistances of \SI{5}{}/\SI{12.5}{\ohm} keep the die below
+        \SI{1080}{\volt} at \SI{950}{\volt} and \SI{60}{\ampere} with this
+        value (\cref{sec:kelvin});
+  \item the limit is lost at \SI{22.6}{\nano\henry} at turn-off and at
+        \SI{23.6}{\nano\henry} at recovery (\cref{tab:lthreshold});
+  \item the board, extracted from its copper, has about
+        \SI{8.3}{\nano\henry} (\cref{sec:loopextract}). The budget is
+        therefore met, and the switching simulation is repeated with the
+        extracted values (\cref{tab:dptextract}).
+\end{itemize}
 
 \subsection{Extraction from the copper}
 \label{sec:loopextract}
@@ -238,34 +240,43 @@ outer layers. The board loop falls from 12 to \SI{7.8}{\nano\henry}
 (\SI{8.2}{\nano\henry} on a finer grid). The ceramics add about
 \SI{0.5}{\nano\henry} of ESL, so the board loop is about
 \SI{8.3}{\nano\henry}. It is well below the \SI{20}{\nano\henry} design input
-and \SI{14}{\nano\henry} below the \SI{22.6}{\nano\henry} threshold. The
-physical loop, with the packages, is about \SI{23}{\nano\henry}.
+and \SI{14}{\nano\henry} below the \SI{22.6}{\nano\henry} threshold.
 
 \subsection{Switching simulation with the extracted values}
 
 The double-pulse test of \cref{sec:kelvin} was run again with the extracted
-loop and gate-loop inductances. Nothing else changed.
+values in place of the budget. Two values change:
+\begin{itemize}
+  \item the commutation loop on the PCB, from \SI{20}{} to
+        \SI{8.3}{\nano\henry};
+  \item the gate loop, from the \SI{5}{\nano\henry} assumed in
+        \cref{sec:kelvin} to the \SI{13}{\nano\henry} extracted. This value
+        is higher than assumed, so it is checked here.
+\end{itemize}
+Nothing else changes, and the packages stay in the model.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Double pulse at \SI{950}{\volt}, \SI{60}{\ampere}, \SI{175}{\celsius},
-$R_g$ \SI{5}{}/\SI{12.5}{\ohm}: the budget and the extracted board. Peak at
-the die; limit \SI{1080}{\volt}.}
+$R_g$ \SI{5}{}/\SI{12.5}{\ohm}: the budget and the extracted board. Loop
+values on the PCB; packages included in all cases. Peak at the die; limit
+\SI{1080}{\volt}; blue: final layout.}
 \label{tab:dptextract}
 \small
 \zebra
-\begin{tabular}{lrrrr}
+\begin{tabular}{lcccc}
 \toprule
 Case & Loop & Gate loop & Turn-off peak & Recovery peak \\
 \midrule
 Budget (\cref{sec:kelvin}) & \SI{20}{\nano\henry} & \SI{5}{\nano\henry} & \pass{\SI{1073.5}{\volt}} & \pass{\SI{1050.0}{\volt}} \\
 First layout, extracted & \SI{12.5}{\nano\henry} & \SI{13}{\nano\henry} & \pass{\SI{1052.5}{\volt}} & \pass{\SI{1046.6}{\volt}} \\
-\textbf{Final layout, extracted} & \SI{8.3}{\nano\henry} & \SI{13}{\nano\henry} & \pass{\textbf{\SI{1040.1}{\volt}}} & \pass{\SI{1027.2}{\volt}} \\
+\scelta Final layout, extracted & \SI{8.3}{\nano\henry} & \SI{13}{\nano\henry} & \pass{\SI{1040.1}{\volt}} & \pass{\SI{1027.2}{\volt}} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The margin at the die goes from \SI{6.5}{} to \SI{40}{\volt}. It could be
+Both peaks pass, also with the higher gate loop. The margin at the die
+goes from \SI{6.5}{} to \SI{40}{\volt}. It could be
 used to lower $R_{g,\mathrm{off}}$ to \SI{7.5}{\ohm} (die at \SI{1064}{\volt},
 turn-off energy \SI{38}{\percent} lower). The resistor is not changed,
 because the margin comes from a model of the copper and not from a
@@ -287,13 +298,13 @@ The phase conductors carry \SI{30}{\Arms}. The DC bus carries
 rounded up to \SI{35}{\ampere} for the ripple. \Cref{tab:widths} gives the
 minimum widths from the IPC-2221B formula~\cite{ipc2221}.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Minimum conductor width, IPC-2221B, external layer, \SI{2}{oz}
 copper.}
 \label{tab:widths}
 \zebra
-\begin{tabular}{llrr}
+\begin{tabular}{llcc}
 \toprule
 Conductor & Current & $\Delta T = \SI{20}{\kelvin}$ & $\Delta T = \SI{30}{\kelvin}$ \\
 \midrule
@@ -305,9 +316,7 @@ DC bus & \SI{35}{\ampere} & \SI{13.3}{\milli\metre} & \SI{10.4}{\milli\metre} \\
 
 At these currents the conductors are pours, so the widths are a minimum
 check. Two design rules flag any track on a bus or phase net narrower than
-\SI{10.4}{} or \SI{8.4}{\milli\metre}. Two connections are exempt, because
-they carry milliamperes: the lead of the desaturation diode and the
-bus-voltage divider.
+\SI{10.4}{} or \SI{8.4}{\milli\metre}.
 
 The rules check tracks and not pours, so the pours were measured on the
 filled copper. The positive rail (\SI{411}{\centi\metre\squared}) and the
@@ -345,14 +354,14 @@ the bus. \Cref{tab:creepage} compares the \SI{3.24}{\milli\metre} with the
 creepage required at \SI{900}{\volt}. The board is coated, which gives
 pollution degree 1.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Creepage required at the \SI{900}{\volt} working voltage
 ($V_\mathrm{max,cont}$, \cref{tab:vhierarchy}) against the
 \SI{3.24}{\milli\metre} available.}
 \label{tab:creepage}
 \zebra
-\begin{tabular}{lrrl}
+\begin{tabular}{lccl}
 \toprule
 Condition & Required & Margin & Test \\
 \midrule
@@ -384,19 +393,19 @@ because most automotive housings breathe and can condense. The pad is a
 reinforced barrier, and \cref{tab:pad} sizes it by the creepage around its
 edge.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Insulating pad sized by the creepage around its edge. Reinforced
 barrier at \SI{900}{\volt}; the path available is the overhang plus the
 \SI{0.63}{\milli\metre} pad thickness; tab \SI{15.9}{}$\times$\SI{20}{\milli\metre}.}
 \label{tab:pad}
 \zebra
-\begin{tabular}{lrrl}
+\begin{tabular}{lccl}
 \toprule
 Surface at the pad & Creepage & Overhang & Pad \\
 \midrule
 Pollution degree 1, sealed housing & \SI{5.60}{\milli\metre} & \SI{4.97}{\milli\metre} & \SI{26}{}$\times$\SI{30}{\milli\metre} \\
-\textbf{Pollution degree 2, material group I} (selected) & \SI{9.00}{\milli\metre} & \SI{8.37}{\milli\metre} & \textbf{\SI{33}{}$\times$\SI{37}{\milli\metre}} \\
+\scelta Pollution degree 2, material group I (selected) & \SI{9.00}{\milli\metre} & \SI{8.37}{\milli\metre} & \SI{33}{}$\times$\SI{37}{\milli\metre} \\
 Pollution degree 2, material group II & \SI{12.70}{\milli\metre} & \SI{12.07}{\milli\metre} & \SI{41}{}$\times$\SI{45}{\milli\metre} \\
 \bottomrule
 \end{tabular}
@@ -404,7 +413,7 @@ Pollution degree 2, material group II & \SI{12.70}{\milli\metre} & \SI{12.07}{\m
 
 The design uses pollution degree 2. It costs \SI{57}{\percent} more pad area
 on a part worth a few euros, and it does not depend on the sealing of the
-housing, which is outside this module. On the cooling rail the creepage is
+housing, which is outside the power stage. On the cooling rail the creepage is
 obtained by raising the rail, which gives \SI{10.1}{\milli\metre}
 (\cref{fig:mechsection}). The overhang of the pad is outside the path of the
 heat, so it does not change $\Rthcs$.
@@ -443,16 +452,16 @@ The cold plate is a rail:
   \item aluminium nitride with a phase-change interface on both faces
         between tabs and rail (\cref{sec:coolalt}), in segments of
         \SI{70}{\milli\metre}, one under each leg, because ceramic
-        substrates are not made \SI{345}{\milli\metre} long;
+        substrates are not made as long as the rail;
   \item one spring clip per device, hooked over the rail and pressing the
         plastic body, never the tab.
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{figures/kicad_meccanica_3d_nord.png}
-  \caption{Cooling rail, insulating strip and spring clips on the board, seen
-  from the driver side (indicative bodies).}
+  \includegraphics[width=\textwidth,trim=12mm 25mm 8mm 30mm,clip]{figures/kicad_modulo_meccanica_3d.png}
+  \caption{Cooling rail, insulating strip and spring clips on the power stage,
+  seen from the side of the devices (indicative bodies).}
   \label{fig:mech3d}
 \end{figure}
 
@@ -471,7 +480,7 @@ The tab touches the rail over \SI{81}{\percent} of its height. The lip is
 The wide part with the channels starts \SI{13}{\milli\metre} above the board,
 over every component.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.92\textwidth]{figures/kicad_meccanica_sezione.pdf}
   \caption{Section through the rail at the high-side device of leg~1, with the

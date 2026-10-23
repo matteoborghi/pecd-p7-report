@@ -15,8 +15,8 @@ COLORI = ["fblu", "farancio", "fverde"]
 
 GRAFICI = {
     "topologia": {
-        "assi": ["few devices", "few gate drives", "output voltage\\\\quality", "simple\\\\layout",
-                 "simple\\\\control", "low device\\\\voltage"],
+        "assi": ["few devices", "few gate signals", "output voltage\\\\quality", "simple\\\\layout",
+                 "simple\\\\control", "low voltage\\\\per device"],
         "serie": [
             # dispositivi 6 / 18 / 12; driver 6 / 12 / 12; livelli 3 / 5 / 5 (tab. topologia);
             # maglie di commutazione 1 / piu' asimmetriche / piu'; bilanciamento del punto neutro no / si / si;
