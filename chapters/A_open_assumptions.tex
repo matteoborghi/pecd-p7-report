@@ -26,13 +26,13 @@ A.2 & Impulse withstand of \SI{2.5}{\kilo\volt}, from the transient of the conve
     & The design passes up to \SI{4}{\kilo\volt} and fails at \SI{6}{\kilo\volt}.
     & the text of IEC 60664-1; the values come from a calculator \\
 A.3 & Short-circuit withstand time: not declared by Wolfspeed. A device of the same class has \SI{2.9}{\micro\second} at \SI{800}{\volt} and \SI{2.4}{\micro\second} at \SI{950}{\volt}.
-    & Criterion C5 ($t_\mathrm{SC} \geq \SI{1.5}{\micro\second}$) stays open. The desaturation protection closes in \SI{0.83}{\micro\second} in the worst case.
+    & Criterion C5 ($t_\mathrm{SC} \geq \SI{1.5}{\micro\second}$) stays open. The short-circuit protection is assumed to switch the device off within \SI{0.83}{\micro\second} in the worst case.
     & the written value of the manufacturer, or a short-circuit test on a spare device \\
 A.4 & Switching energy from the datasheet. At the datasheet point the SPICE model gives $E_\mathrm{on} = \SI{748}{\micro\joule}$ against \SI{2552}{\micro\joule} measured, and $E_\mathrm{off} = \SI{509}{}$ against \SI{788}{\micro\joule}.
     & If the model is right, the thermal budget is better. The overshoot results do not depend on it.
     & a double-pulse test at the datasheet point \\
-A.5 & Case-to-sink resistance $\Rthcs = \SI{0.18}{\celsius\per\watt}$ (aluminium nitride with a phase-change interface), \SI{0.50}{\celsius\per\watt} at most.
-    & Each \SI{0.1}{\celsius\per\watt} costs about \SI{7}{\celsius} at locked rotor (\cref{sec:lockedrotor}). Above \SI{0.50}{\celsius\per\watt} C1 is lost on the rail.
+A.5 & Case-to-sink resistance $\Rthcs = \SI{0.18}{\celsius\per\watt}$ (aluminium nitride with a phase-change interface), \SI{0.45}{\celsius\per\watt} at most at assembly.
+    & Each \SI{0.1}{\celsius\per\watt} costs about \SI{7}{\celsius} at locked rotor (\cref{sec:lockedrotor}). Above about \SI{0.49}{\celsius\per\watt} C1 is lost on the rail.
     & the resistance of a mounted sample at the specified clip force \\
 A.6 & Pad material group I (CTI $\geq \SI{600}{\volt}$). Aluminium nitride and alumina do not track, but this is not confirmed on a specific part.
     & With group II the pad grows from \SI{33}{}$\times$\SI{37}{} to \SI{41}{}$\times$\SI{45}{\milli\metre}.
@@ -44,7 +44,7 @@ A.8 & Conductor widths from the IPC-2221B formula at \SI{30}{\kelvin} of rise: \
     & The formula is conservative. On a board at \SI{67}{}--\SI{85}{\celsius} the copper reaches about \SI{115}{\celsius}.
     & the IPC-2152 charts, or a thermal test of the board \\
 A.9 & Coolant at \SI{65}{\celsius} at the rail inlet. The brief gives only the ambient, \SI{50}{\celsius}.
-    & At \SI{70}{\celsius} the junction at locked rotor rises by about \SI{6}{\celsius}. With all tolerances the rail reaches \SI{117.8}{\celsius} (\cref{tab:coolalt}).
+    & At \SI{70}{\celsius} the junction at locked rotor rises by about \SI{6}{\celsius}. With all tolerances the rail reaches \SI{117.4}{\celsius} (\cref{tab:coolalt}).
     & a requirement on the vehicle cooling loop (\cref{tab:sysassume}) \\
 A.10 & Maximum continuous bus voltage of \SI{900}{\volt}, including charging and regenerative braking.
     & Creepage, device derating and the voltage class of the film are sized at \SI{900}{\volt}. A battery above it for long periods is outside the design.

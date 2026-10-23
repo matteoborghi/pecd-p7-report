@@ -29,16 +29,16 @@ GRANDEZZE = [
     ("Corrente di bus",        32.0,   r"32\.\d(?=\}\{\\ampere)",  ["32.1}{\\ampere"]),
     ("Larghezza pista bus",    10.4,   r"10\.4(?=\}\{\\milli\\metre)", []),
     ("P_cond",                 57.64,  r"57\.6\d?(?=\}\{\\watt)",  ["151.1}{\\watt"]),
-    ("P_sw",                   70.46,  r"70\.\d+(?=\}\{\\watt)",   []),
-    ("P_tot",                 128.09,  r"128\.\d+(?=\}\{\\watt)",  ["178.2}{\\watt"]),
-    ("P per dispositivo",      21.348, r"21\.\d+(?=\}\{\\watt)",   ["29.7}{\\watt"]),
-    ("T_heatsink",             66.28,  r"66\.2\d?(?=\}\{\\celsius)", ["66.78"]),
+    ("P_sw",                   70.6,  r"70\.\d+(?=\}\{\\watt)",   []),
+    ("P_tot",                 128.52,  r"128\.\d+(?=\}\{\\watt)",  ["178.2}{\\watt"]),
+    ("P per dispositivo",      21.42, r"21\.\d+(?=\}\{\\watt)",   ["29.7}{\\watt"]),
+    ("T_heatsink",             66.29,  r"66\.2\d?(?=\}\{\\celsius)", ["66.78"]),
     ("T_case",                 76.96,  r"76\.9\d?(?=\}\{\\celsius)", ["81.63"]),
     ("T_giunzione",            81.84,  r"81\.8\d?(?=\}\{\\celsius)", []),
-    ("Margine termico",        68.16,  r"68\.\d+(?=\}\{\\celsius)", ["54.71"]),
+    ("Margine termico",        68.11,  r"68\.\d+(?=\}\{\\celsius)", ["54.71"]),
     ("R_th,JC",                 0.22864, r"0\.22864|0\.23(?=\}\{\\celsius\\per\\watt)", ["0.46020"]),
     ("Pad massimo a C1",        0.62,  r"0\.6\d(?=\}\{\\celsius\\per\\watt)", ["1.18}{\\celsius"]),
-    ("T_j rotore bloccato 65",  111.06, r"111\.\d+(?=\}\{\\celsius)", ["105.1}{\\celsius"]),
+    ("T_j rotore bloccato 65",  111.04, r"111\.\d+(?=\}\{\\celsius)", ["105.1}{\\celsius"]),
     # l'obsoleto 110,9 (primo dispositivo, liquido a 70 degC) e' stato tolto il
     # 11/10/2026: lo stesso numero ricompare, legittimo, nella tab. coolalt
     # (dissipatore di rame, caso peggiore) e il controllo non li distingue
@@ -48,15 +48,15 @@ GRANDEZZE = [
     ("tau termica",            10.2047, r"10\.\d+(?=\}\{\\second)", []),
     ("Picco di corrente",      43.0,   r"\b43\.0\b",               []),
     ("I_C caso peggiore",      16.28,  r"16\.\d+(?=\}\{\\ampere)", ["16.48"]),
-    ("Energia commutazione",  596.487, r"59[67](?:\.\d)?(?=\}\{\\micro\\joule)", ["231.4"]),
+    ("Energia commutazione",  596.9, r"59[67](?:\.\d)?(?=\}\{\\micro\\joule)", ["231.4"]),
     ("Induttanza package",     14.6,   r"1[45]\.\d(?=\}\{\\nano\\henry)", ["15.5}{\\nano"]),
     ("Picco V_DS 20 nH",     1073.5,   r"107[34](?:\.\d)?(?=\}\{\\volt)", ["998.3"]),
     # --- revisione dopo il cambio di dispositivo: soglie e caso peggiore ---
     ("Soglia induttanza C2",   22.6,  r"22\.6(?=\}\{\\nano\\henry)", []),
     ("Soglia recupero C2",     23.6,  r"23\.6(?=\}\{\\nano\\henry)", []),
-    ("Caso peggiore simult.", 140.5,  r"140\.5(?=\}\{\\celsius)",     []),
+    ("Caso peggiore simult.", 140.4,  r"140\.\d(?=\}\{\\celsius)",     []),
     ("Soglia t_SC",             0.83, r"0\.83(?=\}\{\\micro\\second)", []),
-    ("T_j DPWM-MAX",           93.9,  r"93\.\d+(?=\}\{\\celsius)",   []),
+    ("T_j DPWM-MAX",           93.83, r"93\.\d+(?=\}\{\\celsius)",   []),
     ("R_g,off",                12.5,   r"12\.5(?=\}\{\\ohm)",      []),
     ("Tempo morto",           260.0,   r"26\d(?=\}\{\\nano\\second)", []),
     # 5,45 mm resta nel testo di proposito: il riquadro di §9 spiega perche'
@@ -99,6 +99,8 @@ GRANDEZZE = [
 # Valori che compaiono di proposito accanto al canonico, e che quindi NON
 # sono incoerenze: il testo li mette a confronto apposta.
 ECCEZIONI = {
+    # 99,59 %: rendimento con il diodo Schottky esterno (sezione sbd), non il progetto
+    "Rendimento": {"99.59"},
     # il capitolo termico confronta la tau identificata con quella attesa
     "tau termica": {"10.0", "10.00"},
     # il riquadro di §9 cita il passo sbagliato per correggerlo
@@ -113,12 +115,14 @@ ECCEZIONI = {
     "Rinforzato PD1": {"4.60"},
     # 111,05 degC e' il dettaglio della tabella del rotore bloccato: 111,06 +-
     # 0,02 fra due esecuzioni, che arrotondato a un decimale da' 111,1
+    # 111,05: metodo nel tempo nella tabella di confronto del cap. 5
     "T_j rotore bloccato 65": {"111.6", "111.05"},
     # 1074,2 V e' la riga a 21 nH della scansione fine della soglia
     "Picco V_DS 20 nH": {"1073", "1074.2"},
     # 128,52 W e 81,89 degC sono lo steady-state nativo, messo a confronto
     # col metodo nel tempo nel cap. 5
-    "P_tot": {"128.52", "128.0"},   # 128,0 W: sweep a 30 A, cos phi 0,87 e 0,95
+    # 128,09: metodo nel tempo nella tabella di confronto del cap. 5
+    "P_tot": {"128.09"},
     "T_giunzione": {"81.89"},
     # 21,2 W e' la conduzione di A1 a rotore bloccato, non la perdita media
     "P per dispositivo": {"21.2"},
@@ -128,7 +132,8 @@ ECCEZIONI = {
     # 116,7 degC e' il caso peggiore del TO-247 isolato internamente (tab. coolalt)
     "T_j rotore bloccato 70": {"116.9", "116.7"},
     # 93,27 degC e' la T_case a R_cs 1,2 nello sweep del pad
-    "T_j DPWM-MAX": {"93.27"},
+    # 93,37: T_case con pad 1,2 nella tabella del pad, non DPWM
+    "T_j DPWM-MAX": {"93.27", "93.37"},
 }
 
 
