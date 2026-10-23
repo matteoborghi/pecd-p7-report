@@ -1,30 +1,38 @@
-% Corrente efficace nel DC-link riferita alla corrente di fase (formula del
-% corso, slide DC-AC), al variare di M_f = V_M/V_DC e del fattore di potenza.
+% Corrente efficace nel DC-link riferita alla corrente di fase, al variare di
+% M_f = V_M/V_DC e del fattore di potenza. Legenda sotto il grafico, etichette
+% dei due punti fuori dalle curve.
 \begin{tikzpicture}
   \begin{axis}[
     width=0.82\textwidth, height=6.2cm,
-    xmin=0, xmax=0.6, ymin=0, ymax=0.76,
+    xmin=0, xmax=0.6, ymin=0, ymax=0.8,
+    xtick={0,0.1,0.2,0.3,0.4,0.5,0.6},
+    xticklabel style={/pgf/number format/fixed, /pgf/number format/precision=1},
+    scaled x ticks=false,
     xlabel={modulation index $M_f = V_M/\Vdc$},
     ylabel={$I_{C,\mathrm{RMS}}/I_{o,\mathrm{RMS}}$},
     grid=major, grid style={black!10},
-    legend style={font=\scriptsize, draw=none, fill=none, at={(0.98,0.03)}, anchor=south east},
+    legend columns=4,
+    legend style={font=\scriptsize, draw=none, fill=none, at={(0.5,-0.32)}, anchor=north,
+                  /tikz/every even column/.append style={column sep=6pt}},
     tick label style={font=\scriptsize}, label style={font=\footnotesize},
     domain=0.001:0.577, samples=120]
     \addplot[fblu, thick] {sqrt(max(0, x*(sqrt(3)/pi + 1*(4*sqrt(3)/pi - 4.5*x))))};
     \addlegendentry{$\cos\varphi = 1$}
     \addplot[farancio, thick] {sqrt(max(0, x*(sqrt(3)/pi + 0.949^2*(4*sqrt(3)/pi - 4.5*x))))};
-    \addlegendentry{$\cos\varphi = 0.949$ (rated load)}
+    \addlegendentry{$\cos\varphi = 0.949$ (rated)}
     \addplot[fverde, thick, dashed] {sqrt(max(0, x*(sqrt(3)/pi + 0.25*(4*sqrt(3)/pi - 4.5*x))))};
     \addlegendentry{$\cos\varphi = 0.5$}
     \addplot[fgrigio, thick, dotted] {sqrt(max(0, x*(sqrt(3)/pi)))};
     \addlegendentry{$\cos\varphi = 0$}
     % limite lineare SVPWM
-    \draw[black!50, dashed] (axis cs:0.577,0) -- (axis cs:0.577,0.76);
-    \node[font=\scriptsize, black!60, anchor=north east, rotate=90] at (axis cs:0.577,0.76) {$1/\sqrt{3}$};
-    % punto nominale e caso peggiore
+    \draw[black!50, dashed] (axis cs:0.577,0) -- (axis cs:0.577,0.8);
+    \node[font=\scriptsize, black!60, anchor=south east] at (axis cs:0.577,0.02) {$1/\sqrt{3}$};
+    % punto nominale e caso peggiore, con le etichette su fondo bianco
     \addplot[only marks, mark=*, mark size=1.8pt, farancio] coordinates {(0.534,0.447)};
-    \node[font=\scriptsize, anchor=north east, farancio] at (axis cs:0.534,0.43) {rated point, 0.447};
+    \node[font=\scriptsize, farancio, fill=white, inner sep=1pt, anchor=north] at (axis cs:0.47,0.36) {rated point, 0.447};
+    \draw[farancio, thin] (axis cs:0.534,0.447) -- (axis cs:0.49,0.365);
     \addplot[only marks, mark=*, mark size=1.8pt, fblu] coordinates {(0.306,0.650)};
-    \node[font=\scriptsize, anchor=south, fblu] at (axis cs:0.306,0.655) {worst case, 0.650 at $M_f = 0.306$};
+    \node[font=\scriptsize, fblu, fill=white, inner sep=1pt, anchor=south] at (axis cs:0.306,0.70) {worst case, 0.650 at $M_f = 0.306$};
+    \draw[fblu, thin] (axis cs:0.306,0.650) -- (axis cs:0.306,0.70);
   \end{axis}
 \end{tikzpicture}

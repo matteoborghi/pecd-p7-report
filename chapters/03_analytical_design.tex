@@ -1,13 +1,13 @@
 \chapter{Analytical design}
 \label{ch:analytical}
 
-This chapter sizes the converter with the formulas of the course, before any
+This chapter sizes the converter with closed-form relations, before any
 simulation. \Cref{ch:model,ch:losses} then check each result with PLECS.
 
 \section{Operating point}
 
-The modulation index of the course is the ratio between the peak of the
-phase voltage and the DC-link voltage, $M_f = V_M/\Vdc$. With space-vector
+The modulation index is the ratio between the peak of the phase voltage
+and the DC-link voltage, $M_f = V_M/\Vdc$. With space-vector
 modulation (\cref{ch:modulation}) the linear range ends at
 %
 \begin{equation}
@@ -67,9 +67,10 @@ dead time (\cref{sec:deadtime}).
 \label{sec:anypf}
 
 The brief asks for \SI{30}{\Arms} at any load power factor. The peak phase
-current is $I_{oM} = \sqrt{2}\cdot 30 = \SI{42.4}{\ampere}$. The course gives
-the average and RMS currents of each transistor $T_k$ and of its
-antiparallel diode $D_k$ over one output period:
+current is $I_{oM} = \sqrt{2}\cdot 30 = \SI{42.4}{\ampere}$. With sinusoidal
+output currents of negligible ripple, the average and RMS currents of each
+transistor $T_k$ and of its antiparallel diode $D_k$ over one output period
+are:
 %
 \begin{align}
   I_{T,\mathrm{avg}} &= I_{oM}\left(\frac{1}{2\pi} + \frac{M_f}{4}\cos\varphi\right), &
@@ -84,14 +85,14 @@ antiparallel diode $D_k$ over one output period:
 ($\cos\varphi = 1$) to regeneration ($\cos\varphi = -1$). A negative
 $\cos\varphi$ means that the power flows from the motor to the battery.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Device and DC-link currents against the load power factor, from
 \cref{eq:it,eq:id,eq:icrms}, at $M_f = 0.534$ and \SI{30}{\Arms}. $I_\mathrm{dev}$
 is the RMS current of the MOSFET channel, \cref{eq:idev}.}
 \label{tab:pfcurrents}
 \zebra[3]
-\begin{tabular}{rrrrrrr}
+\begin{tabular}{rcccccc}
 \toprule
 $\cos\varphi$ & $I_{T,\mathrm{avg}}$ & $I_{T,\mathrm{RMS}}$ & $I_{D,\mathrm{avg}}$ & $I_{D,\mathrm{RMS}}$ & $I_\mathrm{dev}$ & $I_{C,\mathrm{RMS}}$ \\
  & [\si{\ampere}] & [\si{\ampere}] & [\si{\ampere}] & [\si{\ampere}] & [\si{\ampere}] & [\si{\ampere}] \\
@@ -131,7 +132,9 @@ Three results follow from the table:
         $\Tj = \SI{82}{\celsius}$, it is \SI{54.4}{\watt}.
 \end{itemize}
 
-The switching loss of each device is, from the course,
+If the switching energy is proportional to the switched voltage and
+current, the switching loss of each device averaged over one output period
+is
 %
 \begin{equation}
   P_{sw} = \Vdc\,\frac{I_{oM}}{\pi}\,(\tau_\mathrm{on} + \tau_\mathrm{off})\,\fsw ,
@@ -148,14 +151,15 @@ Both loss terms are independent of the power factor. The rated current at
 any power factor gives the same losses as at the rated point:
 $54.4 + 71.6 = \SI{126}{\watt}$, plus about \SI{3}{\watt} in the body
 diodes during the dead time (\cref{sec:deadtime}). \Cref{sec:pfsweep} checks this with the simulation at
-exactly \SI{30}{\Arms} for eight power factors.
+exactly \SI{30}{\Arms} for sixteen power factors, in motoring and in
+regeneration.
 
 \section{DC-link capacitor}
 \label{sec:dclink}
 
 \subsection{RMS current}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \input{figures/tikz/corrente_dc}
 \caption{Currents in the DC-link over three switching periods (shape only).
@@ -167,7 +171,7 @@ zero average.}
 
 The capacitor carries the difference between the bridge input current and the
 smooth battery current (\cref{fig:dccurrent}). Its RMS value heats the
-capacitor. The course gives it for sinusoidal output currents:
+capacitor. For sinusoidal output currents it is~\cite{kolar_dclink}
 %
 \begin{equation}
   I_{C,\mathrm{RMS}} = I_{o,\mathrm{RMS}}
@@ -184,12 +188,12 @@ capacitor. The course gives it for sinusoidal output currents:
         \SI{16.3}{\ampere} at $\cos\varphi = 0$ (\cref{tab:pfcurrents});
   \item the worst case is at $\cos\varphi = 1$ and $M_f = 0.306$, a low-speed
         point at full current. The ratio is 0.650, that is
-        \SI{19.5}{\ampere}. This is the worst case given in the course
+        \SI{19.5}{\ampere}. This is the known worst case of the two-level bridge
         ($\varphi = 0$, $M_f \approx 0.3$, $0.65\,I_{o,\mathrm{RMS}}$).
 \end{itemize}
 The capacitor is sized for \SI{19.5}{\ampere}.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \input{figures/tikz/kolar}
 \caption{DC-link RMS current relative to the phase current, \cref{eq:icrms},
@@ -200,7 +204,7 @@ over the linear range and for four power factors.}
 \subsection{Capacitance}
 
 The brief allows a DC-link ripple of \SI{0.5}{\percent}, that is
-\SI{4}{\volt} peak-to-peak. The course estimates the capacitance from the
+\SI{4}{\volt} peak-to-peak. A fast estimate of the capacitance uses the
 dominant harmonic of the capacitor current, which with SVPWM is at
 $2\fsw$:
 %
@@ -214,8 +218,8 @@ $\Delta V_\mathrm{RMS} = 4/(2\sqrt{2}) = \SI{1.41}{\volt}$. With the worst
 case of \SI{19.5}{\ampere}, \cref{eq:cin} gives
 $C_\mathrm{IN} \geq \SI{55}{\micro\farad}$.
 
-The course notes that this is a fast estimate and that a simulation is more
-accurate. The PLECS model of \cref{ch:model} includes the \SI{5}{\micro\henry}
+This estimate assumes a single harmonic and an ideal source, so the
+simulation decides the final value. The PLECS model of \cref{ch:model} includes the \SI{5}{\micro\henry}
 inductance of the battery cables. This inductance and the capacitor form a
 resonant circuit, and the ripple is larger than the estimate:
 \begin{itemize}
@@ -265,9 +269,9 @@ The switching frequency is \SI{20}{\kilo\hertz} for these reasons:
   \item The switching loss grows linearly with $\fsw$, \cref{eq:psw}.
 \end{itemize}
 
-\Cref{ch:losses} sweeps $\fsw$ from \SI{10}{} to \SI{30}{\kilo\hertz}. The
-total loss goes from \SI{90.5}{} to \SI{166.1}{\watt} and the junction
-temperature at the rated point from \SI{76.9}{} to \SI{86.8}{\celsius}. At
+\Cref{ch:losses} sweeps $\fsw$ from \SI{10}{} to \SI{25}{\kilo\hertz}. The
+total loss goes from \SI{90.8}{} to \SI{147.6}{\watt} and the junction
+temperature at the rated point from \SI{76.9}{} to \SI{84.4}{\celsius}. At
 the rated point no frequency in this range is limited by temperature. The
 limit is the locked rotor (\cref{sec:lockedrotor}), where one device takes
 the full switching loss. The frequency is therefore chosen for noise and

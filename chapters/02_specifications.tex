@@ -6,12 +6,12 @@
 \Cref{tab:spec} lists what the brief asks. It also contains two values chosen
 for this design: the output frequency and the coolant temperature.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Converter specification.}
 \label{tab:spec}
 \zebra
-\begin{tabular}{llr}
+\begin{tabular}{llc}
 \toprule
 Quantity & Symbol & Value \\
 \midrule
@@ -54,13 +54,13 @@ choice is stricter than the brief, and it decides the device
 \subsection{Voltage levels}
 \label{sec:vhierarchy}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{DC-link voltage levels and what each one sizes.}
 \label{tab:vhierarchy}
 \small
 \zebra
-\begin{tabularx}{\textwidth}{lrY}
+\begin{tabularx}{\textwidth}{lcY}
 \toprule
 Level & Value & Sizes \\
 \midrule
@@ -90,7 +90,7 @@ could pass while the die is already above the limit (\cref{sec:kelvin}).
 The power stage depends on four values that come from outside the module.
 \Cref{tab:sysassume} lists them, and each chapter uses the ones it needs.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Assumptions on the system around the power stage.}
 \label{tab:sysassume}
@@ -116,7 +116,7 @@ Modulation at standstill & discontinuous PWM, recommended but not needed & \cref
 topologies, and \cref{fig:radar-topology} shows the same comparison as
 scores.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Topologies for an \SI{800}{\volt} traction inverter.}
 \label{tab:topology}
@@ -129,25 +129,25 @@ scores.
 Devices                & 6 & 12 + 6 diodes & 12 \\
 Device voltage class   & \SI{1200}{\volt} & \SI{650}{\volt} & \SI{650}{} and \SI{1200}{\volt} \\
 Phase voltage levels   & 3 & 5 & 5 \\
-Gate drives            & 6 & 12 & 12 \\
+Gate signals           & 6 & 12 & 12 \\
 Commutation loops      & one per leg & several, not symmetric & several \\
 Neutral-point control  & not needed & needed & needed \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \input{figures/tikz/radar_topologia}
-\caption{Topologies compared on a scale from 1 (worst) to 5 (best). Device
-and gate-drive counts come from \cref{tab:topology}; the other axes rank the
-three options.}
+\caption{Topologies compared on a scale from 1 (worst) to 5 (best); a larger
+area is better. Device and gate-signal counts come from \cref{tab:topology};
+the other axes rank the three options.}
 \label{fig:radar-topology}
 \end{figure}
 
 The two-level bridge (\cref{fig:vsi}) is chosen for these reasons:
 \begin{itemize}
-  \item It needs 6 devices and 6 gate drives, against 12 or more.
+  \item It needs 6 devices and 6 gate signals, against 12 or more.
   \item It has one short commutation loop per leg. \Cref{ch:layout} shows
         that the inductance of this loop is the main constraint of the
         layout.
@@ -158,7 +158,7 @@ A three-level inverter gives a better output voltage and can use faster
 small: the device already switches \SI{800}{\volt} at \SI{20}{\kilo\hertz}
 with low losses (\cref{ch:losses}).
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \input{figures/tikz/ponte}
 \caption{The two-level three-phase bridge with its DC-link: film capacitors for
@@ -170,7 +170,7 @@ the MOSFETs, since no external diode is fitted.}
 
 \subsection{Why silicon carbide}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{SiC MOSFET and Si IGBT at \SI{800}{\volt}, \SI{20}{\kilo\hertz}.}
 \label{tab:technology}
@@ -191,17 +191,17 @@ Cost & higher & lower \\
 \end{tabularx}
 \end{table}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \input{figures/tikz/radar_tecnologia}
-\caption{SiC MOSFET and Si IGBT compared on a scale from 1 (worst) to 5
-(best). The three loss and temperature axes come from the numbers in the
+\caption{SiC MOSFET and Si IGBT compared on a scale from 1 (worst) to 5 (best); a larger area is better. The three loss and temperature axes come from the numbers in the
 text; the others rank the two options.}
 \label{fig:radar-technology}
 \end{figure}
 
-To compare the two technologies with numbers, the loss formulas of the
-course are applied to an IGBT inverter at the same operating point. The IGBT
+To compare the two technologies with numbers, the average and RMS current
+formulas of \cref{sec:anypf} and the switching-loss formula
+(\cref{eq:psw}) are applied to an IGBT inverter at the same operating point. The IGBT
 is the fastest \SI{1200}{\volt}, \SI{40}{\ampere} device found, the
 TRENCHSTOP IKW40N120H3~\cite{infineon_ikw40n120h3}:
 \begin{itemize}
@@ -230,7 +230,7 @@ Five pass/fail criteria were fixed before any result was computed
 (\cref{tab:criteria}). Every candidate goes through the same model, the same
 load and the same thermal loop.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Pass/fail criteria for the power device.}
 \label{tab:criteria}
@@ -252,7 +252,7 @@ C3 & drain--source creepage $\geq \SI{2.8}{\milli\metre}$ at \SI{900}{\volt}
    & coated board (\cref{sec:insulation}) \\
 C4 & AEC-Q101 (discrete) or AQG~324 (module) & automotive use \\
 C5 & declared short-circuit time $t_\mathrm{SC} \geq \SI{1.5}{\micro\second}$
-   & twice the reaction time of the driver protection, \SI{0.75}{\micro\second} \\
+   & twice the reaction time of the short-circuit protection, \SI{0.75}{\micro\second} (assumed) \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -272,10 +272,10 @@ Infineon devices these models are built from the datasheet graphs. C2 is
 checked with the vendor SPICE models: Wolfspeed publishes them, Infineon does not.
 \Cref{tab:selection} shows the result.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Selection result. Green: pass; orange: fail; yellow: not demonstrated;
-grey: not checked, because the candidate already fails C1. C1 values at the
+grey: not checked, because the candidate already fails C1; blue: chosen device. C1 values at the
 gate resistance that C2 needs, on the ideal cold plate of \cref{ch:thermal}.}
 \label{tab:selection}
 \small
@@ -293,7 +293,7 @@ CCB021M12FM3, module & \fail{\SI{153}{\celsius}} & \nd & \nd & \fail{no} & \nd \
 E3M0021120K (\SI{21}{\milli\ohm}) & \fail{$>\SI{121}{\celsius}$} & \pass{\SI{7.5}{}/\SI{15}{\ohm}} & \pass{yes} & \pass{yes} & \aperto{not declared} \\
 $2\times$ E3M0040120K in parallel & \pass{\SI{98}{\celsius}} & \fail{needs $>\SI{25}{\ohm}$} & \pass{yes} & \pass{yes} & \aperto{not declared} \\
 AIMZH120R020M1T (\SI{20}{\milli\ohm}) & \pass{\SIrange{97}{110}{\celsius}} & \aperto{no SPICE model} & \pass{yes} & \pass{yes} & \pass{\SI{1.5}{\micro\second}} \\
-\textbf{E3M0016120K} (\SI{16}{\milli\ohm}) & \pass{\SI{111}{\celsius}} & \pass{\SI{1073}{\volt}} & \pass{\SI{3.24}{\milli\metre}} & \pass{yes} & \aperto{not declared} \\
+\scelta E3M0016120K (\SI{16}{\milli\ohm}) & \pass{\SI{111}{\celsius}} & \pass{\SI{1073}{\volt}} & \pass{\SI{3.24}{\milli\metre}} & \pass{yes} & \aperto{not declared} \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -334,10 +334,10 @@ Two candidates remain, and \cref{fig:radar-candidates} compares them:
         there is no SPICE model to check C2.
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \input{figures/tikz/radar_candidati}
-\caption{The two final candidates on a scale from 1 (worst) to 5 (best).
+\caption{The two final candidates on a scale from 1 (worst) to 5 (best); a larger area is better.
 Margin and loss come from \cref{tab:selection}; the other axes say whether
 the vendor provides the data or the feature.}
 \label{fig:radar-candidates}
@@ -351,7 +351,7 @@ SPICE model are available. Its missing short-circuit time stays an open point
 (\cref{app:assumptions}, item A.3). The Infineon device remains the alternative: a
 double-pulse test in the real power loop would show whether it meets C2.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Main parameters of the \device{}~\cite{wolfspeed_e3m0016}. Switching
 energies at \SI{800}{\volt}, \SI{80.28}{\ampere}, $R_{G(\mathrm{ext})} =
@@ -359,7 +359,7 @@ energies at \SI{800}{\volt}, \SI{80.28}{\ampere}, $R_{G(\mathrm{ext})} =
 \label{tab:device}
 \small
 \zebra
-\begin{tabular}{llrl}
+\begin{tabular}{llcl}
 \toprule
 Parameter & Symbol & Value & Condition \\
 \midrule
@@ -373,8 +373,8 @@ Internal gate resistance & $R_{G(\mathrm{int})}$ & \SI{2.6}{\ohm} & \\
 Gate threshold         & $V_\mathrm{GS(th)}$ & \SI{2.5}{\volt} & typ., \SI{25}{\celsius}; \SI{1.8}{} min. \\
 Turn-on energy, SiC diode  & $\Eon$  & \SI{1287}{\micro\joule} & \\
 Turn-off energy, SiC diode & $\Eoff$ & \SI{805}{\micro\joule} & \\
-Turn-on energy, body diode  & $\Eon$  & \SI{2552}{\micro\joule} & used in this design \\
-Turn-off energy, body diode & $\Eoff$ & \SI{788}{\micro\joule} & used in this design \\
+\scelta Turn-on energy, body diode  & $\Eon$  & \SI{2552}{\micro\joule} & used in this design \\
+\scelta Turn-off energy, body diode & $\Eoff$ & \SI{788}{\micro\joule} & used in this design \\
 Body-diode recovery charge & $Q_\mathrm{rr}$ & \SI{1665}{\nano\coulomb} & \SI{5.18}{\ampere\per\nano\second} \\
 Junction-to-case resistance & $\Rthjc$ & \SI{0.23}{\celsius\per\watt} & typ.; \SI{0.31}{} max. \\
 Pulsed drain current   & $I_\mathrm{D,pulse}$ & \SI{321}{\ampere} & \\
@@ -388,7 +388,7 @@ Two lines of \cref{tab:device} matter for \cref{ch:losses}:
         external SiC diode and with the body diode. This design has no
         external diode, so the turn-on energy is \SI{2552}{\micro\joule},
         not \SI{1287}{\micro\joule}. The difference is the recovery charge of
-        the body diode.
+        the body diode. \Cref{sec:sbd} compares the two solutions.
   \item The package has four pins. The fourth pin is a Kelvin source. The
         gate current returns straight to the source of the die, without
         crossing the inductance of the power path. Without this pin the
