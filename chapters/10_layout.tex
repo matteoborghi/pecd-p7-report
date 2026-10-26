@@ -47,6 +47,8 @@ Parts & 30: six MOSFETs, two film capacitors, twelve ceramics, three shunts, fiv
 Copper pours & positive DC rail on L1 (\SI{411}{\centi\metre\squared}); negative DC plane on L2
   (\SI{627}{\centi\metre\squared}); switching nodes and phases on L1; a second phase pour on L6 \\
 Vias & 50 on the negative DC rail, 60 joining the phase pours to L6 \\
+Volume & \SI{269}{}$\times$\SI{195}{}$\times$\SI{67}{\milli\metre}, about \SI{3.5}{\litre}: board and film capacitors, \SI{65}{\milli\metre} tall; housing and coolant fittings excluded \\
+Power density & about \SI{7}{\kilo\watt\per\litre} at \SI{25.5}{\kilo\watt} \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -212,7 +214,11 @@ extracted with a partial-inductance method, like the one used by FastHenry:
         device, and the resistance is neglected.
 \end{itemize}
 The result is the board part of the loop. The packages and the ESL of the
-capacitors are added to it.
+capacitors are added to it. The method is quasi three-dimensional: it
+contains the two copper layers, the \SI{0.10}{\milli\metre} between them
+and the mutual inductance of every pair of cells on the two layers. The vias
+and the device pins are ideal shorts; their inductance is in the package
+model (\SI{14.6}{\nano\henry}) and in the ESL estimate.
 
 The solver was checked first. Two parallel plates of
 \SI{10}{}$\times$\SI{30}{\milli\metre} at \SI{0.10}{\milli\metre} give
@@ -241,6 +247,39 @@ outer layers. The board loop falls from 12 to \SI{7.8}{\nano\henry}
 \SI{0.5}{\nano\henry} of ESL, so the board loop is about
 \SI{8.3}{\nano\henry}. It is well below the \SI{20}{\nano\henry} design input
 and \SI{14}{\nano\henry} below the \SI{22.6}{\nano\henry} threshold.
+
+\Cref{fig:loopenergy} shows where the magnetic energy of the loop is, in
+the first and in the final layout.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.49\textwidth}\centering
+    \includegraphics[width=\textwidth]{figures/kicad_maglia_energia_v10.png}
+    \caption{first layout: \SI{11.7}{\nano\henry}}\end{subfigure}\hfill
+  \begin{subfigure}{0.49\textwidth}\centering
+    \includegraphics[width=\textwidth]{figures/kicad_maglia_energia_v11.png}
+    \caption{final layout: \SI{7.8}{\nano\henry}}\end{subfigure}
+  \caption{Magnetic energy density of the commutation loop of leg~1, L1 on
+  the left and L2 on the right of each picture (red: high energy; black:
+  device and capacitor pads; grey: copper with little energy). The energy is
+  at the device pins and along the edges of the holes in the negative plane;
+  the smaller holes of the final layout hold less energy.}
+  \label{fig:loopenergy}
+\end{figure}
+
+The path of the commutation current with the lowest inductance is:
+\begin{enumerate}
+  \item from the ceramic capacitors, next to the leg, along the positive rail
+        on L1;
+  \item through the high-side device to the switching node on L1;
+  \item through the low-side device to its source;
+  \item down through the vias to the negative plane on L2, and back under
+        the outgoing current, \SI{0.10}{\milli\metre} below it, to the
+        ceramic capacitors.
+\end{enumerate}
+The return current on L2 must run directly under the current on L1. Every
+hole in the plane under this path makes the current go around it and adds
+inductance, which is what \cref{fig:loopenergy} shows.
 
 \subsection{Switching simulation with the extracted values}
 
@@ -494,6 +533,23 @@ and copper area at high voltage, with the component heights from their
 datasheets. All parts keep at least \SI{5.8}{\milli\metre} of air from the
 rail. The outlines of rail, pad and clip are drawn on the documentation
 layer of the board, so the assembler sees them.
+
+The vertical mounting must also survive the vibration of a vehicle. The
+device body is clamped to the rail and the leads are soldered to the board,
+so any relative movement between board and rail bends the leads. The design
+limits this movement:
+\begin{itemize}
+  \item the board and the rail are fixed to the same housing; two of the M3
+        fixing holes of the board are inside the power stage
+        (\cref{sec:asbuilt});
+  \item the clip presses the plastic body, so the package does not rest on
+        its leads;
+  \item the devices are soldered after they are clamped, so the leads carry
+        no assembly preload.
+\end{itemize}
+The vibration resistance is not computed in this report. It must be
+checked with a vibration test on the assembly, for example to ISO 16750-3
+(\cref{app:assumptions}, A.13).
 
 The devices are soldered after they are clamped to the rail. If they were
 soldered first, the leads would take every tolerance between the hole pattern

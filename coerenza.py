@@ -100,7 +100,13 @@ GRANDEZZE = [
 # sono incoerenze: il testo li mette a confronto apposta.
 ECCEZIONI = {
     # 99,59 %: rendimento con il diodo Schottky esterno (sezione sbd), non il progetto
-    "Rendimento": {"99.59"},
+    "Rendimento": {"99.59",
+                   # efficienza a temperatura diversa (tab. rthcs e stime a 125/150 gradi)
+                   "99.39", "99.43", "99.47", "99.51",
+                   # efficienza a carico ridotto (sezione efficiency)
+                   "99.70"},
+    # 70,9 W: accensione + spegnimento dalle tabelle del costruttore, verifica dei 70,6 simulati
+    "P_sw": {"70.9"},
     # il capitolo termico confronta la tau identificata con quella attesa
     "tau termica": {"10.0", "10.00"},
     # il riquadro di §9 cita il passo sbagliato per correggerlo

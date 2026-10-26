@@ -23,6 +23,8 @@ Channel conduction              & \SI{54.7}{\watt} & \\
 Body-diode surplus (dead time)  & \SI{3.2}{\watt} & included in $P_\mathrm{cond}$, \cref{sec:deadtime-loss} \\
 Total conduction $P_\mathrm{cond}$ & \SI{57.9}{\watt} & \\
 Switching $P_\mathrm{sw}$          & \SI{70.6}{\watt}  & \\
+\quad of which turn-on           & \SI{45.3}{\watt}  & vendor tables, see text \\
+\quad of which turn-off          & \SI{25.6}{\watt}  & vendor tables, see text \\
 \scelta Total $P_\mathrm{tot}$ & \SI{128.5}{\watt} & \\
 Per device                      & \SI{21.4}{\watt} & six devices \\
 Switching energy per device     & \SI{597}{\micro\joule} & per cycle, \cref{fig:perdite-fsw} \\
@@ -39,6 +41,20 @@ The simulation agrees with the formulas of \cref{sec:anypf}:
   \item switching: \SI{70.6}{\watt} simulated, \SI{71.6}{\watt} from
         \cref{eq:psw} (\SI{1.3}{\percent}).
 \end{itemize}
+
+The model gives the switching loss as one value. Turn-on and turn-off are
+separated with the vendor tables, at the design gate resistances and at the
+junction temperature of \SI{82}{\celsius}: the energy of each edge is averaged
+over the sinusoidal current of each device. The results are:
+\begin{itemize}
+  \item turn-on: \SI{45.3}{\watt}, \SI{64}{\percent} of the switching loss;
+  \item turn-off: \SI{25.6}{\watt}, \SI{36}{\percent};
+  \item at the current peak of \SI{42.4}{\ampere}: $\Eon = \SI{1151}{\micro\joule}$
+        and $\Eoff = \SI{703}{\micro\joule}$ per device.
+\end{itemize}
+The sum, \SI{70.9}{\watt}, agrees with the simulation within
+\SI{0.4}{\percent}. Turn-on dominates because it also removes the recovery
+charge of the opposite body diode (\cref{sec:sbd}).
 
 Switching is \SI{55}{\percent} of the total. For a SiC MOSFET at
 \SI{20}{\kilo\hertz} this share is high, for two reasons:
@@ -93,6 +109,77 @@ The results are:
         heats the junction, and a hotter junction has a higher $\Rdson$;
   \item the junction stays more than \SI{60}{\celsius} below the limit at
         every frequency of the sweep.
+\end{itemize}
+
+\section{Efficiency against output power}
+\label{sec:efficiency}
+
+The output power of a traction inverter changes in two ways: with the
+torque, that is the current, at a given speed, and with the speed, that is
+the voltage, at a given torque. The steady-state analysis gives the
+efficiency for both families, on the ideal cold plate:
+\begin{itemize}
+  \item rated speed ($M_f = 0.534$, \SI{200}{\hertz}), current from
+        \SI{3}{} to \SI{30}{\Arms}: the load impedance scales with the
+        inverse of the current, so $\cos\varphi$ stays 0.949;
+  \item rated current (\SI{30}{\Arms}), speed from \SI{20}{} to
+        \SI{100}{\percent}: $V_M$, $f_\mathrm{ref}$ and $R$ scale together
+        and $L$ stays the same, so $\cos\varphi$ stays 0.949.
+\end{itemize}
+\Cref{fig:efficiency} gives the results.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{plecs_14_efficienza.pdf}
+\caption{Efficiency against output power, steady-state analysis. Blue: rated
+speed, current from \SI{3}{} to \SI{30}{\Arms}; orange: rated current, speed
+from \SI{20}{} to \SI{100}{\percent}.}
+\label{fig:efficiency}
+\end{figure}
+
+The results are:
+\begin{itemize}
+  \item At rated speed the efficiency rises from \SI{99.50}{\percent} at
+        \SI{25.5}{\kilo\watt} to \SI{99.70}{\percent} at \SI{2.5}{\kilo\watt}.
+        The conduction loss falls with the square of the current and the
+        switching loss falls linearly, so the losses fall faster than the
+        power: \SI{128.5}{\watt} at \SI{30}{\Arms}, \SI{7.8}{\watt} at
+        \SI{3}{\Arms}.
+  \item At rated current the losses stay between \SI{119}{} and
+        \SI{128.5}{\watt}, because they depend on the current and not on the
+        voltage (\cref{sec:anypf}). The output power falls with the speed, so
+        the efficiency falls to \SI{97.5}{\percent} at \SI{20}{\percent}
+        speed (\SI{4.6}{\kilo\watt}). At this point the current is
+        \SI{28.6}{\Arms}, because the dead time removes a larger share of the
+        small output voltage.
+  \item The gate-drive power, \SI{0.54}{\watt} for the six devices
+        (\cref{sec:gatecurrent}), is not in the model. It lowers the
+        efficiency at \SI{2.5}{\kilo\watt} by \SI{0.02}{\percent}.
+\end{itemize}
+
+\section{Hard switching and soft switching}
+
+The bridge is hard-switched. At each commutation of a leg:
+\begin{itemize}
+  \item one device turns on or off with the full bus voltage and the full
+        phase current. These edges are the switching loss of
+        \cref{tab:losses};
+  \item the other device turns on after the dead time, while its body diode
+        already conducts. Its voltage is then almost zero, so this turn-on
+        has practically no loss.
+\end{itemize}
+Soft switching of every edge needs extra circuits, for example resonant
+inductors and capacitors with auxiliary switches in each leg. These
+solutions are common in DC--DC converters. They are not used here, for three
+reasons:
+\begin{itemize}
+  \item the switching loss is already small: \SI{70.6}{\watt}, that is
+        \SI{0.28}{\percent} of the output power;
+  \item the auxiliary components add cost, volume and failure modes, and a
+        resonant inductor in series would carry the load current;
+  \item in an inverter the simpler way to cut the switching loss is
+        discontinuous modulation, about \SI{-33}{\percent}
+        (\cref{ch:modulation}).
 \end{itemize}
 
 \section{Dependence on the load power factor}
@@ -253,7 +340,16 @@ TO-247 parts on the rail & 6 & 12 \\
 
 The external diode saves \SI{22.5}{\watt} at the rated point
 (\SI{17.5}{\percent} of the losses) and lowers the hottest junction at locked
-rotor by \SI{6.7}{\celsius} on the final cooling. The comparison is slightly
+rotor by \SI{6.7}{\celsius} on the final cooling. This saving is the
+recovery loss of the body diode: when a MOSFET turns on, it also removes the
+recovery charge of the opposite body diode, and this energy appears in its
+turn-on loss. The body diode therefore causes two losses:
+\begin{itemize}
+  \item recovery: about \SI{22}{\watt}, inside the switching loss;
+  \item conduction in the dead time: \SI{3.3}{\watt}, inside the
+        conduction loss (\cref{sec:deadtime-loss}).
+\end{itemize}
+The comparison is slightly
 favourable to the external diode, because the model keeps the body diode for
 the conduction in the dead time; the Schottky diode would save up to another
 \SI{3.3}{\watt} there [estimate].
@@ -385,6 +481,61 @@ its inductance limit, and the voltage read at the die. A resistor of
 loss and \SI{2.0}{\celsius} more at locked rotor. The thermal margin at a
 \SI{70}{\celsius} coolant is the scarcer of the two, so \SI{12.5}{\ohm} is
 kept.
+
+\subsection{Gate current and gate-drive power}
+\label{sec:gatecurrent}
+
+The gate resistances set the gate current. The gate charge gives the
+current, the switching time of the voltage and the power that the gate drive
+must deliver. The values used are:
+\begin{itemize}
+  \item gate swing $\Delta V_G = 15 - (-5) = \SI{20}{\volt}$;
+  \item internal gate resistance $R_{G(\mathrm{int})} = \SI{2.6}{\ohm}$ and
+        total gate charge $Q_g = \SI{223}{\nano\coulomb}$ (\cref{tab:device});
+  \item Miller plateau $V_\mathrm{pl} = V_\mathrm{GS(th)} + I_D/g_\mathrm{fs}
+        = 2.5 + 42.4/54 = \SI{3.3}{\volt}$ at the current peak, with the
+        transconductance $g_\mathrm{fs} = \SI{54}{\siemens}$ and the
+        Miller charge $Q_\mathrm{gd} = \SI{65}{\nano\coulomb}$ of the
+        datasheet~\cite{wolfspeed_e3m0016}.
+\end{itemize}
+
+\Cref{tab:gatecurrent} gives the results. The output resistance of the
+gate drive is neglected, so the peak currents are upper bounds.
+
+\begin{table}[H]
+\centering
+\caption{Gate current, voltage switching time and gate-drive power per
+device, at the current peak of \SI{42.4}{\ampere}.}
+\label{tab:gatecurrent}
+\zebra
+\begin{tabular}{lcc}
+\toprule
+Quantity & Turn-on & Turn-off \\
+\midrule
+Gate resistance, external + internal & \SI{7.6}{\ohm} & \SI{15.1}{\ohm} \\
+Peak gate current, $\Delta V_G/R$ & \SI{2.6}{\ampere} & \SI{1.3}{\ampere} \\
+Gate current on the Miller plateau & \SI{1.54}{\ampere} & \SI{0.55}{\ampere} \\
+Voltage switching time, $Q_\mathrm{gd}/I_g$ [estimate] & \SI{42}{\nano\second} & \SI{118}{\nano\second} \\
+Average gate current, $Q_g \fsw$ & \multicolumn{2}{c}{\SI{4.5}{\milli\ampere}} \\
+Gate-drive power, $Q_g \Delta V_G \fsw$ & \multicolumn{2}{c}{\SI{0.09}{\watt}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The results are:
+\begin{itemize}
+  \item On the Miller plateau the turn-off current is about three times
+        lower than the turn-on current, because only $V_\mathrm{pl} + \SI{5}{\volt}$
+        drives it through the larger resistor. The voltage edge at turn-off
+        is therefore slower, which is what limits the overshoot.
+  \item The gate drive of each device must deliver at least
+        \SI{2.6}{\ampere} at turn-on and \SI{1.3}{\ampere} at turn-off, and
+        \SI{0.09}{\watt}; the six devices need \SI{0.54}{\watt} in total.
+  \item A pull-down resistor between gate and source keeps each device off
+        while the gate supply starts. Without it a $\mathrm{d}v/\mathrm{d}t$ on
+        the bus could charge the gate through $C_\mathrm{gd}$.
+\end{itemize}
+\Cref{tab:sysassume} lists these values as requirements on the gate drive.
 
 \subsection{Overshoot and loop inductance}
 

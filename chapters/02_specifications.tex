@@ -87,7 +87,7 @@ could pass while the die is already above the limit (\cref{sec:kelvin}).
 
 \subsection{Assumptions on the surrounding system}
 
-The power stage depends on four values that come from outside the module.
+The power stage depends on six values that come from outside it.
 \Cref{tab:sysassume} lists them, and each chapter uses the ones it needs.
 
 \begin{table}[H]
@@ -104,6 +104,8 @@ Maximum battery voltage, also while charging and braking & \SI{900}{\volt} & \cr
 Impedance of the battery and cables at \SI{20}{\kilo\hertz} & $L \geq \SI{1.5}{\micro\henry}$ or $R \geq \SI{50}{\milli\ohm}$ & \cref{sec:dclink}, \cref{ch:model} \\
 Coolant at the rail inlet & water--glycol 50/50, $\leq\SI{65}{\celsius}$, $\geq\SI{10}{\litre\per\minute}$ & \cref{sec:cooling} \\
 Modulation at standstill & discontinuous PWM, recommended but not needed & \cref{ch:modulation}, \cref{sec:lrdpwm} \\
+Gate drive of each device & $+15/-5$~V; peak current at least \SI{2.6}{\ampere} (turn-on) and \SI{1.3}{\ampere} (turn-off); \SI{0.09}{\watt} & \cref{sec:gatecurrent} \\
+Gate--source pull-down resistor & present at each device, so that the gate stays off while the gate supply starts & \cref{sec:gatecurrent} \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -154,9 +156,17 @@ The two-level bridge (\cref{fig:vsi}) is chosen for these reasons:
   \item It needs no control of a neutral-point voltage.
 \end{itemize}
 A three-level inverter gives a better output voltage and can use faster
-\SI{650}{\volt} devices. With a \SI{1200}{\volt} SiC MOSFET this gain is
-small: the device already switches \SI{800}{\volt} at \SI{20}{\kilo\hertz}
-with low losses (\cref{ch:losses}).
+\SI{650}{\volt} devices. The same aim, a small current ripple, can be reached
+in two ways:
+\begin{itemize}
+  \item a three-level topology lowers the voltage steps, and so the ripple,
+        at the same switching frequency (better circuit);
+  \item a two-level bridge with SiC devices reaches the same ripple by
+        switching faster (better devices).
+\end{itemize}
+The second way keeps the simpler circuit. A \SI{1200}{\volt} SiC MOSFET
+already switches \SI{800}{\volt} at \SI{20}{\kilo\hertz} with low losses
+(\cref{ch:losses}), so the two-level bridge is kept.
 
 \begin{figure}[H]
 \centering
@@ -215,6 +225,18 @@ zero turn-on energy the inverter still loses \SI{332}{\watt}, and the hottest
 IGBT reaches \SI{186}{\celsius} at locked rotor. The gap is a factor of 3 to
 5, much larger than the error of the formulas, so the IGBT is not
 simulated (\cref{fig:radar-technology}).
+
+Two other technologies are excluded:
+\begin{itemize}
+  \item a silicon MOSFET of the \SI{1200}{\volt} class: its specific
+        on-resistance grows roughly with the square of the blocking voltage,
+        so the die would be very large, and its body diode has a large
+        recovery charge, so it cannot carry the reverse current of an
+        inverter leg;
+  \item a GaN transistor: the commercial parts reach the \SI{650}{\volt}
+        class, with a few up to \SI{900}{\volt}, and none the
+        \SI{1200}{\volt} class that an \SI{800}{\volt} bus needs.
+\end{itemize}
 
 The SiC MOSFET also behaves like a resistor when it conducts. A traction
 inverter works most of the time below rated current, and there a resistor
@@ -323,6 +345,13 @@ Why the candidates fail:
   \item The modules are either industrial and too hot, or made to be
         sintered on a cooler, which this design cannot do.
 \end{itemize}
+Devices in parallel divide the conduction loss by the number of devices.
+This pays off at high current: commercial traction inverters of hundreds of
+amperes put several dies in parallel in each switch. At \SI{30}{\Arms} one
+\SI{16}{\milli\ohm} device conducts \SI{9.1}{\watt}. A second device in
+parallel would save at most half of the conduction loss, about
+\SI{27}{\watt} for the converter, but it would double the capacitance and
+the recovery charge that are switched, besides the problems listed above.
 
 \subsection{The choice}
 
