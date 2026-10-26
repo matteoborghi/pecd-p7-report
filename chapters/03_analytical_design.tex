@@ -23,9 +23,19 @@ The design uses $V_M = \SI{427}{\volt}$, so
   M_f = \frac{427}{800} = 0.534 ,
 \end{equation}
 %
-which is \SI{92}{\percent} of the linear range. The margin covers the
-voltage lost in the dead time and in the devices, and it keeps the converter
-out of overmodulation during transients.
+which is \SI{92}{\percent} of the linear range. The margin of
+\SI{8}{\percent} covers the voltage drops between the DC-link and the load:
+\begin{itemize}
+  \item the dead time removes \SI{1.2}{\percent} of the fundamental
+        (\cref{sec:powerfactor});
+  \item the MOSFET drops $\SI{42.4}{\ampere} \times \SI{20}{\milli\ohm}
+        \approx \SI{0.85}{\volt}$ at the current peak and at the operating
+        temperature, \SI{0.2}{\percent} of the \SI{427}{\volt} phase voltage;
+  \item the DC-link ripple is \SI{0.17}{\percent} of the bus voltage at the
+        rated point (\cref{sec:dclink}).
+\end{itemize}
+These drops are small, and the rest of the margin keeps the converter out of
+overmodulation during transients.
 
 \subsection{Load and power factor}
 \label{sec:powerfactor}
@@ -264,8 +274,12 @@ The switching frequency is \SI{20}{\kilo\hertz} for these reasons:
   \item At \SI{20}{\kilo\hertz} the noise of the motor and of the capacitors
         is at the upper limit of hearing. At \SI{10}{\kilo\hertz} it would be
         in the middle of the audible band.
-  \item A higher $\fsw$ reduces the current ripple and the harmonic losses
-        in the motor.
+  \item The switching frequency must be at least ten times the output
+        frequency, so that the controller can shape the fundamental of the
+        current. Here the ratio is $\SI{20}{\kilo\hertz}/\SI{200}{\hertz} = 100$.
+  \item A higher $\fsw$ reduces the current ripple. The ripple causes
+        losses in the motor, in particular in the permanent magnets, whose
+        heating lowers their strength.
   \item The switching loss grows linearly with $\fsw$, \cref{eq:psw}.
 \end{itemize}
 

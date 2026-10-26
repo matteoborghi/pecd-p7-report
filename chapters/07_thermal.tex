@@ -82,6 +82,21 @@ once. The sweep of the pad below gives the strength of this loop:
 The loop amplifies the temperature rise by only \SI{5.5}{\percent}, and it
 converges.
 
+The same loop sets the efficiency at the operating temperature. The
+\SI{99.50}{\percent} of \cref{tab:losses} is already the value at the
+junction temperature of the rated point, \SI{81.9}{\celsius}, because the
+steady-state analysis closes the loop. At other junction temperatures:
+\begin{itemize}
+  \item between \SI{75}{} and \SI{98.5}{\celsius} the efficiency goes from
+        \SI{99.51}{} to \SI{99.47}{\percent} (\cref{tab:rthcs});
+  \item with the slope of \SI{0.394}{\watt\per\celsius}, the junction at
+        \SI{125}{\celsius} would give \SI{145.5}{\watt} and
+        \SI{99.43}{\percent}, and at \SI{150}{\celsius} \SI{155.3}{\watt} and
+        \SI{99.39}{\percent} [estimate].
+\end{itemize}
+The efficiency therefore depends little on the temperature: the conduction
+loss rises with $\Rdson$, but it is less than half of the total.
+
 \section{Insulating pad}
 \label{sec:rthcs}
 
@@ -95,18 +110,19 @@ mediocre silicone one (\cref{tab:rthcs,fig:rthcs}).
 \begin{table}[H]
 \centering
 \caption{Sensitivity to the insulating pad at the rated point, steady-state
-analysis. Blue: value used in this chapter.}
+analysis; efficiency with the output power of \SI{25.48}{\kilo\watt}. Blue:
+value used in this chapter.}
 \label{tab:rthcs}
 \zebra
-\begin{tabular}{lcccc}
+\begin{tabular}{lccccc}
 \toprule
-$\Rthcs$ & $P_\mathrm{tot}$ & $\Tcase$ & $\Tj$ & Margin \\
+$\Rthcs$ & $P_\mathrm{tot}$ & $\Tcase$ & $\Tj$ & Margin & Efficiency \\
 \midrule
-\SI{0.20}{\celsius\per\watt} & \SI{125.91}{\watt} & \SI{70.46}{\celsius} & \SI{75.25}{\celsius} & \SI{74.75}{\celsius} \\
-\SI{0.30}{\celsius\per\watt} & \SI{126.76}{\watt} & \SI{72.61}{\celsius} & \SI{77.44}{\celsius} & \SI{72.56}{\celsius} \\
-\SI{0.40}{\celsius\per\watt} & \SI{127.63}{\watt} & \SI{74.79}{\celsius} & \SI{79.65}{\celsius} & \SI{70.35}{\celsius} \\
-\scelta \SI{0.50}{\celsius\per\watt} & \SI{128.52}{\watt} & \SI{77.00}{\celsius} & \SI{81.89}{\celsius} & \SI{68.11}{\celsius} \\
-\SI{1.20}{\celsius\per\watt} & \SI{135.08}{\watt} & \SI{93.37}{\celsius} & \SI{98.51}{\celsius} & \SI{51.49}{\celsius} \\
+\SI{0.20}{\celsius\per\watt} & \SI{125.91}{\watt} & \SI{70.46}{\celsius} & \SI{75.25}{\celsius} & \SI{74.75}{\celsius} & \SI{99.51}{\percent} \\
+\SI{0.30}{\celsius\per\watt} & \SI{126.76}{\watt} & \SI{72.61}{\celsius} & \SI{77.44}{\celsius} & \SI{72.56}{\celsius} & \SI{99.50}{\percent} \\
+\SI{0.40}{\celsius\per\watt} & \SI{127.63}{\watt} & \SI{74.79}{\celsius} & \SI{79.65}{\celsius} & \SI{70.35}{\celsius} & \SI{99.50}{\percent} \\
+\scelta \SI{0.50}{\celsius\per\watt} & \SI{128.52}{\watt} & \SI{77.00}{\celsius} & \SI{81.89}{\celsius} & \SI{68.11}{\celsius} & \SI{99.50}{\percent} \\
+\SI{1.20}{\celsius\per\watt} & \SI{135.08}{\watt} & \SI{93.37}{\celsius} & \SI{98.51}{\celsius} & \SI{51.49}{\celsius} & \SI{99.47}{\percent} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -406,7 +422,9 @@ with a grease joint of about \SI{0.6}{\kelvin\centi\metre\squared\per\watt}
 per interface. A phase-change interface material under a specified clip
 force reaches \SI{0.25}{\kelvin\centi\metre\squared\per\watt}. Aluminium
 nitride ($k = \SI{170}{\watt\per\metre\per\kelvin}$) removes most of the
-ceramic term. \Cref{tab:coolalt} compares the options on the same rail.
+ceramic term. Alumina and aluminium nitride are also the ceramics of the
+direct-bonded-copper substrates of power modules, chosen there for the same
+reason. \Cref{tab:coolalt} compares the options on the same rail.
 
 \begin{table}[H]
 \centering
