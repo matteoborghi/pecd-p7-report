@@ -1,0 +1,45 @@
+\chapter{Component datasheets}
+\label{app:datasheets}
+
+This appendix gives the links to the datasheets of the components of the
+power stage. They are the 30 parts of \cref{tab:components}, plus the
+mechanical parts of the cooling. Where the manufacturer has no stable link to
+the PDF file, the link points to the product page, which holds the datasheet
+and the other documents of the part. The links were checked on 3 November
+2026.
+
+\begin{table}[H]
+\centering
+\caption{Datasheets of the components of the power stage.}
+\label{tab:datasheets}
+\footnotesize
+\zebra
+\begin{tabularx}{\textwidth}{L{0.22\textwidth}L{0.28\textwidth}Y}
+\toprule
+Component (quantity, references) & Part number, manufacturer & Datasheet \\
+\midrule
+SiC MOSFET (6, Q111--Q132) & E3M0016120K, Wolfspeed
+  & \url{https://www.wolfspeed.com/products/power/sic-mosfets/e-series-automotive-qualified-sic-mosfets/e3m0016120k/} (product page with the datasheet) \\
+DC-link film capacitor, \SI{140}{\micro\farad} (1, C101) & MKP1848714914Y5, Vishay Roederstein
+  & \url{https://www.vishay.com/en/product/28164/} (MKP1848 DC-Link series, document 28164) \\
+DC-link film capacitor, \SI{60}{\micro\farad} (1, C102) & MKP1848660914Y5, Vishay Roederstein
+  & same series and page as C101 \\
+Commutation ceramic, \SI{47}{\nano\farad} C0G (12, C111--C134) & CKC33C473KEGACAUTO, KEMET
+  & \url{https://content.kemet.com/datasheets/KEM_C1039_KC-LINK_C0G.pdf} (KC-LINK series, document C1039) \\
+Phase shunt, \SI{0.5}{\milli\ohm} (3, R111--R131) & CSS2H-3920R-L500FE, Bourns
+  & \url{https://www.bourns.com/data/global/pdfs/CSS2H-3920.pdf} \\
+Test points (2, TP101--TP102) & 5000 (red) and 5001 (black), Keystone
+  & \url{https://www.keyelco.com/category.cfm/Test-Points-color-keyed-Thru-Hole-Mount/Miniature-Style/id/747} \\
+Power terminals (5, J101--J105) & bolted M6 joint: ISO 4017 screw, ISO 7089 washers, DIN 6796 spring washer, ISO 4032 nut
+  & standard hardware, no datasheet \\
+Insulating pad (one per leg) & aluminium nitride \SI{0.63}{\milli\metre} with phase-change interface
+  & specified by its thermal resistance (\cref{sec:coolalt}); part to be selected \\
+Cooling rail (1) & six-port aluminium extrusion
+  & custom part, drawn in \cref{sec:mechanics} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The datasheets of the other devices compared in \cref{ch:spec} and of the
+parts used only as a source of data, such as the gate driver of
+\cref{tab:deadtime}, are listed in the bibliography.
