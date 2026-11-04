@@ -16,6 +16,8 @@ development. This chapter covers:
 \section{The power-stage area}
 \label{sec:asbuilt}
 
+\Cref{fig:pcb-top} shows the power stage from above.
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{figures/kicad_modulo_alto.png}
@@ -95,6 +97,8 @@ ring. \Cref{tab:dptextract} includes this value in the switching simulation.
 \section{Stack-up}
 \label{sec:stackup}
 
+\Cref{tab:stackup} gives the copper layers of the power stage.
+
 \begin{table}[H]
 \centering
 \caption{Copper layers of the power stage. Finished board thickness
@@ -103,10 +107,10 @@ ring. \Cref{tab:dptextract} includes this value in the switching simulation.
 \zebra
 \begin{tabular}{llll}
 \toprule
-Layer & Copper & Function & Distance to the next layer \\
+Layer & Copper & Function & Gap to next layer \\
 \midrule
-L1 & \SI{2}{oz} & power: DC-positive, switching nodes, terminals & \SI{0.10}{\milli\metre} prepreg to L2 \\
-L2 & \SI{1}{oz} & DC-negative plane under the power stage & about \SI{1.3}{\milli\metre} to L6 \\
+L1 & \SI{2}{oz} & power: DC-positive, switching nodes, terminals & \SI{0.10}{\milli\metre} prepreg \\
+L2 & \SI{1}{oz} & DC-negative plane under the power stage & about \SI{1.3}{\milli\metre} \\
 L6 & \SI{2}{oz} & second phase pours & --- \\
 \bottomrule
 \end{tabular}
@@ -289,6 +293,7 @@ values in place of the budget. Two values change:
         is higher than assumed, so it is checked here.
 \end{itemize}
 Nothing else changes, and the packages stay in the model.
+\Cref{tab:dptextract} gives the results.
 
 \begin{table}[H]
 \centering
@@ -545,7 +550,7 @@ The vibration resistance is not computed in this report. It must be
 checked with a vibration test on the assembly, for example to ISO 16750-3
 (\cref{app:assumptions}, A.13).
 
-The devices are soldered after they are clamped to the rail. If they were
-soldered first, the leads would take every tolerance between the hole pattern
+The order of assembly also matters for the joints. If the devices were
+soldered before they are clamped, the leads would take every tolerance between the hole pattern
 and the rail, and the joints of a \SI{20}{\milli\metre}-tall package would
 crack in the first thermal cycles.
