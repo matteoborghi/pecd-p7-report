@@ -86,7 +86,7 @@ SV-PWM is chosen for these reasons:
 
 DPWM would cut the switching loss by about one third. At the rated point
 this is about \SI{23}{\watt} of the \SI{70.6}{\watt} of switching
-(\cref{tab:losses}) [estimate]. The junction is at \SI{81.8}{\celsius}, so
+(\cref{tab:losses}) [estimate]. The junction is at \SI{81.9}{\celsius}, so
 the rated point does not need this reduction, and DPWM would increase the
 current ripple.
 
@@ -103,6 +103,10 @@ current is clamped, the hottest junction falls from \SI{111.0}{} to
 
 \section{Output waveforms}
 
+Each pole voltage $v_{k0}$ has only two values, $0$ and $\Vdc$. The load
+neutral floats, so the phase voltage $v_{1N} = v_{10} - v_{N0}$ has the five
+levels of \cref{fig:tensioni}.
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{plecs_02_tensione_di_fase.pdf}
@@ -111,9 +115,8 @@ levels $0, \pm\Vdc/3, \pm 2\Vdc/3$.}
 \label{fig:tensioni}
 \end{figure}
 
-Each pole voltage $v_{k0}$ has only two values, $0$ and $\Vdc$. The load
-neutral floats, so the phase voltage $v_{1N} = v_{10} - v_{N0}$ has the five
-levels of \cref{fig:tensioni}.
+The load inductance filters this voltage, and the phase currents of
+\cref{fig:correnti} are close to sinusoidal.
 
 \begin{figure}[H]
 \centering
@@ -177,6 +180,7 @@ Minimum with the fall time $t_f = \SI{32}{\nano\second}$ & \SI{198}{\nano\second
 The largest term is the delay of the MOSFET. It grows with the gate
 resistance, so the dead time must be checked again whenever $R_g$ changes.
 The gate resistances come from the overshoot limit (\cref{sec:kelvin}).
+\Cref{fig:deadtime} shows one commutation with the chosen dead time.
 
 \begin{figure}[H]
 \centering

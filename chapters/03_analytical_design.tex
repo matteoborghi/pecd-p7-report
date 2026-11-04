@@ -169,6 +169,9 @@ regeneration.
 
 \subsection{RMS current}
 
+The capacitor carries the difference between the bridge input current and the
+smooth battery current (\cref{fig:dccurrent}).
+
 \begin{figure}[H]
 \centering
 \input{figures/tikz/corrente_dc}
@@ -179,9 +182,7 @@ zero average.}
 \label{fig:dccurrent}
 \end{figure}
 
-The capacitor carries the difference between the bridge input current and the
-smooth battery current (\cref{fig:dccurrent}). Its RMS value heats the
-capacitor. For sinusoidal output currents it is~\cite{kolar_dclink}
+The RMS value of the capacitor current heats the capacitor. For sinusoidal output currents it is~\cite{kolar_dclink}
 %
 \begin{equation}
   I_{C,\mathrm{RMS}} = I_{o,\mathrm{RMS}}

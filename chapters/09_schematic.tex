@@ -7,14 +7,14 @@ The power stage is two sheets of a KiCad 10.0.6 project, frozen on
   \item a sheet with the DC-link and the terminals;
   \item a half-bridge leg, instantiated three times.
 \end{itemize}
-The power stage has 30 parts. It talks to the rest of the project through 23
+The power stage has 30 parts. It connects to the rest of the project through 23
 labelled signals (\cref{tab:interface}). The two sheets close the chapter.
 
 \section{Sheet hierarchy}
 
 The schematic is organised by voltage domain. The three legs are one sheet,
 drawn once and used three times. This sheet holds 21 of the 30 parts of the
-power stage.
+power stage. \Cref{tab:sheets} gives the hierarchy.
 
 \begin{table}[H]
 \centering
@@ -34,7 +34,8 @@ root & --- & 1 & 0 & the blocks of the whole project and the signals between the
 \end{table}
 
 The other sheets of the project belong to the rest of the board and are
-outside the brief.
+outside the brief. \Cref{tab:interface} lists the signals that connect the
+power stage to them.
 
 \begin{table}[H]
 \centering
@@ -66,7 +67,8 @@ electrical rule check cannot detect.
 There is one net class per domain. Inside a class the clearance is the
 manufacturing minimum, because the gate and the Kelvin source of one device
 belong to the same domain and are only \SI{0.70}{\milli\metre} apart on the
-package. Between classes the rules of the board apply.
+package. Between classes the rules of the board apply. \Cref{tab:netclasses}
+gives the classes of the power stage.
 
 \begin{table}[H]
 \centering
@@ -110,7 +112,7 @@ at \SI{1200}{\volt} the largest ceramic is \SI{47}{\nano\farad} in a
 \zebra
 \begin{tabularx}{\textwidth}{L{0.16\textwidth}L{0.2\textwidth}L{0.15\textwidth}Y}
 \toprule
-Function (quantity) & Part & Key values & Chosen because \\
+Function (quantity) & Part & Main values & Chosen because \\
 \midrule
 Switching devices (6) & E3M0016120K, Wolfspeed~\cite{wolfspeed_e3m0016}
   & \SI{1200}{\volt}, \SI{16}{\milli\ohm}, TO-247-4L
