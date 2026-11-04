@@ -44,7 +44,8 @@ the model. Two settings matter:
 
 For the spectra the waveforms are taken on a uniform time grid that covers a
 whole number of output periods. The fundamental then falls exactly on one
-bin and no window is needed.
+bin and no window is needed. \Cref{fig:fft} shows the spectra of the phase
+voltage and of the phase current.
 
 \begin{figure}[H]
 \centering
@@ -122,11 +123,11 @@ $\cos\varphi$ & Simulated [\si{\ampere}] & Formula [\si{\ampere}] & Difference \
 0.02 & 16.28 & 16.28 & \SI{0.0}{\percent} \\
 0.10 & 16.25 & 16.24 & \SI{0.0}{\percent} \\
 0.30 & 16.01 & 16.01 & \SI{0.0}{\percent} \\
-0.50 & 15.56 & 15.53 & \SI{0.2}{\percent} \\
-0.70 & 14.89 & 14.79 & \SI{0.7}{\percent} \\
-0.87 & 14.15 & 13.91 & \SI{1.8}{\percent} \\
-0.95 & 13.74 & 13.40 & \SI{2.5}{\percent} \\
-1.00 & 14.47 & 12.67 & \SI{14.2}{\percent} \\
+0.50 & 15.56 & 15.53 & \SI{+0.2}{\percent} \\
+0.70 & 14.89 & 14.79 & \SI{+0.7}{\percent} \\
+0.87 & 14.15 & 13.91 & \SI{+1.8}{\percent} \\
+0.95 & 13.74 & 13.40 & \SI{+2.5}{\percent} \\
+1.00 & 14.47 & 12.67 & \SI{+14.2}{\percent} \\
 \midrule
 $-0.02$ & 16.92 & 16.27 & \SI{+4.0}{\percent} \\
 $-0.10$ & 16.89 & 16.25 & \SI{+4.0}{\percent} \\
@@ -210,6 +211,8 @@ analysis gives each device its own temperature, so its total is the correct
 one.
 
 \section{DC-link ripple}
+
+\Cref{fig:ripple} shows the DC-link voltage at the rated point.
 
 \begin{figure}[H]
 \centering

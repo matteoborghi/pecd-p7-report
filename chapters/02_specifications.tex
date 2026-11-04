@@ -54,6 +54,9 @@ choice is stricter than the brief, and it decides the device
 \subsection{Voltage levels}
 \label{sec:vhierarchy}
 
+\Cref{tab:vhierarchy} gives the four DC-link voltage levels of the design and
+the parts that each level sizes.
+
 \begin{table}[H]
 \centering
 \caption{DC-link voltage levels and what each one sizes.}
@@ -179,6 +182,9 @@ the MOSFETs, since no external diode is fitted.}
 \end{figure}
 
 \subsection{Why silicon carbide}
+
+\Cref{tab:technology} compares the SiC MOSFET with the silicon IGBT, and
+\cref{fig:radar-technology} ranks the two options.
 
 \begin{table}[H]
 \centering
@@ -379,6 +385,7 @@ lab test. For the E3M0016120K both the vendor thermal model and the vendor
 SPICE model are available. Its missing short-circuit time stays an open point
 (\cref{app:assumptions}, item A.3). The Infineon device remains the alternative: a
 double-pulse test in the real power loop would show whether it meets C2.
+\Cref{tab:device} gives the main parameters of the chosen device.
 
 \begin{table}[H]
 \centering

@@ -7,6 +7,8 @@ junction temperature closed inside the model.
 
 \section{Loss budget at the design point}
 
+\Cref{tab:losses} gives the losses and the efficiency at the design point.
+
 \begin{table}[H]
 \centering
 \caption[Loss budget at the design point]{Loss budget at \SI{800}{\volt}, \SI{30}{\Arms}, \SI{20}{\kilo\hertz},
@@ -245,8 +247,12 @@ The results are:
         (\SI{+2.5}{\percent}) and the junction \SI{82.3}{\celsius}. This load has only
         \SI{0.1}{\milli\henry}, so the current ripple is large, and the extra ripple adds
         loss. A motor keeps its own inductance at every power factor;
-  \item the DC-link ripple is largest near $\cos\varphi = 0$, \SI{0.33}{\percent}.
-        All points are below \SI{0.5}{\percent};
+  \item the DC-link ripple is largest for $|\cos\varphi| \leq 0.1$, where it
+        reaches \SI{0.33}{\percent} of $\Vdc$. At the rated modulation index
+        ($M_f = 0.534$) the capacitor current grows as $|\cos\varphi|$ falls.
+        All points are below the \SI{0.5}{\percent} limit. The worst case of the
+        whole operating range, \SI{0.36}{\percent}, is at a lower modulation
+        index ($M_f = 0.306$, \cref{sec:dclink});
   \item all points pass the junction limit with more than \SI{65}{\celsius} of
         margin.
 \end{itemize}
@@ -390,7 +396,8 @@ through separate turn-on and turn-off resistors.
 The bench is a real double pulse. A first pulse of \SI{6.25}{\micro\second}
 raises the load current from zero. A run is accepted only if the bus voltage
 and the current are within \SI{2}{} and \SI{5}{\percent} of the test values
-just before the edge.
+just before the edge. \Cref{fig:dpt} shows the waveforms with the design gate
+resistances.
 
 \begin{figure}[H]
 \centering
@@ -438,6 +445,9 @@ The off device therefore does not turn on. The $-\SI{5}{\volt}$ level leaves
 \SI{3}{\volt} to the absolute maximum of $-\SI{8}{\volt}$~\cite{wolfspeed_e3m0016}.
 
 \subsection{Gate resistance from the overshoot limit}
+
+\Cref{tab:rgsweep} gives the peak voltage at the die and the switching
+energies for gate resistances from \SI{2.5}{} to \SI{20}{\ohm}.
 
 \begin{table}[H]
 \centering
@@ -539,6 +549,9 @@ The results are:
 
 \subsection{Overshoot and loop inductance}
 
+\Cref{tab:overshoot} gives the turn-off peak for three values of the
+external loop inductance.
+
 \begin{table}[H]
 \centering
 \caption{Peak voltage at turn-off against external loop inductance,
@@ -601,12 +614,15 @@ locked-rotor result to be computed again.
 
 All the inductances of this section are those of the PCB. The two packages
 add \SI{14.6}{\nano\henry} that no layout can remove, and the SPICE model
-always contains them. The board, extracted from its copper, has
-\SI{8.3}{\nano\henry} on the PCB, well inside the \SI{20}{\nano\henry} budget
+always contains them. The loop extracted from the board copper is
+\SI{8.3}{\nano\henry}, well inside the \SI{20}{\nano\henry} budget
 (\cref{sec:loopextract}); with the packages the physical loop is about
 \SI{23}{\nano\henry}.
 
 \subsection{Switching energy saved by the Kelvin pin}
+
+\Cref{tab:kelvin} compares the switching energy with the gate return on the
+Kelvin pin and on the power source pin.
 
 \begin{table}[H]
 \centering
