@@ -245,8 +245,12 @@ The results are:
         (\SI{+2.5}{\percent}) and the junction \SI{82.3}{\celsius}. This load has only
         \SI{0.1}{\milli\henry}, so the current ripple is large, and the extra ripple adds
         loss. A motor keeps its own inductance at every power factor;
-  \item the DC-link ripple is largest near $\cos\varphi = 0$, \SI{0.33}{\percent}.
-        All points are below \SI{0.5}{\percent};
+  \item the DC-link ripple is largest for $|\cos\varphi| \leq 0.1$, where it
+        reaches \SI{0.33}{\percent} of $\Vdc$. At the rated modulation index
+        ($M_f = 0.534$) the capacitor current grows as $|\cos\varphi|$ falls.
+        All points are below the \SI{0.5}{\percent} limit. The worst case of the
+        whole operating range, \SI{0.36}{\percent}, is at a lower modulation
+        index ($M_f = 0.306$, \cref{sec:dclink});
   \item all points pass the junction limit with more than \SI{65}{\celsius} of
         margin.
 \end{itemize}
