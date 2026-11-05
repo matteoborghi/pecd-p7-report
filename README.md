@@ -1,3 +1,36 @@
+# Three-phase two-level SiC traction inverter: power stage
+
+LaTeX source of the report for Project 7, University of Bologna, 2025/2026.
+The report designs the power stage of a three-phase two-level inverter:
+800 V DC link, 30 A rms per phase at any power factor, 20 kHz, forced-air or
+liquid cooling, 50 °C ambient.
+
+It contains the design equations, the component selection, the design
+choices and the discussion of the simulation results.
+
+**PDF:** the final version (99 pages) is attached to the release
+[exam-v6](https://github.com/matteoborghi/pecd-p7-report/releases/tag/exam-v6).
+**Board:** the KiCad project of the power stage is in
+[pecd-p7-kicad](https://github.com/matteoborghi/pecd-p7-kicad).
+
+## Main results
+
+- Device: Wolfspeed E3M0016120K, 1200 V, 16 mΩ SiC MOSFET in TO-247-4L.
+- DC-link: 200 µF. The worst-case voltage ripple is 2.86 V (0.36 %), under the 0.5 % limit.
+- Rated point: about 128 W total loss, junction at 81.9 °C.
+- Output current ripple: 2.46 A peak to peak with a 2.5 mH load (0.84 % of the RMS current).
+- Commutation loop on the board: 8.3 nH, against a 20 nH budget.
+
+## Tags
+
+The tags `exam-v3` to `exam-v6` mark the delivered revisions of the report.
+`exam-v1` is the first exam version. `report-full` is the complete report
+before the scope was reduced to the power stage.
+
+The notes below are in Italian.
+
+---
+
 # Report LaTeX, Project 7: versione d'esame (branch `for-exam`)
 
 Report della consegna d'esame: **solo lo stadio di potenza** di un inverter
